@@ -1,9 +1,10 @@
 import "react-app-polyfill/ie11"
+import { observer } from "mobx-react-lite"
 import * as React from "react"
 import * as ReactDOM from "react-dom"
 import { useForm } from "../."
 
-const App = () => {
+const App = observer(() => {
   const form = useForm(
     {
       username: "",
@@ -55,6 +56,6 @@ const App = () => {
       </Form>
     </div>
   )
-}
+})
 
 ReactDOM.render(<App />, document.getElementById("root"))
