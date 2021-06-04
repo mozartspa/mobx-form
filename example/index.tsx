@@ -30,7 +30,7 @@ const App = () => {
 
   return (
     <div>
-      <Form>
+      <Form debug>
         <Field name="username">
           {field => (
             <div>
