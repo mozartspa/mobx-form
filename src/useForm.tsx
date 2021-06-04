@@ -1,10 +1,10 @@
 import debouncePromise from "debounce-promise"
 import get from "lodash.get"
+import set from "lodash.set"
 import { runInAction, toJS } from "mobx"
 import { Observer, observer, useLocalObservable } from "mobx-react-lite"
 import React, { ReactElement, useMemo, useRef } from "react"
 import isEqual from "react-fast-compare"
-import { set } from "./helpers/set"
 import { DebugForm } from "./DebugForm"
 
 const isString = (obj: any): obj is string =>
