@@ -50,12 +50,12 @@ export const DebugForm = observer((props: DebugFormProps) => {
     data.touched = touched
   }
   if (showInfo) {
-    data.info = {
+    data = Object.assign(data, {
       isDirty,
       isValid,
       isValidating,
       isSubmitting,
-    }
+    })
   }
 
   return <pre>{JSON.stringify(data, null, 2)}</pre>
