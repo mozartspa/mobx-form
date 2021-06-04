@@ -5,6 +5,7 @@ import { Observer, observer, useLocalObservable } from "mobx-react-lite"
 import React, { ReactElement, useMemo, useRef } from "react"
 import isEqual from "react-fast-compare"
 import { set } from "./helpers/set"
+import { DebugForm } from "./DebugForm"
 
 const isString = (obj: any): obj is string =>
   Object.prototype.toString.call(obj) === "[object String]"
@@ -607,12 +608,23 @@ export function useFieldArray<T>(
 
 export const FormProvider = FormContext.Provider
 
-export type FormProps = React.FormHTMLAttributes<HTMLFormElement>
+export type FormProps = React.FormHTMLAttributes<HTMLFormElement> & {
+  debug?: boolean
+}
 
 export const Form: React.FC<FormProps> = props => {
   const form = useFormContext()
+  const { debug, children, ...formProps } = props
+
   return (
-    <form {...props} onSubmit={form.handleSubmit} onReset={form.handleReset} />
+    <form
+      {...formProps}
+      onSubmit={form.handleSubmit}
+      onReset={form.handleReset}
+    >
+      {children}
+      {debug && <DebugForm showAll={true} />}
+    </form>
   )
 }
 
