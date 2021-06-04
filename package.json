@@ -20,6 +20,8 @@
     "analyze": "size-limit --why"
   },
   "peerDependencies": {
+    "mobx": ">=5",
+    "mobx-react-lite": ">=2",
     "react": ">=16"
   },
   "husky": {
@@ -29,8 +31,8 @@
   },
   "prettier": {
     "printWidth": 80,
-    "semi": true,
-    "singleQuote": true,
+    "semi": false,
+    "singleQuote": false,
     "trailingComma": "es5"
   },
   "name": "@mozartspa/mobx-form",
@@ -48,14 +50,24 @@
   ],
   "devDependencies": {
     "@size-limit/preset-small-lib": "^4.11.0",
+    "@types/debounce-promise": "^3.1.3",
+    "@types/lodash.get": "^4.4.6",
     "@types/react": "^17.0.9",
     "@types/react-dom": "^17.0.6",
     "husky": "^6.0.0",
+    "mobx": "^6.3.2",
+    "mobx-react-lite": "^3.2.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "size-limit": "^4.11.0",
     "tsdx": "^0.14.1",
     "tslib": "^2.2.0",
     "typescript": "^4.3.2"
+  },
+  "dependencies": {
+    "debounce-promise": "^3.1.2",
+    "install-peers": "^1.0.3",
+    "lodash.get": "^4.4.2",
+    "react-fast-compare": "^3.2.0"
   }
 }
