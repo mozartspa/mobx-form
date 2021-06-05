@@ -1,49 +1,49 @@
-export type FormModel = {
+export type FormValues = {
   [field: string]: any
 }
 
-export type FormErrors<Model> = {
-  [K in keyof Model]?: Model[K] extends any[]
-    ? Model[K][number] extends object
-      ? FormErrors<Model[K][number]>[] | string
+export type FormErrors<Values> = {
+  [K in keyof Values]?: Values[K] extends any[]
+    ? Values[K][number] extends object
+      ? FormErrors<Values[K][number]>[] | string
       : string
-    : Model[K] extends object
-    ? FormErrors<Model[K]>
+    : Values[K] extends object
+    ? FormErrors<Values[K]>
     : string
 }
 
-export type FormTouched<Model> = {
-  [K in keyof Model]?: Model[K] extends any[]
-    ? Model[K][number] extends object
-      ? FormTouched<Model[K][number]>[]
+export type FormTouched<Values> = {
+  [K in keyof Values]?: Values[K] extends any[]
+    ? Values[K][number] extends object
+      ? FormTouched<Values[K][number]>[]
       : boolean
-    : Model[K] extends object
-    ? FormTouched<Model[K]>
+    : Values[K] extends object
+    ? FormTouched<Values[K]>
     : boolean
 }
 
-export type Form<Model = FormModel> = {
-  model: Model
-  validModel: Model
-  submittedModel: Model | undefined
-  errors: FormErrors<Model>
-  touched: FormTouched<Model>
+export type Form<Values = FormValues> = {
+  values: Values
+  validValues: Values
+  submittedValues: Values | undefined
+  errors: FormErrors<Values>
+  touched: FormTouched<Values>
   isSubmitting: boolean
   isValidating: boolean
   readonly isDirty: boolean
   readonly isValid: boolean
-  setErrors(errors: FormErrors<Model>): void
-  setTouched(touched: FormTouched<Model>): void
-  setModel(model: Model): void
-  setFieldValue(field: keyof Model & string, value: any): void
-  setFieldError(field: keyof Model & string, message: string): void
-  setFieldTouched(field: keyof Model & string, isTouched?: boolean): void
-  getFieldValue(field: keyof Model & string): any
-  getFieldError(field: keyof Model & string): string
-  getFieldTouched(field: keyof Model & string): boolean
+  setErrors(errors: FormErrors<Values>): void
+  setTouched(touched: FormTouched<Values>): void
+  setValues(values: Values): void
+  setFieldValue(field: keyof Values & string, value: any): void
+  setFieldError(field: keyof Values & string, message: string): void
+  setFieldTouched(field: keyof Values & string, isTouched?: boolean): void
+  getFieldValue(field: keyof Values & string): any
+  getFieldError(field: keyof Values & string): string
+  getFieldTouched(field: keyof Values & string): boolean
   validate(): Promise<FormErrors<Error>>
-  reset(model?: Model, isValid?: boolean): void
-  resetField(field: keyof Model & string, value?: any): void
+  reset(values?: Values, isValid?: boolean): void
+  resetField(field: keyof Values & string, value?: any): void
   submit(): Promise<void>
   handleSubmit: (e?: React.FormEvent<HTMLFormElement>) => Promise<void>
   handleReset: (e?: React.SyntheticEvent<any>) => void

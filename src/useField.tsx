@@ -3,8 +3,8 @@ import { Form } from "./types"
 import { useFormContext } from "./useFormContext"
 
 export type FieldConverter<M = any, F = any> = {
-  fromModelToForm: (value: M) => F
-  fromFormToModel: (value: F) => M
+  valueToInput: (value: M) => F
+  inputToValue: (value: F) => M
 }
 
 export type UseFieldOptions = {
@@ -42,7 +42,7 @@ export function useField<T = any>(
           eventOrValue && eventOrValue.target
             ? eventOrValue.target.value
             : eventOrValue
-        form.setFieldValue(name, converter.fromFormToModel(value))
+        form.setFieldValue(name, converter.inputToValue(value))
       }
     } else {
       return form.handleChange(name)
@@ -55,7 +55,7 @@ export function useField<T = any>(
       get value(): T {
         const value = form.getFieldValue(name)
         return converter
-          ? converter.fromModelToForm(value)
+          ? converter.valueToInput(value)
           : value == null
           ? defaultValue
           : value

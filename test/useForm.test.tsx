@@ -3,18 +3,18 @@ import { observer } from "mobx-react-lite"
 import * as React from "react"
 import { FormConfig, useForm, UseFormResult } from "../src"
 
-const InitialModel = {
+const initialValues = {
   name: "bill",
   surname: "murray",
 }
 
-type ModelType = typeof InitialModel
+type Values = typeof initialValues
 
-function renderForm(props: FormConfig<ModelType> = {}) {
-  let formHook: UseFormResult<ModelType> | undefined = undefined
+function renderForm(props: FormConfig<Values> = {}) {
+  let formHook: UseFormResult<Values> | undefined = undefined
 
   const Form = observer(() => {
-    const form = useForm(InitialModel, props)
+    const form = useForm(initialValues, props)
 
     formHook = form
 
@@ -54,14 +54,14 @@ describe("useForm", () => {
   it("has initial values", () => {
     const { form } = renderForm()
 
-    expect(form.model).toEqual(InitialModel)
+    expect(form.values).toEqual(initialValues)
   })
 
   it("handleChange", () => {
     const { form, getByTestId } = renderForm()
     form.handleChange("name")("jean")
 
-    expect(form.model.name).toEqual("jean")
+    expect(form.values.name).toEqual("jean")
 
     const input = getByTestId("name-input") as HTMLInputElement
 

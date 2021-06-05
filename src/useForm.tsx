@@ -8,7 +8,7 @@ import isEqual from "react-fast-compare"
 import { DebugForm } from "./DebugForm"
 import { Field, FieldProps } from "./Field"
 import { FieldArray, FieldArrayProps } from "./FieldArray"
-import { Form, FormErrors, FormModel, FormTouched } from "./types"
+import { Form, FormErrors, FormTouched, FormValues } from "./types"
 import { FormContext, useFormContext } from "./useFormContext"
 import {
   getSelectedValues,
@@ -19,14 +19,14 @@ import {
   useCounter,
 } from "./utils"
 
-export type FormConfig<Model> = {
+export type FormConfig<Values> = {
   validateOnChange?: boolean
   validateOnBlur?: boolean
   validateDebounce?: boolean
   validateDebounceWait?: number
   validateDebounceLeading?: boolean
-  onSubmit?: (model: Model) => void | Promise<any>
-  onValidate?: (model: Model) => Promise<FormErrors<Model>>
+  onSubmit?: (values: Values) => void | Promise<any>
+  onValidate?: (values: Values) => Promise<FormErrors<Values>>
   onFailedSubmit?: () => void
 }
 
@@ -41,17 +41,17 @@ function withFormProvider<T extends React.ComponentType<any>>(
   )) as T
 }
 
-export type UseFormResult<Model> = Form<Model> & {
+export type UseFormResult<Values> = Form<Values> & {
   FormContext: React.FC<{}>
   Form: React.FC<FormProps>
   Field: React.FC<FieldProps>
   FieldArray: React.FC<FieldArrayProps>
 }
 
-export function useForm<Model extends FormModel>(
-  model: Model | (() => Model),
-  config: FormConfig<Model> = {}
-): UseFormResult<Model> {
+export function useForm<Values extends FormValues>(
+  values: Values | (() => Values),
+  config: FormConfig<Values> = {}
+): UseFormResult<Values> {
   const {
     validateOnChange = true,
     validateOnBlur = false,
@@ -61,10 +61,10 @@ export function useForm<Model extends FormModel>(
     onValidate = async () => ({}),
   } = config
 
-  const [originalModelMemoized] = useState(() =>
-    toJS(isFunction(model) ? model() : model)
+  const [originalValuesMemoized] = useState(() =>
+    toJS(isFunction(values) ? values() : values)
   )
-  const originalModelRef = useRef<Model>(originalModelMemoized)
+  const originalValuesRef = useRef<Values>(originalValuesMemoized)
 
   const executeBlur = (e: any = {}, path?: string) => {
     const { name, id } = e.target || {}
@@ -90,7 +90,7 @@ export function useForm<Model extends FormModel>(
       val = /number|range/.test(type)
         ? ((parsed = parseFloat(value)), isNaN(parsed) ? undefined : parsed)
         : /checkbox/.test(type) // checkboxes
-        ? getValueForCheckbox(get(form.model, field!), checked, value)
+        ? getValueForCheckbox(get(form.values, field!), checked, value)
         : !!multiple // <select multiple>
         ? getSelectedValues(options)
         : value
@@ -108,12 +108,12 @@ export function useForm<Model extends FormModel>(
       try {
         form.isValidating = true
         const validationId = counter.getValue()
-        const data = toJS(form.model)
+        const data = toJS(form.values)
         const errors = await onValidate(data)
         if (counter.isLastValue(validationId)) {
           form.setErrors(errors)
           if (form.isValid) {
-            runInAction(() => (form.validModel = data))
+            runInAction(() => (form.validValues = data))
           }
         }
         return errors
@@ -140,84 +140,84 @@ export function useForm<Model extends FormModel>(
     onValidate,
   ])
 
-  const form: Form<Model> = useLocalObservable(() => ({
-    model: originalModelRef.current,
-    validModel: originalModelRef.current,
-    submittedModel: undefined,
-    errors: {} as FormErrors<Model>,
-    touched: {} as FormTouched<Model>,
+  const form: Form<Values> = useLocalObservable(() => ({
+    values: originalValuesRef.current,
+    validValues: originalValuesRef.current,
+    submittedValues: undefined,
+    errors: {} as FormErrors<Values>,
+    touched: {} as FormTouched<Values>,
     isSubmitting: false,
     isValidating: false,
     get isDirty() {
-      return !isEqual(originalModelRef.current, toJS(form.model))
+      return !isEqual(originalValuesRef.current, toJS(form.values))
     },
     get isValid() {
       return Object.keys(form.errors).length === 0
     },
-    setErrors(errors: FormErrors<Model>) {
+    setErrors(errors: FormErrors<Values>) {
       form.errors = errors
     },
-    setTouched(touched: FormTouched<Model>) {
+    setTouched(touched: FormTouched<Values>) {
       form.touched = touched
     },
-    setModel(model: Model) {
-      form.model = toJS(model)
+    setValues(values: Values) {
+      form.values = toJS(values)
     },
-    setFieldValue(field: keyof Model & string, value: any) {
+    setFieldValue(field: keyof Values & string, value: any) {
       if (form.getFieldValue(field) !== value) {
-        set(form.model, field, value)
+        set(form.values, field, value)
         validateOnChange && form.validate()
       }
     },
-    getFieldValue(field: keyof Model & string) {
-      return get(form.model, field)
+    getFieldValue(field: keyof Values & string) {
+      return get(form.values, field)
     },
-    setFieldError(field: keyof Model & string, message: string) {
+    setFieldError(field: keyof Values & string, message: string) {
       set(form.errors, field, message)
     },
-    getFieldError(field: keyof Model & string) {
+    getFieldError(field: keyof Values & string) {
       return get(form.errors, field) as string
     },
-    setFieldTouched(field: keyof Model & string, isTouched: boolean = true) {
+    setFieldTouched(field: keyof Values & string, isTouched: boolean = true) {
       set(form.touched, field, isTouched)
       isTouched && validateOnBlur && form.validate()
     },
-    getFieldTouched(field: keyof Model & string) {
+    getFieldTouched(field: keyof Values & string) {
       return get(form.touched, field) as boolean
     },
     async validate() {
       return executeValidate()
     },
-    reset(model: Model | undefined = undefined, isValid: boolean = true) {
-      if (model) {
-        originalModelRef.current = toJS(model)
+    reset(values: Values | undefined = undefined, isValid: boolean = true) {
+      if (values) {
+        originalValuesRef.current = toJS(values)
       }
 
-      form.setModel(originalModelRef.current)
+      form.setValues(originalValuesRef.current)
       form.setErrors({})
       form.setTouched({})
 
       if (isValid) {
-        form.validModel = toJS(form.model)
+        form.validValues = toJS(form.values)
       } else {
         form.validate()
       }
     },
-    resetField(field: keyof Model & string, value: any = undefined) {
+    resetField(field: keyof Values & string, value: any = undefined) {
       if (value !== undefined) {
-        set(originalModelRef.current, field, toJS(value))
+        set(originalValuesRef.current, field, toJS(value))
       }
 
-      form.setFieldValue(field, toJS(get(originalModelRef.current, field)))
+      form.setFieldValue(field, toJS(get(originalValuesRef.current, field)))
     },
     async submit() {
       try {
         form.isSubmitting = true
-        const data = toJS(form.model)
+        const data = toJS(form.values)
         form.touched = setNestedObjectValues(data, true)
         const errors = await form.validate()
         if (Object.keys(errors).length === 0) {
-          runInAction(() => (form.submittedModel = data))
+          runInAction(() => (form.submittedValues = data))
           if (config.onSubmit) {
             await config.onSubmit(data)
           }
