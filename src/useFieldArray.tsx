@@ -1,6 +1,8 @@
+import { Form } from "./types"
 import { useField } from "./useField"
 
 export type UseFieldArrayOptions = {
+  form?: Form
   validateOnChange?: boolean
 }
 

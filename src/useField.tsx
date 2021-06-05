@@ -7,35 +7,36 @@ function defaultParse(value: any) {
   return value == null ? undefined : value
 }
 
-export type UseFieldOptions<T = any> = {
+export type UseFieldOptions<T = any, Values = any> = {
+  form?: Form<Values> | undefined
   format?: (value: T) => any
   parse?: (value: any) => T
 }
 
-export type UseFieldResult<T = any> = {
+export type UseFieldResult<T = any, Values = any> = {
   input: {
     name: string
     readonly value: T
-    onBlur: (e: any) => void
+    onBlur: (event: React.FocusEvent) => void
     onChange: (event: React.ChangeEvent<any>) => void
   }
   readonly name: string
   readonly value: T
   readonly touched: boolean
   readonly error: string
-  form: Form<any>
+  form: Form<Values>
   setValue: (value: T) => void
   setTouched: (isTouched?: boolean) => void
   setError: (error: string) => void
 }
 
-export function useField<T = any>(
-  name: string,
-  options: UseFieldOptions<T> = {}
-): UseFieldResult<T> {
+export function useField<T = any, Values = any>(
+  name: keyof Values & string,
+  options: UseFieldOptions<T, Values> = {}
+): UseFieldResult<T, Values> {
   const { format, parse = defaultParse } = options
 
-  const form = useFormContext()
+  const form = options.form || useFormContext()
 
   const onBlur = useCallback(() => {
     form.setFieldTouched(name, true)
