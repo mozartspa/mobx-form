@@ -2,10 +2,14 @@ import debouncePromise from "debounce-promise"
 import get from "lodash.get"
 import set from "lodash.set"
 import { runInAction, toJS } from "mobx"
-import { Observer, observer, useLocalObservable } from "mobx-react-lite"
-import React, { ReactElement, useMemo, useRef } from "react"
+import { observer, useLocalObservable } from "mobx-react-lite"
+import React, { useMemo, useRef } from "react"
 import isEqual from "react-fast-compare"
 import { DebugForm } from "./DebugForm"
+import { Field, FieldProps } from "./Field"
+import { FieldArray, FieldArrayProps } from "./FieldArray"
+import { Form, FormErrors, FormModel, FormTouched } from "./types"
+import { FormContext, useFormContext } from "./useFormContext"
 import {
   getSelectedValues,
   getValueForCheckbox,
@@ -13,67 +17,6 @@ import {
   isString,
   setNestedObjectValues,
 } from "./utils"
-
-export type FormModel = {
-  [field: string]: any
-}
-
-export type FormErrors<Model> = {
-  [K in keyof Model]?: Model[K] extends any[]
-    ? Model[K][number] extends object
-      ? FormErrors<Model[K][number]>[] | string
-      : string
-    : Model[K] extends object
-    ? FormErrors<Model[K]>
-    : string
-}
-
-export type FormTouched<Model> = {
-  [K in keyof Model]?: Model[K] extends any[]
-    ? Model[K][number] extends object
-      ? FormTouched<Model[K][number]>[]
-      : boolean
-    : Model[K] extends object
-    ? FormTouched<Model[K]>
-    : boolean
-}
-
-export type Form<Model = FormModel> = {
-  model: Model
-  validModel: Model
-  submittedModel: Model | undefined
-  errors: FormErrors<Model>
-  touched: FormTouched<Model>
-  isSubmitting: boolean
-  isValidating: boolean
-  readonly isDirty: boolean
-  readonly isValid: boolean
-  setErrors(errors: FormErrors<Model>): void
-  setTouched(touched: FormTouched<Model>): void
-  setModel(model: Model): void
-  setFieldValue(field: keyof Model & string, value: any): void
-  setFieldError(field: keyof Model & string, message: string): void
-  setFieldTouched(field: keyof Model & string, isTouched?: boolean): void
-  getFieldValue(field: keyof Model & string): any
-  getFieldError(field: keyof Model & string): string
-  getFieldTouched(field: keyof Model & string): boolean
-  validate(): Promise<FormErrors<Error>>
-  reset(model?: Model, isValid?: boolean): void
-  resetField(field: keyof Model & string, value?: any): void
-  submit(): Promise<void>
-  handleSubmit: (e?: React.FormEvent<HTMLFormElement>) => Promise<void>
-  handleReset: (e?: React.SyntheticEvent<any>) => void
-  handleBlur(e: React.FocusEvent<any>): void
-  handleBlur<T = string | any>(
-    fieldOrEvent: T
-  ): T extends string ? (e: any) => void : void
-  handleChange(e: React.ChangeEvent<any>): void
-  handleChange<T = string | React.ChangeEvent<any>>(
-    field: T
-  ): T extends React.ChangeEvent<any>
-    ? void
-    : (eventOrValue: React.ChangeEvent<any> | any) => void
-}
 
 export type FormConfig<Model> = {
   validateOnChange?: boolean
@@ -84,18 +27,6 @@ export type FormConfig<Model> = {
   onSubmit?: (model: Model) => void | Promise<any>
   onValidate?: (model: Model) => Promise<FormErrors<Model>>
   onFailedSubmit?: () => void
-}
-
-export const FormContext = React.createContext<Form | undefined>(undefined)
-
-export function useFormContext<FormModel = any>() {
-  const context = React.useContext(FormContext)
-  if (!context) {
-    throw new Error(
-      `Missing FormContext. Did you use "<FormProvider />" or the "<Form />" provided by "useForm()"?`
-    )
-  }
-  return context as Form<FormModel>
 }
 
 function withFormProvider<T extends React.ComponentType<any>>(
@@ -342,7 +273,7 @@ export function useForm<Model extends FormModel>(
     () => withFormProvider(form, (({ children }) => children) as React.FC<{}>),
     []
   )
-  const FormComponent = useMemo(() => withFormProvider(form, Form), [])
+  const FormComponent = useMemo(() => withFormProvider(form, FormComp), [])
   const FieldComponent = useMemo(() => withFormProvider(form, Field), [])
   const FieldArrayComponent = useMemo(
     () => withFormProvider(form, FieldArray),
@@ -363,193 +294,13 @@ export function useForm<Model extends FormModel>(
   return formWithComponents
 }
 
-export type FieldConverter<M = any, F = any> = {
-  fromModelToForm: (value: M) => F
-  fromFormToModel: (value: F) => M
-}
-
-export type UseFieldOptions = {
-  defaultValue?: string
-  converter?: FieldConverter
-}
-
-export type UseFieldResult<T = any> = {
-  input: {
-    name: string
-    readonly value: T
-    onBlur: (e: any) => void
-    onChange: (eventOrValue: React.ChangeEvent<any> | any) => void
-  }
-  meta: {
-    readonly value: T
-    readonly touched: boolean
-    readonly error: string
-  }
-  form: Form<any>
-}
-
-export function useField<T = any>(
-  name: string,
-  options: UseFieldOptions = {}
-): UseFieldResult<T> {
-  const { defaultValue = "", converter } = options
-
-  const form = useFormContext()
-  const onBlur = useMemo(() => form.handleBlur(name), [name])
-  const onChange = useMemo(() => {
-    if (converter) {
-      return (eventOrValue: React.ChangeEvent<any> | any) => {
-        const value =
-          eventOrValue && eventOrValue.target
-            ? eventOrValue.target.value
-            : eventOrValue
-        form.setFieldValue(name, converter.fromFormToModel(value))
-      }
-    } else {
-      return form.handleChange(name)
-    }
-  }, [name, converter])
-
-  return {
-    input: {
-      name,
-      get value(): T {
-        const value = form.getFieldValue(name)
-        return converter
-          ? converter.fromModelToForm(value)
-          : value == null
-          ? defaultValue
-          : value
-      },
-      onBlur,
-      onChange,
-    },
-    meta: {
-      get value(): T {
-        return form.getFieldValue(name)
-      },
-      get touched() {
-        return form.getFieldTouched(name)
-      },
-      get error() {
-        return form.getFieldError(name)
-      },
-    },
-    form,
-  }
-}
-
-export type UseFieldArrayOptions = {
-  validateOnChange?: boolean
-}
-
-export function useFieldArray<T>(
-  name: string,
-  options: UseFieldArrayOptions = {}
-) {
-  const { validateOnChange = true } = options
-
-  const field = useField(name)
-  const { meta, form } = field
-
-  function update<TResult>(fn: (array: T[]) => TResult) {
-    const result = fn(ensureArray())
-    if (validateOnChange) {
-      form.validate()
-    }
-    return result
-  }
-
-  const ensureArray = (): T[] => {
-    if (!Array.isArray(meta.value)) {
-      form.setFieldValue(name, [])
-      return form.getFieldValue(name)
-    } else {
-      return meta.value
-    }
-  }
-
-  const getLength = () => (Array.isArray(meta.value) ? meta.value.length : 0)
-
-  const forEach = (iterator: (name: string, index: number) => void): void => {
-    const len = getLength()
-    for (let i = 0; i < len; i++) {
-      iterator(`${name}[${i}]`, i)
-    }
-  }
-
-  const map = (iterator: (name: string, index: number) => any): any[] => {
-    const len = getLength()
-    const results: any[] = []
-    for (let i = 0; i < len; i++) {
-      results.push(iterator(`${name}[${i}]`, i))
-    }
-    return results
-  }
-
-  const push = (...items: T[]) => {
-    return update((array) => array.push(...items))
-  }
-
-  const pop = () => {
-    return update((array) => array.pop())
-  }
-
-  const clear = () => {
-    return update((array) => array.splice(0, array.length))
-  }
-
-  const insertAt = (index: number, item: T) => {
-    update((array) => array.splice(index, 0, item))
-  }
-
-  const removeAt = (index: number) => {
-    return update((array) => array.splice(index, 1)[0])
-  }
-
-  const remove = (item: T) => {
-    const index = ensureArray().indexOf(item)
-    if (index !== -1) {
-      removeAt(index)
-    }
-  }
-
-  const setValue = (value: T[]) => {
-    form.setFieldValue(name, value)
-  }
-
-  const fields = {
-    name,
-    get value(): T[] {
-      return form.getFieldValue(name) || []
-    },
-    get length() {
-      return getLength()
-    },
-    forEach,
-    map,
-    push,
-    pop,
-    insertAt,
-    removeAt,
-    remove,
-    clear,
-    setValue,
-  }
-
-  return {
-    fields,
-    form,
-  }
-}
-
 export const FormProvider = FormContext.Provider
 
 export type FormProps = React.FormHTMLAttributes<HTMLFormElement> & {
   debug?: boolean
 }
 
-export const Form: React.FC<FormProps> = (props) => {
+export const FormComp: React.FC<FormProps> = (props) => {
   const form = useFormContext()
   const { debug, children, ...formProps } = props
 
@@ -563,30 +314,4 @@ export const Form: React.FC<FormProps> = (props) => {
       {debug && <DebugForm showAll={true} />}
     </form>
   )
-}
-
-export type FieldRenderProps = UseFieldResult
-
-export type FieldProps = UseFieldOptions & {
-  name: string
-  children: (props: FieldRenderProps) => ReactElement
-}
-
-export const Field: React.FC<FieldProps> = ({ name, children, ...options }) => {
-  const field = useField(name, options)
-
-  return <Observer>{() => children(field)}</Observer>
-}
-
-export type FieldArrayRenderProps = ReturnType<typeof useFieldArray>
-
-export type FieldArrayProps = {
-  name: string
-  children: (props: FieldArrayRenderProps) => ReactElement
-}
-
-export const FieldArray: React.FC<FieldArrayProps> = ({ name, children }) => {
-  const fieldArray = useFieldArray(name)
-
-  return <Observer>{() => children(fieldArray)}</Observer>
 }
