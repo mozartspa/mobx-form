@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useRef, useState } from "react"
 
 export const isString = (obj: any): obj is string =>
   Object.prototype.toString.call(obj) === "[object String]"
@@ -81,4 +81,11 @@ export function useCounter() {
   })
 
   return counter
+}
+
+export function useLatestValue<T>(getValue: () => T) {
+  const value = getValue()
+  const ref = useRef(value)
+  ref.current = value
+  return ref
 }

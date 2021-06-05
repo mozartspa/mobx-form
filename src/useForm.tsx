@@ -3,7 +3,7 @@ import get from "lodash.get"
 import set from "lodash.set"
 import { runInAction, toJS } from "mobx"
 import { observer, useLocalObservable } from "mobx-react-lite"
-import React, { useMemo, useRef, useState } from "react"
+import React, { useRef, useState } from "react"
 import isEqual from "react-fast-compare"
 import { DebugForm } from "./DebugForm"
 import { Field, FieldProps } from "./Field"
@@ -17,6 +17,7 @@ import {
   isString,
   setNestedObjectValues,
   useCounter,
+  useLatestValue,
 } from "./utils"
 
 export type FormConfig<Values> = {
@@ -103,7 +104,7 @@ export function useForm<Values extends FormValues>(
 
   const counter = useCounter()
 
-  const executeValidate = useMemo(() => {
+  const executeValidate = useLatestValue(() => {
     const doValidate = async () => {
       try {
         form.isValidating = true
@@ -132,13 +133,7 @@ export function useForm<Values extends FormValues>(
     } else {
       return doValidate
     }
-  }, [
-    validateDebounce,
-    validateDebounceWait,
-    validateDebounceLeading,
-    counter,
-    onValidate,
-  ])
+  })
 
   const form: Form<Values> = useLocalObservable(() => ({
     values: originalValuesRef.current,
@@ -186,7 +181,7 @@ export function useForm<Values extends FormValues>(
       return get(form.touched, field) as boolean
     },
     async validate() {
-      return executeValidate()
+      return executeValidate.current()
     },
     reset(values: Values | undefined = undefined, isValid: boolean = true) {
       if (values) {

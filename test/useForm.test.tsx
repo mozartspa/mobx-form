@@ -113,4 +113,20 @@ describe("useForm", () => {
     expect(renderCount()).toEqual(1)
     expect(renderNameCount()).toEqual(2)
   })
+
+  it("uses latest onValidate", () => {
+    const onValidate = jest.fn(() => Promise.resolve({}))
+    const onValidate2 = jest.fn(() => Promise.resolve({}))
+    const { form, rerender } = renderForm({ onValidate })
+
+    form.setFieldValue("name", "jean")
+
+    expect(onValidate).toBeCalledTimes(1)
+
+    rerender({ onValidate: onValidate2 })
+    form.setFieldValue("name", "jean2")
+
+    expect(onValidate).toBeCalledTimes(1)
+    expect(onValidate2).toBeCalledTimes(1)
+  })
 })
