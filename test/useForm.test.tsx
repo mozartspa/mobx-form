@@ -12,23 +12,29 @@ type Values = typeof initialValues
 
 function renderForm(props: FormConfig<Values> = {}) {
   let formHook: UseFormResult<Values> | undefined = undefined
+  let renderCount = 0
+  let renderNameCount = 0
 
   const Form = observer(() => {
     const form = useForm(initialValues, props)
 
     formHook = form
+    renderCount++
 
     const { Form, Field } = form
 
     return (
       <Form>
         <Field name="name">
-          {(field) => (
-            <div>
-              <input type="text" {...field.input} data-testid="name-input" />
-              {field.meta.touched && field.meta.error}
-            </div>
-          )}
+          {(field) => {
+            renderNameCount++
+            return (
+              <div>
+                <input type="text" {...field.input} data-testid="name-input" />
+                {field.meta.touched && field.meta.error}
+              </div>
+            )
+          }}
         </Field>
         <Field name="surname">
           {(field) => (
@@ -47,7 +53,11 @@ function renderForm(props: FormConfig<Values> = {}) {
 
   const result = render(<Form />)
 
-  return Object.assign(result, { form: formHook! })
+  return Object.assign(result, {
+    form: formHook!,
+    renderCount: () => renderCount,
+    renderNameCount: () => renderNameCount,
+  })
 }
 
 describe("useForm", () => {
@@ -66,5 +76,17 @@ describe("useForm", () => {
     const input = getByTestId("name-input") as HTMLInputElement
 
     expect(input.value).toEqual("jean")
+  })
+
+  it("rerenders only the input", () => {
+    const { form, renderCount, renderNameCount } = renderForm()
+
+    expect(renderCount()).toBe(1)
+    expect(renderNameCount()).toEqual(1)
+
+    form.handleChange("name")("jean")
+
+    expect(renderCount()).toEqual(1)
+    expect(renderNameCount()).toEqual(2)
   })
 })
