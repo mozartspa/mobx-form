@@ -3,7 +3,7 @@ import get from "lodash.get"
 import set from "lodash.set"
 import { runInAction, toJS } from "mobx"
 import { observer, useLocalObservable } from "mobx-react-lite"
-import React, { useMemo, useRef } from "react"
+import React, { useMemo, useRef, useState } from "react"
 import isEqual from "react-fast-compare"
 import { DebugForm } from "./DebugForm"
 import { Field, FieldProps } from "./Field"
@@ -61,9 +61,8 @@ export function useForm<Model extends FormModel>(
     onValidate = async () => ({}),
   } = config
 
-  const originalModelMemoized = useMemo(
-    () => toJS(isFunction(model) ? model() : model),
-    []
+  const [originalModelMemoized] = useState(() =>
+    toJS(isFunction(model) ? model() : model)
   )
   const originalModelRef = useRef<Model>(originalModelMemoized)
 
@@ -133,7 +132,13 @@ export function useForm<Model extends FormModel>(
     } else {
       return doValidate
     }
-  }, [validateDebounce, validateDebounceWait, validateDebounceLeading, counter])
+  }, [
+    validateDebounce,
+    validateDebounceWait,
+    validateDebounceLeading,
+    counter,
+    onValidate,
+  ])
 
   const form: Form<Model> = useLocalObservable(() => ({
     model: originalModelRef.current,
@@ -258,26 +263,16 @@ export function useForm<Model extends FormModel>(
     },
   }))
 
-  const FormContextComponent = useMemo(
-    () => withFormProvider(form, (({ children }) => children) as React.FC<{}>),
-    []
-  )
-  const FormComponent = useMemo(() => withFormProvider(form, FormComp), [])
-  const FieldComponent = useMemo(() => withFormProvider(form, Field), [])
-  const FieldArrayComponent = useMemo(
-    () => withFormProvider(form, FieldArray),
-    []
-  )
-
-  const formWithComponents = useMemo(
-    () =>
-      Object.assign(form, {
-        FormContext: FormContextComponent,
-        Form: FormComponent,
-        Field: FieldComponent,
-        FieldArray: FieldArrayComponent,
-      }),
-    []
+  const [formWithComponents] = useState(() =>
+    Object.assign(form, {
+      FormContext: withFormProvider(
+        form,
+        (({ children }) => children) as React.FC<{}>
+      ),
+      Form: withFormProvider(form, FormComp),
+      Field: withFormProvider(form, Field),
+      FieldArray: withFormProvider(form, FieldArray),
+    })
   )
 
   return formWithComponents

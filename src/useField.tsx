@@ -34,7 +34,7 @@ export function useField<T = any>(
   const { defaultValue = "", converter } = options
 
   const form = useFormContext()
-  const onBlur = useMemo(() => form.handleBlur(name), [name])
+  const onBlur = useMemo(() => form.handleBlur(name), [name, form])
   const onChange = useMemo(() => {
     if (converter) {
       return (eventOrValue: React.ChangeEvent<any> | any) => {
@@ -47,7 +47,7 @@ export function useField<T = any>(
     } else {
       return form.handleChange(name)
     }
-  }, [name, converter])
+  }, [name, converter, form])
 
   return {
     input: {
