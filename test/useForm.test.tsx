@@ -9,7 +9,7 @@ const InitialValues = {
 }
 
 type Values = typeof InitialValues
-type Props = FormConfig<Values> & { initialValues?: Values }
+type Props = FormConfig<Values>
 
 function renderForm(props: Props = {}) {
   let formHook: UseFormResult<Values> | undefined = undefined
@@ -17,8 +17,7 @@ function renderForm(props: Props = {}) {
   let renderNameCount = 0
 
   const Form = observer((props: Props = {}) => {
-    const { initialValues = InitialValues, ...formProps } = props
-    const form = useForm(initialValues, formProps)
+    const form = useForm({ initialValues: InitialValues, ...props })
 
     formHook = form
     renderCount++

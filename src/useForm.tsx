@@ -17,7 +17,8 @@ import {
   useLatestValue,
 } from "./utils"
 
-export type FormConfig<Values> = {
+export type FormConfig<Values = any> = {
+  initialValues?: Values | (() => Values)
   validateOnChange?: boolean
   validateOnBlur?: boolean
   validateDebounce?: boolean
@@ -47,10 +48,10 @@ export type UseFormResult<Values> = Form<Values> & {
 }
 
 export function useForm<Values extends FormValues>(
-  initialValues: Values | (() => Values),
   config: FormConfig<Values> = {}
 ): UseFormResult<Values> {
   const {
+    initialValues = {},
     validateOnChange = true,
     validateOnBlur = false,
     validateDebounce = false,

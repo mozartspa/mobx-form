@@ -3,27 +3,25 @@ import * as React from "react"
 import { useForm } from "../../src"
 
 export const SimpleForm = observer(() => {
-  const form = useForm(
-    {
+  const form = useForm({
+    initialValues: {
       username: "",
       password: "",
     },
-    {
-      onSubmit: (values) => {
-        console.log("submitted", values)
-      },
-      onValidate: async ({ username, password }) => {
-        let errors = {} as Record<string, string>
-        if (username === "") {
-          errors.username = "Username cannot be blank."
-        }
-        if (password === "") {
-          errors.password = "Password cannot be blank."
-        }
-        return errors
-      },
-    }
-  )
+    onSubmit: (values) => {
+      console.log("submitted", values)
+    },
+    onValidate: async ({ username, password }) => {
+      let errors = {} as Record<string, string>
+      if (username === "") {
+        errors.username = "Username cannot be blank."
+      }
+      if (password === "") {
+        errors.password = "Password cannot be blank."
+      }
+      return errors
+    },
+  })
 
   const { Form, Field } = form
 
