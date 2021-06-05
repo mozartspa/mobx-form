@@ -67,6 +67,14 @@ describe("useForm", () => {
     expect(form.values).toEqual(initialValues)
   })
 
+  it("does not change initial values", () => {
+    const { form } = renderForm()
+    form.setFieldValue("name", "jean")
+
+    expect(form.values.name).toEqual("jean")
+    expect(initialValues.name).toEqual("bill")
+  })
+
   it("handleChange", () => {
     const { form, getByTestId } = renderForm()
     form.handleChange("name")("jean")

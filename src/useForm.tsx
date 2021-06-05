@@ -49,7 +49,7 @@ export type UseFormResult<Values> = Form<Values> & {
 }
 
 export function useForm<Values extends FormValues>(
-  values: Values | (() => Values),
+  initialValues: Values | (() => Values),
   config: FormConfig<Values> = {}
 ): UseFormResult<Values> {
   const {
@@ -62,7 +62,7 @@ export function useForm<Values extends FormValues>(
   } = config
 
   const [originalValuesMemoized] = useState(() =>
-    toJS(isFunction(values) ? values() : values)
+    toJS(isFunction(initialValues) ? initialValues() : initialValues)
   )
   const originalValuesRef = useRef<Values>(originalValuesMemoized)
 
