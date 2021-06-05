@@ -3,20 +3,22 @@ import { observer } from "mobx-react-lite"
 import * as React from "react"
 import { FormConfig, useForm, UseFormResult } from "../src"
 
-const initialValues = {
+const InitialValues = {
   name: "bill",
   surname: "murray",
 }
 
-type Values = typeof initialValues
+type Values = typeof InitialValues
+type Props = FormConfig<Values> & { initialValues?: Values }
 
-function renderForm(props: FormConfig<Values> = {}) {
+function renderForm(props: Props = {}) {
   let formHook: UseFormResult<Values> | undefined = undefined
   let renderCount = 0
   let renderNameCount = 0
 
-  const Form = observer(() => {
-    const form = useForm(initialValues, props)
+  const Form = observer((props: Props = {}) => {
+    const { initialValues = InitialValues, ...formProps } = props
+    const form = useForm(initialValues, formProps)
 
     formHook = form
     renderCount++
@@ -51,12 +53,16 @@ function renderForm(props: FormConfig<Values> = {}) {
     )
   })
 
-  const result = render(<Form />)
+  const result = render(<Form {...props} />)
+  const originalRerender = result.rerender
 
   return Object.assign(result, {
     form: formHook!,
     renderCount: () => renderCount,
     renderNameCount: () => renderNameCount,
+    rerender: (props: Props = {}) => {
+      originalRerender(<Form {...props} />)
+    },
   })
 }
 
@@ -64,7 +70,7 @@ describe("useForm", () => {
   it("has initial values", () => {
     const { form } = renderForm()
 
-    expect(form.values).toEqual(initialValues)
+    expect(form.values).toEqual(InitialValues)
   })
 
   it("does not change initial values", () => {
@@ -72,7 +78,17 @@ describe("useForm", () => {
     form.setFieldValue("name", "jean")
 
     expect(form.values.name).toEqual("jean")
-    expect(initialValues.name).toEqual("bill")
+    expect(InitialValues.name).toEqual("bill")
+  })
+
+  it("values don't change when initialValues change", () => {
+    const { form, rerender } = renderForm()
+
+    expect(form.values).toEqual(InitialValues)
+
+    rerender({ initialValues: { name: "donald", surname: "duck" } })
+
+    expect(form.values).toEqual(InitialValues)
   })
 
   it("handleChange", () => {
