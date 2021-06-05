@@ -17,14 +17,16 @@ export type UseFieldResult<T = any> = {
     name: string
     readonly value: T
     onBlur: (e: any) => void
-    onChange: (eventOrValue: React.ChangeEvent<any> | any) => void
+    onChange: (event: React.ChangeEvent<any>) => void
   }
-  meta: {
-    readonly value: T
-    readonly touched: boolean
-    readonly error: string
-  }
+  readonly name: string
+  readonly value: T
+  readonly touched: boolean
+  readonly error: string
   form: Form<any>
+  setValue: (value: T) => void
+  setTouched: (isTouched?: boolean) => void
+  setError: (error: string) => void
 }
 
 export function useField<T = any>(
@@ -37,11 +39,8 @@ export function useField<T = any>(
   const onBlur = useMemo(() => form.handleBlur(name), [name, form])
   const onChange = useMemo(() => {
     if (converter) {
-      return (eventOrValue: React.ChangeEvent<any> | any) => {
-        const value =
-          eventOrValue && eventOrValue.target
-            ? eventOrValue.target.value
-            : eventOrValue
+      return (event: React.ChangeEvent<any>) => {
+        const value = event.target.value
         form.setFieldValue(name, converter.inputToValue(value))
       }
     } else {
@@ -63,17 +62,25 @@ export function useField<T = any>(
       onBlur,
       onChange,
     },
-    meta: {
-      get value(): T {
-        return form.getFieldValue(name)
-      },
-      get touched() {
-        return form.getFieldTouched(name)
-      },
-      get error() {
-        return form.getFieldError(name)
-      },
+    name,
+    get value(): T {
+      return form.getFieldValue(name)
+    },
+    get touched() {
+      return form.getFieldTouched(name)
+    },
+    get error() {
+      return form.getFieldError(name)
     },
     form,
+    setValue(value: T) {
+      form.setFieldValue(name, value)
+    },
+    setTouched(isTouched = true) {
+      form.setFieldTouched(name, isTouched)
+    },
+    setError(error: string) {
+      form.setFieldError(name, error)
+    },
   }
 }

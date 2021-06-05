@@ -11,26 +11,25 @@ export function useFieldArray<T>(
   const { validateOnChange = true } = options
 
   const field = useField(name)
-  const { meta, form } = field
 
   function update<TResult>(fn: (array: T[]) => TResult) {
     const result = fn(ensureArray())
     if (validateOnChange) {
-      form.validate()
+      field.form.validate()
     }
     return result
   }
 
   const ensureArray = (): T[] => {
-    if (!Array.isArray(meta.value)) {
-      form.setFieldValue(name, [])
-      return form.getFieldValue(name)
+    if (!Array.isArray(field.value)) {
+      field.setValue([])
+      return field.value
     } else {
-      return meta.value
+      return field.value
     }
   }
 
-  const getLength = () => (Array.isArray(meta.value) ? meta.value.length : 0)
+  const getLength = () => (Array.isArray(field.value) ? field.value.length : 0)
 
   const forEach = (iterator: (name: string, index: number) => void): void => {
     const len = getLength()
@@ -76,13 +75,13 @@ export function useFieldArray<T>(
   }
 
   const setValue = (value: T[]) => {
-    form.setFieldValue(name, value)
+    field.setValue(value)
   }
 
   const fields = {
     name,
     get value(): T[] {
-      return form.getFieldValue(name) || []
+      return field.value || []
     },
     get length() {
       return getLength()
@@ -100,6 +99,6 @@ export function useFieldArray<T>(
 
   return {
     fields,
-    form,
+    form: field.form,
   }
 }

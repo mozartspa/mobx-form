@@ -33,7 +33,7 @@ function renderForm(props: Props = {}) {
             return (
               <div>
                 <input type="text" {...field.input} data-testid="name-input" />
-                {field.meta.touched && field.meta.error}
+                {field.touched && field.error}
               </div>
             )
           }}
@@ -42,7 +42,7 @@ function renderForm(props: Props = {}) {
           {(field) => (
             <div>
               <input type="text" {...field.input} data-testid="surname-input" />
-              {field.meta.touched && field.meta.error}
+              {field.touched && field.error}
             </div>
           )}
         </Field>

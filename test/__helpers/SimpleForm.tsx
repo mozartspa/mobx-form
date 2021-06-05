@@ -34,7 +34,7 @@ export const SimpleForm = observer(() => {
           {(field) => (
             <div>
               <input type="text" autoComplete="username" {...field.input} />
-              {field.meta.touched && field.meta.error}
+              {field.touched && field.error}
             </div>
           )}
         </Field>
@@ -46,7 +46,7 @@ export const SimpleForm = observer(() => {
                 autoComplete="current-password"
                 {...field.input}
               />
-              {field.meta.touched && field.meta.error}
+              {field.touched && field.error}
             </div>
           )}
         </Field>
