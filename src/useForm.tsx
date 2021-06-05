@@ -141,7 +141,7 @@ export function useForm<Values extends FormValues>(
       isTouched && validateOnBlur && form.validate()
     },
     getFieldTouched(field: keyof Values & string) {
-      return get(form.touched, field) as boolean
+      return Boolean(get(form.touched, field))
     },
     async validate() {
       return executeValidate.current()
