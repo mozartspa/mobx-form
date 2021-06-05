@@ -150,15 +150,9 @@ export function useForm<Model extends FormModel>(
     let parsed
 
     if (eventOrValue && eventOrValue.target) {
-      const {
-        type,
-        name,
-        id,
-        value,
-        checked,
-        options,
-        multiple,
-      } = (eventOrValue as React.ChangeEvent<any>).target
+      const { type, name, id, value, checked, options, multiple } = (
+        eventOrValue as React.ChangeEvent<any>
+      ).target
 
       field = maybePath ? maybePath : name ? name : id
 
@@ -328,7 +322,7 @@ export function useForm<Model extends FormModel>(
     },
     handleBlur(eventOrString: any): void | ((e: any) => void) {
       if (isString(eventOrString)) {
-        return event => executeBlur(event, eventOrString)
+        return (event) => executeBlur(event, eventOrString)
       } else {
         executeBlur(eventOrString)
       }
@@ -337,7 +331,7 @@ export function useForm<Model extends FormModel>(
       eventOrPath: string | React.ChangeEvent<any>
     ): void | ((eventOrTextValue: React.ChangeEvent<any> | any) => void) {
       if (isString(eventOrPath)) {
-        return event => executeChange(event, eventOrPath)
+        return (event) => executeChange(event, eventOrPath)
       } else {
         executeChange(eventOrPath)
       }
@@ -494,23 +488,23 @@ export function useFieldArray<T>(
   }
 
   const push = (...items: T[]) => {
-    return update(array => array.push(...items))
+    return update((array) => array.push(...items))
   }
 
   const pop = () => {
-    return update(array => array.pop())
+    return update((array) => array.pop())
   }
 
   const clear = () => {
-    return update(array => array.splice(0, array.length))
+    return update((array) => array.splice(0, array.length))
   }
 
   const insertAt = (index: number, item: T) => {
-    update(array => array.splice(index, 0, item))
+    update((array) => array.splice(index, 0, item))
   }
 
   const removeAt = (index: number) => {
-    return update(array => array.splice(index, 1)[0])
+    return update((array) => array.splice(index, 1)[0])
   }
 
   const remove = (item: T) => {
@@ -555,7 +549,7 @@ export type FormProps = React.FormHTMLAttributes<HTMLFormElement> & {
   debug?: boolean
 }
 
-export const Form: React.FC<FormProps> = props => {
+export const Form: React.FC<FormProps> = (props) => {
   const form = useFormContext()
   const { debug, children, ...formProps } = props
 

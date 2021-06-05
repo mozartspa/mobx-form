@@ -9,7 +9,7 @@ export const SimpleForm = observer(() => {
       password: "",
     },
     {
-      onSubmit: values => {
+      onSubmit: (values) => {
         console.log("submitted", values)
       },
       onValidate: async ({ username, password }) => {
@@ -31,7 +31,7 @@ export const SimpleForm = observer(() => {
     <div>
       <Form debug>
         <Field name="username">
-          {field => (
+          {(field) => (
             <div>
               <input type="text" autoComplete="username" {...field.input} />
               {field.meta.touched && field.meta.error}
@@ -39,7 +39,7 @@ export const SimpleForm = observer(() => {
           )}
         </Field>
         <Field name="password">
-          {field => (
+          {(field) => (
             <div>
               <input
                 type="password"

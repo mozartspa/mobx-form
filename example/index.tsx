@@ -1,6 +1,6 @@
-import "react-app-polyfill/ie11"
 import { observer } from "mobx-react-lite"
 import * as React from "react"
+import "react-app-polyfill/ie11"
 import * as ReactDOM from "react-dom"
 import { useForm } from "../."
 
@@ -11,7 +11,7 @@ const App = observer(() => {
       password: "",
     },
     {
-      onSubmit: values => {
+      onSubmit: (values) => {
         console.log("submitted", values)
       },
       onValidate: async ({ username, password }) => {
@@ -33,7 +33,7 @@ const App = observer(() => {
     <div>
       <Form debug>
         <Field name="username">
-          {field => (
+          {(field) => (
             <div>
               <input type="text" autoComplete="username" {...field.input} />
               {field.meta.touched && field.meta.error}
@@ -41,7 +41,7 @@ const App = observer(() => {
           )}
         </Field>
         <Field name="password">
-          {field => (
+          {(field) => (
             <div>
               <input
                 type="password"

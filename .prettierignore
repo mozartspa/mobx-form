@@ -1,0 +1,10 @@
+// ignore a wide range of support files
+.*
+
+# yarn
+yarn.lock
+yarn-error.logs
+
+# other
+dist
+LICENSE
