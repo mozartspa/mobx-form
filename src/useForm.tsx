@@ -16,6 +16,7 @@ import {
   isFunction,
   isString,
   setNestedObjectValues,
+  useCounter,
 } from "./utils"
 
 export type FormConfig<Model> = {
@@ -101,28 +102,16 @@ export function useForm<Model extends FormModel>(
     }
   }
 
-  const { getValidationId, isLastValidation } = useMemo(() => {
-    let validationId = 0
-    const getValidationId = () => {
-      return ++validationId
-    }
-    const isLastValidation = (id: number) => {
-      return id === validationId
-    }
-    return {
-      getValidationId,
-      isLastValidation,
-    }
-  }, [])
+  const counter = useCounter()
 
   const executeValidate = useMemo(() => {
     const doValidate = async () => {
       try {
         form.isValidating = true
-        const validationId = getValidationId()
+        const validationId = counter.getValue()
         const data = toJS(form.model)
         const errors = await onValidate(data)
-        if (isLastValidation(validationId)) {
+        if (counter.isLastValue(validationId)) {
           form.setErrors(errors)
           if (form.isValid) {
             runInAction(() => (form.validModel = data))
@@ -144,7 +133,7 @@ export function useForm<Model extends FormModel>(
     } else {
       return doValidate
     }
-  }, [validateDebounce, validateDebounceWait, validateDebounceLeading])
+  }, [validateDebounce, validateDebounceWait, validateDebounceLeading, counter])
 
   const form: Form<Model> = useLocalObservable(() => ({
     model: originalModelRef.current,

@@ -1,3 +1,5 @@
+import { useState } from "react"
+
 export const isString = (obj: any): obj is string =>
   Object.prototype.toString.call(obj) === "[object String]"
 
@@ -61,4 +63,22 @@ export function getSelectedValues(options: any[]) {
   return Array.from(options)
     .filter((el) => el.selected)
     .map((el) => el.value)
+}
+
+export function useCounter() {
+  const [counter] = useState(() => {
+    let counter = 0
+    const getValue = () => {
+      return ++counter
+    }
+    const isLastValue = (value: number) => {
+      return value === counter
+    }
+    return {
+      getValue,
+      isLastValue,
+    }
+  })
+
+  return counter
 }
