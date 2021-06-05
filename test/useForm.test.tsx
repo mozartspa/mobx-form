@@ -93,7 +93,7 @@ describe("useForm", () => {
 
   it("handleChange", () => {
     const { form, getByTestId } = renderForm()
-    form.handleChange("name")("jean")
+    form.setFieldValue("name", "jean")
 
     expect(form.values.name).toEqual("jean")
 
@@ -108,7 +108,7 @@ describe("useForm", () => {
     expect(renderCount()).toBe(1)
     expect(renderNameCount()).toEqual(1)
 
-    form.handleChange("name")("jean")
+    form.setFieldValue("name", "jean")
 
     expect(renderCount()).toEqual(1)
     expect(renderNameCount()).toEqual(2)

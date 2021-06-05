@@ -1,15 +1,15 @@
-import { useMemo } from "react"
+import React, { useCallback } from "react"
 import { Form } from "./types"
 import { useFormContext } from "./useFormContext"
+import { getSelectedValues, getValueForCheckbox } from "./utils"
 
-export type FieldConverter<M = any, F = any> = {
-  valueToInput: (value: M) => F
-  inputToValue: (value: F) => M
+function defaultParse(value: any) {
+  return value == null ? undefined : value
 }
 
-export type UseFieldOptions = {
-  defaultValue?: string
-  converter?: FieldConverter
+export type UseFieldOptions<T = any> = {
+  format?: (value: T) => any
+  parse?: (value: any) => T
 }
 
 export type UseFieldResult<T = any> = {
@@ -31,33 +31,47 @@ export type UseFieldResult<T = any> = {
 
 export function useField<T = any>(
   name: string,
-  options: UseFieldOptions = {}
+  options: UseFieldOptions<T> = {}
 ): UseFieldResult<T> {
-  const { defaultValue = "", converter } = options
+  const { format, parse = defaultParse } = options
 
   const form = useFormContext()
-  const onBlur = useMemo(() => form.handleBlur(name), [name, form])
-  const onChange = useMemo(() => {
-    if (converter) {
-      return (event: React.ChangeEvent<any>) => {
-        const value = event.target.value
-        form.setFieldValue(name, converter.inputToValue(value))
+
+  const onBlur = useCallback(() => {
+    form.setFieldTouched(name, true)
+  }, [form, name])
+
+  const onChange = useCallback(
+    (event: React.ChangeEvent<any>) => {
+      if (!event || !event.target) {
+        // warn somehow?
+        return
       }
-    } else {
-      return form.handleChange(name)
-    }
-  }, [name, converter, form])
+
+      const { type, value, checked, options, multiple } = event.target
+
+      let val = undefined
+      let parsed
+
+      val = /number|range/.test(type)
+        ? ((parsed = parseFloat(value)), isNaN(parsed) ? undefined : parsed)
+        : /checkbox/.test(type) // checkboxes
+        ? getValueForCheckbox(form.getFieldValue(name), checked, value)
+        : !!multiple // <select multiple>
+        ? getSelectedValues(options)
+        : value
+
+      form.setFieldValue(name, format ? format(val) : val)
+    },
+    [form, name, format]
+  )
 
   return {
     input: {
       name,
       get value(): T {
         const value = form.getFieldValue(name)
-        return converter
-          ? converter.valueToInput(value)
-          : value == null
-          ? defaultValue
-          : value
+        return parse ? parse(value) : value
       },
       onBlur,
       onChange,

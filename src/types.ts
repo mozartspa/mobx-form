@@ -47,14 +47,4 @@ export type Form<Values = FormValues> = {
   submit(): Promise<void>
   handleSubmit: (e?: React.FormEvent<HTMLFormElement>) => Promise<void>
   handleReset: (e?: React.SyntheticEvent<any>) => void
-  handleBlur(e: React.FocusEvent<any>): void
-  handleBlur<T = string | any>(
-    fieldOrEvent: T
-  ): T extends string ? (e: any) => void : void
-  handleChange(e: React.ChangeEvent<any>): void
-  handleChange<T = string | React.ChangeEvent<any>>(
-    field: T
-  ): T extends React.ChangeEvent<any>
-    ? void
-    : (eventOrValue: React.ChangeEvent<any> | any) => void
 }

@@ -11,10 +11,7 @@ import { FieldArray, FieldArrayProps } from "./FieldArray"
 import { Form, FormErrors, FormTouched, FormValues } from "./types"
 import { FormContext, useFormContext } from "./useFormContext"
 import {
-  getSelectedValues,
-  getValueForCheckbox,
   isFunction,
-  isString,
   setNestedObjectValues,
   useCounter,
   useLatestValue,
@@ -66,41 +63,6 @@ export function useForm<Values extends FormValues>(
     toJS(isFunction(initialValues) ? initialValues() : initialValues)
   )
   const originalValuesRef = useRef<Values>(originalValuesMemoized)
-
-  const executeBlur = (e: any = {}, path?: string) => {
-    const { name, id } = e.target || {}
-    const field = path ? path : name ? name : id
-    form.setFieldTouched(field, true)
-  }
-
-  const executeChange = (
-    eventOrValue: React.ChangeEvent<any> | any,
-    maybePath?: string
-  ) => {
-    let field = maybePath
-    let val = eventOrValue
-    let parsed
-
-    if (eventOrValue && eventOrValue.target) {
-      const { type, name, id, value, checked, options, multiple } = (
-        eventOrValue as React.ChangeEvent<any>
-      ).target
-
-      field = maybePath ? maybePath : name ? name : id
-
-      val = /number|range/.test(type)
-        ? ((parsed = parseFloat(value)), isNaN(parsed) ? undefined : parsed)
-        : /checkbox/.test(type) // checkboxes
-        ? getValueForCheckbox(get(form.values, field!), checked, value)
-        : !!multiple // <select multiple>
-        ? getSelectedValues(options)
-        : value
-    }
-
-    if (field) {
-      form.setFieldValue(field, val)
-    }
-  }
 
   const counter = useCounter()
 
@@ -239,22 +201,6 @@ export function useForm<Values extends FormValues>(
         e.preventDefault()
       }
       form.reset()
-    },
-    handleBlur(eventOrString: any): void | ((e: any) => void) {
-      if (isString(eventOrString)) {
-        return (event) => executeBlur(event, eventOrString)
-      } else {
-        executeBlur(eventOrString)
-      }
-    },
-    handleChange(
-      eventOrPath: string | React.ChangeEvent<any>
-    ): void | ((eventOrTextValue: React.ChangeEvent<any> | any) => void) {
-      if (isString(eventOrPath)) {
-        return (event) => executeChange(event, eventOrPath)
-      } else {
-        executeChange(eventOrPath)
-      }
     },
   }))
 
