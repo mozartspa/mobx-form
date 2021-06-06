@@ -10,9 +10,9 @@ export function useFieldArray<T>(
   name: string,
   options: UseFieldArrayOptions = {}
 ) {
-  const { validateOnChange = true } = options
+  const { form, validateOnChange = true } = options
 
-  const field = useField(name)
+  const field = useField(name, { form })
 
   function update<TResult>(fn: (array: T[]) => TResult) {
     const result = fn(ensureArray())
