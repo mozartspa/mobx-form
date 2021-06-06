@@ -1,6 +1,6 @@
 import debouncePromise from "debounce-promise"
-import get from "lodash.get"
-import set from "lodash.set"
+import get from "dlv"
+import { dset as set } from "dset"
 import { runInAction, toJS } from "mobx"
 import { observer, useLocalObservable } from "mobx-react-lite"
 import React, { useRef, useState } from "react"
