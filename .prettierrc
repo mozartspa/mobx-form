@@ -8,6 +8,7 @@
   "tabWidth": 2,
   "trailingComma": "es5",
   "useTabs": false,
+  "endOfLine":"auto",
   "overrides": [
     {
       "files": [".prettierrc", "*.json"],
