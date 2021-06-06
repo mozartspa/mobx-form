@@ -1,6 +1,6 @@
 import React, { useCallback } from "react"
 import { Form } from "./types"
-import { useFormContext } from "./useFormContext"
+import { FormContext } from "./useFormContext"
 import { getSelectedValues, getValueForCheckbox } from "./utils"
 
 function defaultParse(value: any) {
@@ -36,7 +36,17 @@ export function useField<T = any, Values = any>(
 ): UseFieldResult<T, Values> {
   const { format, parse = defaultParse } = options
 
-  const form = options.form || useFormContext()
+  const formContext = React.useContext(FormContext) as Form<Values> | undefined
+  const maybeForm = options.form || formContext
+
+  if (!maybeForm) {
+    throw new Error(
+      `Missing FormContext. Did you use "<FormProvider />" or the "<Form />" provided by "useForm()"?` +
+        `Alternatively, you can use the "form" prop to specify which form instance to bind this field to.`
+    )
+  }
+
+  const form = maybeForm
 
   const onBlur = useCallback(() => {
     form.setFieldTouched(name, true)
