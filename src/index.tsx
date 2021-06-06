@@ -1,6 +1,7 @@
 export * from "./DebugForm"
 export * from "./Field"
 export * from "./FieldArray"
+export * from "./FieldScope"
 export * from "./useField"
 export * from "./useFieldArray"
 export * from "./useForm"

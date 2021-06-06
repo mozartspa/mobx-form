@@ -1,4 +1,5 @@
 import React, { useCallback } from "react"
+import { FieldScopeContext } from "./FieldScope"
 import { Form } from "./types"
 import { FormContext } from "./useFormContext"
 import { getSelectedValues, getValueForCheckbox } from "./utils"
@@ -47,6 +48,10 @@ export function useField<T = any, Values = any>(
   }
 
   const form = maybeForm
+
+  // prefix field name with the current scope (if any)
+  const fieldPrefix = React.useContext(FieldScopeContext)
+  name = (fieldPrefix + name) as keyof Values & string
 
   const onBlur = useCallback(() => {
     form.setFieldTouched(name, true)
