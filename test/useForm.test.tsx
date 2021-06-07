@@ -163,23 +163,6 @@ describe("useForm", () => {
     expect(renderNameCount()).toEqual(2)
   })
 
-  it("uses latest onValidate", () => {
-    const onValidate = jest.fn(() => Promise.resolve({}))
-    const onValidate2 = jest.fn(() => Promise.resolve({}))
-    const { form, rerender } = renderTestForm({ onValidate })
-
-    form().setFieldValue("name", "jean")
-
-    expect(onValidate).toBeCalledTimes(1)
-
-    rerender({ onValidate: onValidate2 })
-
-    form().setFieldValue("name", "jean2")
-
-    expect(onValidate).toBeCalledTimes(1)
-    expect(onValidate2).toBeCalledTimes(1)
-  })
-
   it("handles field touched", () => {
     const { form } = renderTestForm()
 
@@ -382,5 +365,125 @@ describe("useForm", () => {
 
       expect(form().isDirty).toBe(false)
     })
+  })
+})
+
+describe("useForm validation", () => {
+  it("uses latest onValidate callback", () => {
+    const onValidate = jest.fn(() => Promise.resolve({}))
+    const onValidate2 = jest.fn(() => Promise.resolve({}))
+    const { form, rerender } = renderTestForm({
+      onValidate,
+      validateOnChange: true,
+    })
+
+    form().setFieldValue("name", "jean")
+
+    expect(onValidate).toBeCalledTimes(1)
+
+    rerender({ onValidate: onValidate2, validateOnChange: true })
+
+    form().setFieldValue("name", "jean2")
+
+    expect(onValidate).toBeCalledTimes(1)
+    expect(onValidate2).toBeCalledTimes(1)
+  })
+
+  it("validateOnChange by default", () => {
+    const onValidate = jest.fn(() => Promise.resolve({}))
+    const { form } = renderTestForm({ onValidate })
+
+    form().setFieldValue("name", "jean")
+
+    expect(onValidate).toBeCalledTimes(1)
+  })
+
+  it("validateOnChange = false does not trigger validation on change", () => {
+    const onValidate = jest.fn(() => Promise.resolve({}))
+    const { form } = renderTestForm({ onValidate, validateOnChange: false })
+
+    form().setFieldValue("name", "jean")
+
+    expect(onValidate).toBeCalledTimes(0)
+  })
+
+  it("validateOnChange can be changed later", () => {
+    const onValidate = jest.fn(() => Promise.resolve({}))
+    const { form, rerender } = renderTestForm({
+      onValidate,
+      validateOnChange: false,
+    })
+
+    form().setFieldValue("name", "jean")
+
+    expect(onValidate).toBeCalledTimes(0)
+
+    rerender({ onValidate, validateOnChange: true })
+
+    form().setFieldValue("name", "jean2")
+
+    expect(onValidate).toBeCalledTimes(1)
+  })
+
+  it("validateOnBlur turned off by default", () => {
+    const onValidate = jest.fn(() => Promise.resolve({}))
+    const { form } = renderTestForm({ onValidate })
+
+    form().setFieldTouched("name", true)
+
+    expect(onValidate).toBeCalledTimes(0)
+  })
+
+  it("validateOnBlur = false does not trigger validation on blur", () => {
+    const onValidate = jest.fn(() => Promise.resolve({}))
+    const { form } = renderTestForm({ onValidate, validateOnBlur: false })
+
+    form().setFieldTouched("name", true)
+
+    expect(onValidate).toBeCalledTimes(0)
+  })
+
+  it("validateOnBlur = true does trigger validation on blur", () => {
+    const onValidate = jest.fn(() => Promise.resolve({}))
+    const { form } = renderTestForm({ onValidate, validateOnBlur: true })
+
+    form().setFieldTouched("name", true)
+
+    expect(onValidate).toBeCalledTimes(1)
+  })
+
+  it("validateOnBlur can be changed later", () => {
+    const onValidate = jest.fn(() => Promise.resolve({}))
+    const { form, rerender } = renderTestForm({
+      onValidate,
+      validateOnBlur: false,
+    })
+
+    form().setFieldTouched("name", true)
+
+    expect(onValidate).toBeCalledTimes(0)
+
+    rerender({ onValidate, validateOnBlur: true })
+
+    form().setFieldTouched("surname", true)
+
+    expect(onValidate).toBeCalledTimes(1)
+  })
+
+  it("validateOnChange and validateOnBlur work together", () => {
+    const onValidate = jest.fn(() => Promise.resolve({}))
+    const { form } = renderTestForm({
+      onValidate,
+      validateOnChange: true,
+      validateOnBlur: true,
+    })
+
+    form().setFieldValue("name", "jean")
+
+    expect(onValidate).toBeCalledTimes(1)
+
+    form().setFieldTouched("name", true)
+
+    expect(onValidate).toBeCalledTimes(2)
   })
 })

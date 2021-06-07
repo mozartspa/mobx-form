@@ -95,6 +95,11 @@ export function useForm<Values extends FormValues>(
     }
   })
 
+  const optionsRef = useLatestValue(() => ({
+    validateOnChange,
+    validateOnBlur,
+  }))
+
   const form: Form<Values> = useLocalObservable(() => ({
     values: originalValuesRef.current,
     validValues: originalValuesRef.current,
@@ -124,7 +129,7 @@ export function useForm<Values extends FormValues>(
     setFieldValue(field: keyof Values & string, value: any) {
       if (form.getFieldValue(field) !== value) {
         set(form.values, field, value)
-        validateOnChange && form.validate()
+        optionsRef.current.validateOnChange && form.validate()
       }
     },
     getFieldValue(field: keyof Values & string) {
@@ -169,7 +174,7 @@ export function useForm<Values extends FormValues>(
     },
     setFieldTouched(field: keyof Values & string, isTouched: boolean = true) {
       form.touched[field] = isTouched
-      isTouched && validateOnBlur && form.validate()
+      isTouched && optionsRef.current.validateOnBlur && form.validate()
     },
     isFieldTouched(field: keyof Values & string) {
       return Boolean(form.touched[field])
