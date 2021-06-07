@@ -267,11 +267,11 @@ describe("useForm", () => {
     form().setFieldTouched("preferences.color") // true if not specified
     form().setFieldTouched("friends.0.name", true)
 
-    expect(form().getFieldTouched("name")).toBe(true)
-    expect(form().getFieldTouched("surname")).toBe(false)
-    expect(form().getFieldTouched("preferences.color")).toBe(true)
-    expect(form().getFieldTouched("friends.0.name")).toBe(true)
-    expect(form().getFieldTouched("friends.0.surname")).toBe(false)
+    expect(form().isFieldTouched("name")).toBe(true)
+    expect(form().isFieldTouched("surname")).toBe(false)
+    expect(form().isFieldTouched("preferences.color")).toBe(true)
+    expect(form().isFieldTouched("friends.0.name")).toBe(true)
+    expect(form().isFieldTouched("friends.0.surname")).toBe(false)
   })
 
   it("setTouched", () => {
@@ -284,10 +284,10 @@ describe("useForm", () => {
       "friends.0.name": true,
     })
 
-    expect(form().getFieldTouched("name")).toBe(true)
-    expect(form().getFieldTouched("surname")).toBe(false)
-    expect(form().getFieldTouched("preferences.color")).toBe(true)
-    expect(form().getFieldTouched("friends.0.name")).toBe(true)
-    expect(form().getFieldTouched("friends.0.surname")).toBe(false)
+    expect(form().isFieldTouched("name")).toBe(true)
+    expect(form().isFieldTouched("surname")).toBe(false)
+    expect(form().isFieldTouched("preferences.color")).toBe(true)
+    expect(form().isFieldTouched("friends.0.name")).toBe(true)
+    expect(form().isFieldTouched("friends.0.surname")).toBe(false)
   })
 })

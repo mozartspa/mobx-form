@@ -99,7 +99,7 @@ export function useField<T = any, Values = any>(
       return form.getFieldValue(name)
     },
     get touched() {
-      return form.getFieldTouched(name)
+      return form.isFieldTouched(name)
     },
     get error() {
       return form.getFieldError(name)
