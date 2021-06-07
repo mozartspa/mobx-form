@@ -89,3 +89,13 @@ export function useLatestValue<T>(getValue: () => T) {
   ref.current = value
   return ref
 }
+
+export function isError(error: string | string[] | undefined) {
+  if (error == null || error === "") {
+    return false
+  }
+  if (Array.isArray(error) && error.length === 0) {
+    return false
+  }
+  return true
+}

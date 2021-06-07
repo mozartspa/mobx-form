@@ -180,6 +180,38 @@ describe("useForm", () => {
     expect(onValidate2).toBeCalledTimes(1)
   })
 
+  it("handles field touched", () => {
+    const { form } = renderTestForm()
+
+    form().setFieldTouched("name", true)
+    form().setFieldTouched("surname", false)
+    form().setFieldTouched("preferences.color") // true if not specified
+    form().setFieldTouched("friends.0.name", true)
+
+    expect(form().isFieldTouched("name")).toBe(true)
+    expect(form().isFieldTouched("surname")).toBe(false)
+    expect(form().isFieldTouched("preferences.color")).toBe(true)
+    expect(form().isFieldTouched("friends.0.name")).toBe(true)
+    expect(form().isFieldTouched("friends.0.surname")).toBe(false)
+  })
+
+  it("setTouched", () => {
+    const { form } = renderTestForm()
+
+    form().setTouched({
+      name: true,
+      surname: false,
+      "preferences.color": true,
+      "friends.0.name": true,
+    })
+
+    expect(form().isFieldTouched("name")).toBe(true)
+    expect(form().isFieldTouched("surname")).toBe(false)
+    expect(form().isFieldTouched("preferences.color")).toBe(true)
+    expect(form().isFieldTouched("friends.0.name")).toBe(true)
+    expect(form().isFieldTouched("friends.0.surname")).toBe(false)
+  })
+
   it("handles field errors", () => {
     const { form } = renderTestForm()
 
@@ -285,35 +317,34 @@ describe("useForm", () => {
     expect(form().isFieldValid("name")).toBe(true)
   })
 
-  it("handles field touched", () => {
+  it("isValid", () => {
     const { form } = renderTestForm()
 
-    form().setFieldTouched("name", true)
-    form().setFieldTouched("surname", false)
-    form().setFieldTouched("preferences.color") // true if not specified
-    form().setFieldTouched("friends.0.name", true)
+    // it is considered valid at init
+    expect(form().isValid).toBe(true)
 
-    expect(form().isFieldTouched("name")).toBe(true)
-    expect(form().isFieldTouched("surname")).toBe(false)
-    expect(form().isFieldTouched("preferences.color")).toBe(true)
-    expect(form().isFieldTouched("friends.0.name")).toBe(true)
-    expect(form().isFieldTouched("friends.0.surname")).toBe(false)
-  })
-
-  it("setTouched", () => {
-    const { form } = renderTestForm()
-
-    form().setTouched({
-      name: true,
-      surname: false,
-      "preferences.color": true,
-      "friends.0.name": true,
+    // errors make it mark as not vlid
+    form().setErrors({
+      name: "any error",
     })
+    expect(form().isValid).toBe(false)
 
-    expect(form().isFieldTouched("name")).toBe(true)
-    expect(form().isFieldTouched("surname")).toBe(false)
-    expect(form().isFieldTouched("preferences.color")).toBe(true)
-    expect(form().isFieldTouched("friends.0.name")).toBe(true)
-    expect(form().isFieldTouched("friends.0.surname")).toBe(false)
+    // undefined means no error
+    form().setErrors({
+      name: undefined,
+    })
+    expect(form().isValid).toBe(true)
+
+    // [] means no error
+    form().setErrors({
+      name: [],
+    })
+    expect(form().isValid).toBe(true)
+
+    // "" means no error
+    form().setErrors({
+      name: "",
+    })
+    expect(form().isValid).toBe(true)
   })
 })

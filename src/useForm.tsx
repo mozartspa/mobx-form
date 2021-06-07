@@ -11,6 +11,7 @@ import { FieldArray, FieldArrayProps } from "./FieldArray"
 import { FieldError, Form, FormErrors, FormTouched, FormValues } from "./types"
 import { FormContext, useFormContext } from "./useFormContext"
 import {
+  isError,
   isFunction,
   setNestedObjectValues,
   useCounter,
@@ -111,7 +112,7 @@ export function useForm<Values extends FormValues>(
     },
     get isValid() {
       return (
-        Object.keys(form.errors).filter((key) => form.errors[key] != null)
+        Object.keys(form.errors).filter((key) => isError(form.errors[key]))
           .length === 0
       )
     },
@@ -178,8 +179,7 @@ export function useForm<Values extends FormValues>(
       return Boolean(form.touched[field])
     },
     isFieldValid(field: keyof Values & string) {
-      const error = form.getFieldError(field)
-      return error == null || error === ""
+      return !isError(form.getFieldError(field))
     },
     async validate() {
       return executeValidate.current()
