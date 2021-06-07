@@ -155,7 +155,7 @@ export function useForm<Values extends FormValues>(
     getFieldError(field: keyof Values & string): string | undefined {
       const err = form.errors[field]
       if (Array.isArray(err)) {
-        return err[0]
+        return err.length > 0 ? err[0] : undefined
       } else {
         return err
       }
