@@ -1,6 +1,7 @@
 import { Observer } from "mobx-react-lite"
 import React, { ReactElement } from "react"
-import { useField, UseFieldOptions, UseFieldResult } from "./useField"
+import { UseFieldOptions } from "./types"
+import { useField, UseFieldResult } from "./useField"
 
 export type FieldRenderProps = UseFieldResult
 

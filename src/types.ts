@@ -60,3 +60,9 @@ export type FormConfig<Values = any> = {
   onValidate?: FormValidate<Values>
   onFailedSubmit?: () => void
 }
+
+export type UseFieldOptions<T = any, Values = any> = {
+  form?: Form<Values> | undefined
+  format?: (value: T) => any
+  parse?: (value: any) => T
+}

@@ -1,17 +1,11 @@
 import React, { useCallback } from "react"
 import { FieldScopeContext } from "./FieldScope"
-import { FieldError, Form } from "./types"
+import { FieldError, Form, UseFieldOptions } from "./types"
 import { FormContext } from "./useFormContext"
 import { getSelectedValues, getValueForCheckbox } from "./utils"
 
 function defaultParse(value: any) {
   return value == null ? undefined : value
-}
-
-export type UseFieldOptions<T = any, Values = any> = {
-  form?: Form<Values> | undefined
-  format?: (value: T) => any
-  parse?: (value: any) => T
 }
 
 export type UseFieldResult<T = any, Values = any> = {
