@@ -347,4 +347,40 @@ describe("useForm", () => {
     })
     expect(form().isValid).toBe(true)
   })
+
+  describe("isDirty", () => {
+    it("not dirty at init", () => {
+      const { form } = renderTestForm()
+
+      expect(form().isDirty).toBe(false)
+    })
+
+    it("dirty if changing a field", () => {
+      const { form } = renderTestForm()
+      form().setFieldValue("name", "jane")
+
+      expect(form().isDirty).toBe(true)
+    })
+
+    it("dirty if changing a nested field", () => {
+      const { form } = renderTestForm()
+      form().setFieldValue("preferences.color", "orange")
+
+      expect(form().isDirty).toBe(true)
+    })
+
+    it("dirty if changing a nested field in list", () => {
+      const { form } = renderTestForm()
+      form().setFieldValue("friends.0.name", "buzz")
+
+      expect(form().isDirty).toBe(true)
+    })
+
+    it("not dirty if changing with same values", () => {
+      const { form } = renderTestForm()
+      form().setFieldValue("friends", [{ name: "bax", age: 23 }])
+
+      expect(form().isDirty).toBe(false)
+    })
+  })
 })
