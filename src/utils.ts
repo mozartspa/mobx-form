@@ -9,25 +9,19 @@ export const isFunction = (func: any): func is Function =>
 export const isObject = (obj: any): obj is Object =>
   obj !== null && typeof obj === "object"
 
-export function setNestedObjectValues<T>(
-  object: any,
-  value: any,
-  visited: any = new WeakMap(),
+export function buildObjectPaths<TObject, TValue>(
+  object: TObject,
+  value: TValue,
+  parentKey: string = "",
   response: any = {}
-): T {
+): Record<keyof TObject & string, TValue> {
   for (let k of Object.keys(object)) {
-    const val = object[k]
+    const path = parentKey + k
+    response[path] = value
+
+    const val = (object as any)[k]
     if (isObject(val)) {
-      if (!visited.get(val)) {
-        visited.set(val, true)
-        // In order to keep array values consistent for both dot path  and
-        // bracket syntax, we need to check if this is an array so that
-        // this will output  { friends: [true] } and not { friends: { "0": true } }
-        response[k] = Array.isArray(val) ? [] : {}
-        setNestedObjectValues(val, value, visited, response[k])
-      }
-    } else {
-      response[k] = value
+      buildObjectPaths(val, value, path + ".", response)
     }
   }
 

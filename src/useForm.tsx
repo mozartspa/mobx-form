@@ -11,9 +11,9 @@ import { FieldArray, FieldArrayProps } from "./FieldArray"
 import { FieldError, Form, FormErrors, FormTouched, FormValues } from "./types"
 import { FormContext, useFormContext } from "./useFormContext"
 import {
+  buildObjectPaths,
   isError,
   isFunction,
-  setNestedObjectValues,
   useCounter,
   useLatestValue,
 } from "./utils"
@@ -210,7 +210,7 @@ export function useForm<Values extends FormValues>(
       try {
         form.isSubmitting = true
         const data = toJS(form.values)
-        form.touched = setNestedObjectValues(data, true)
+        form.touched = buildObjectPaths(data, true)
         const errors = await form.validate()
         if (Object.keys(errors).length === 0) {
           runInAction(() => (form.submittedValues = data))
