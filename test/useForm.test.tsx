@@ -199,6 +199,17 @@ describe("useForm", () => {
     )
     expect(form().getFieldError("friends.0.name")).toEqual("Is it a name?")
     expect(form().getFieldError("friends.0.surname")).toEqual(undefined)
+
+    // undefined clear errors
+    form().setFieldError("name", undefined)
+    expect(form().getFieldError("name")).toBe(undefined)
+    expect(form().getFieldErrors("name")).toBe(undefined)
+
+    // [] clear errors
+    form().setFieldError("name", "New error")
+    form().setFieldError("name", [])
+    expect(form().getFieldError("name")).toBe(undefined)
+    expect(form().getFieldErrors("name")).toEqual([])
   })
 
   it("setErrors", () => {
