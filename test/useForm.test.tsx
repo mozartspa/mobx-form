@@ -51,6 +51,38 @@ function renderTestForm(props: FormConfig = {}) {
               </div>
             )}
           </Field>
+          <Field name="preferences.color">
+            {(field) => (
+              <div>
+                <input type="text" {...field.input} data-testid="color-input" />
+                {field.touched && field.error}
+              </div>
+            )}
+          </Field>
+          <Field name="friends.0.name">
+            {(field) => (
+              <div>
+                <input
+                  type="text"
+                  {...field.input}
+                  data-testid="friend-name-input"
+                />
+                {field.touched && field.error}
+              </div>
+            )}
+          </Field>
+          <Field name="friends.0.age">
+            {(field) => (
+              <div>
+                <input
+                  type="number"
+                  {...field.input}
+                  data-testid="friend-age-input"
+                />
+                {field.touched && field.error}
+              </div>
+            )}
+          </Field>
           <button type="submit" data-testid="submit-button">
             Submit
           </button>
@@ -96,15 +128,27 @@ describe("useForm", () => {
     expect(form().values).toEqual(InitialValues)
   })
 
-  it("handleChange", () => {
+  it("setFieldValue", () => {
     const { form, getByTestId } = renderTestForm()
     form().setFieldValue("name", "jean")
+    form().setFieldValue("preferences.color", "red")
+    form().setFieldValue("friends.0.name", "robin")
+    form().setFieldValue("friends.0.age", 42)
 
     expect(form().values.name).toEqual("jean")
+    expect(form().values.preferences.color).toEqual("red")
+    expect(form().values.friends[0].name).toEqual("robin")
+    expect(form().values.friends[0].age).toEqual(42)
 
-    const input = getByTestId("name-input") as HTMLInputElement
+    function getInputValue(testId: string) {
+      const input = getByTestId(testId) as HTMLInputElement
+      return input.value
+    }
 
-    expect(input.value).toEqual("jean")
+    expect(getInputValue("name-input")).toEqual("jean")
+    expect(getInputValue("color-input")).toEqual("red")
+    expect(getInputValue("friend-name-input")).toEqual("robin")
+    expect(getInputValue("friend-age-input")).toEqual("42")
   })
 
   it("rerenders only the input", () => {
