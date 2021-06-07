@@ -27,6 +27,7 @@ export type Form<Values = FormValues> = {
   setValues(values: Values): void
   setFieldValue(field: keyof Values & string, value: any): void
   setFieldError(field: keyof Values & string, message: FieldError): void
+  addFieldError(field: keyof Values & string, message: FieldError): void
   setFieldTouched(field: keyof Values & string, isTouched?: boolean): void
   getFieldValue(field: keyof Values & string): any
   getFieldError(field: keyof Values & string): string | undefined

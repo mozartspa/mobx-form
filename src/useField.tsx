@@ -30,6 +30,7 @@ export type UseFieldResult<T = any, Values = any> = {
   setValue: (value: T) => void
   setTouched: (isTouched?: boolean) => void
   setError: (error: FieldError) => void
+  addError: (error: FieldError) => void
 }
 
 export function useField<T = any, Values = any>(
@@ -115,6 +116,9 @@ export function useField<T = any, Values = any>(
     },
     setError(error: FieldError) {
       form.setFieldError(name, error)
+    },
+    addError(error: FieldError) {
+      form.addFieldError(name, error)
     },
   }
 }

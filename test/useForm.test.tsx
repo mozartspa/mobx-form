@@ -224,6 +224,30 @@ describe("useForm", () => {
     expect(form().getFieldError("friends.0.surname")).toEqual(undefined)
   })
 
+  it("addFieldError", () => {
+    const { form } = renderTestForm()
+
+    expect(form().getFieldError("name")).toBe(undefined)
+
+    // single error
+    form().addFieldError("name", "Empty name")
+    expect(form().getFieldError("name")).toEqual("Empty name")
+
+    // multiple errors
+    const expectedErrors = ["Empty name", "Another error"]
+    form().addFieldError("name", "Another error")
+    expect(form().getFieldError("name")).toEqual("Empty name")
+    expect(form().getFieldErrors("name")).toEqual(expectedErrors)
+
+    // undefined do nothing
+    form().addFieldError("name", undefined)
+    expect(form().getFieldErrors("name")).toEqual(expectedErrors)
+
+    // [] do nothing
+    form().addFieldError("name", [])
+    expect(form().getFieldErrors("name")).toEqual(expectedErrors)
+  })
+
   it("handles field touched", () => {
     const { form } = renderTestForm()
 

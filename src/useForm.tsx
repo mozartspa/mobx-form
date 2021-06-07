@@ -136,6 +136,22 @@ export function useForm<Values extends FormValues>(
     setFieldError(field: keyof Values & string, message: FieldError) {
       form.errors[field] = message
     },
+    addFieldError(field: keyof Values & string, message: FieldError) {
+      if (message == null) {
+        return // do nothing
+      }
+
+      const error = Array.isArray(message) ? message : [message]
+      const current = form.errors[field]
+
+      if (current == null) {
+        form.errors[field] = message
+      } else if (Array.isArray(current)) {
+        form.errors[field] = [...current, ...error]
+      } else {
+        form.errors[field] = [current, ...error]
+      }
+    },
     getFieldError(field: keyof Values & string): string | undefined {
       const err = form.errors[field]
       if (Array.isArray(err)) {
