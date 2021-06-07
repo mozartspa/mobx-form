@@ -1,8 +1,8 @@
 import { render } from "@testing-library/react"
 import { observer } from "mobx-react-lite"
 import React from "react"
-import { FormConfig, useForm, UseFormResult } from "../../src"
-import { Form } from "../../src/types"
+import { useForm, UseFormResult } from "../../src"
+import { Form, FormConfig } from "../../src/types"
 
 export function renderForm(
   ui?: (form: UseFormResult<any>) => React.ReactNode,

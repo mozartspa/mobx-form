@@ -1,5 +1,5 @@
 import * as React from "react"
-import { FormConfig } from "../src"
+import { FormConfig } from "../src/types"
 import { renderForm } from "./__helpers/renderForm"
 
 const InitialValues = {

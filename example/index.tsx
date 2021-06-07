@@ -22,7 +22,7 @@ const App = observer(() => {
     onSubmit: (values) => {
       console.log("submitted", values)
     },
-    onValidate: async ({ username, password, list }) => {
+    onValidate: ({ username, password, list }) => {
       let errors: FormErrors = {}
       if (username === "") {
         errors.username = "Username cannot be blank."

@@ -41,3 +41,22 @@ export type Form<Values = FormValues> = {
   handleSubmit: (e?: React.FormEvent<HTMLFormElement>) => Promise<void>
   handleReset: (e?: React.SyntheticEvent<any>) => void
 }
+
+export type FormValidate<Values = any> = (
+  values: Values
+) => FormErrors<Values> | Promise<FormErrors<Values>>
+
+export type ValidateDebounce =
+  | boolean
+  | number
+  | { wait?: number; leading?: boolean }
+
+export type FormConfig<Values = any> = {
+  initialValues?: Values | (() => Values)
+  validateOnChange?: boolean
+  validateOnBlur?: boolean
+  validateDebounce?: ValidateDebounce
+  onSubmit?: (values: Values) => void | Promise<any>
+  onValidate?: FormValidate<Values>
+  onFailedSubmit?: () => void
+}

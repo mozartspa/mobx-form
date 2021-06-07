@@ -1,6 +1,7 @@
 import { render } from "@testing-library/react"
 import * as React from "react"
-import { Field, FieldRenderProps, FormConfig, UseFormResult } from "../src"
+import { Field, FieldRenderProps, UseFormResult } from "../src"
+import { FormConfig } from "../src/types"
 import { renderForm } from "./__helpers/renderForm"
 
 const InitialValues = { name: "murray" }

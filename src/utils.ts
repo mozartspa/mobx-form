@@ -1,4 +1,5 @@
 import { useRef, useState } from "react"
+import { ValidateDebounce } from "./types"
 
 export const isString = (obj: any): obj is string =>
   Object.prototype.toString.call(obj) === "[object String]"
@@ -92,4 +93,35 @@ export function isError(error: string | string[] | undefined) {
     return false
   }
   return true
+}
+
+export function getDebounceValues(
+  debounce: ValidateDebounce,
+  defaultWait = 300,
+  defaultLeading = true
+) {
+  if (!debounce) {
+    return false
+  }
+
+  if (typeof debounce === "number") {
+    return {
+      wait: debounce,
+      leading: defaultLeading,
+    }
+  }
+
+  if (typeof debounce === "boolean") {
+    return {
+      wait: defaultWait,
+      leading: defaultLeading,
+    }
+  }
+
+  const { wait = defaultWait, leading = defaultLeading } = debounce
+
+  return {
+    wait,
+    leading,
+  }
 }

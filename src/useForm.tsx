@@ -8,27 +8,23 @@ import isEqual from "react-fast-compare"
 import { DebugForm } from "./DebugForm"
 import { Field, FieldProps } from "./Field"
 import { FieldArray, FieldArrayProps } from "./FieldArray"
-import { FieldError, Form, FormErrors, FormTouched, FormValues } from "./types"
+import {
+  FieldError,
+  Form,
+  FormConfig,
+  FormErrors,
+  FormTouched,
+  FormValues,
+} from "./types"
 import { FormContext, useFormContext } from "./useFormContext"
 import {
   buildObjectPaths,
+  getDebounceValues,
   isError,
   isFunction,
   useCounter,
   useLatestValue,
 } from "./utils"
-
-export type FormConfig<Values = any> = {
-  initialValues?: Values | (() => Values)
-  validateOnChange?: boolean
-  validateOnBlur?: boolean
-  validateDebounce?: boolean
-  validateDebounceWait?: number
-  validateDebounceLeading?: boolean
-  onSubmit?: (values: Values) => void | Promise<any>
-  onValidate?: (values: Values) => Promise<FormErrors<Values>>
-  onFailedSubmit?: () => void
-}
 
 function withFormProvider<T extends React.ComponentType<any>>(
   form: Form,
@@ -56,8 +52,6 @@ export function useForm<Values extends FormValues>(
     validateOnChange = true,
     validateOnBlur = false,
     validateDebounce = false,
-    validateDebounceWait = 300,
-    validateDebounceLeading = false,
     onValidate = async () => ({}),
   } = config
 
@@ -90,9 +84,11 @@ export function useForm<Values extends FormValues>(
       }
     }
 
-    if (validateDebounce) {
-      return debouncePromise(doValidate, validateDebounceWait, {
-        leading: validateDebounceLeading,
+    const debounce = getDebounceValues(validateDebounce)
+
+    if (debounce) {
+      return debouncePromise(doValidate, debounce.wait, {
+        leading: debounce.leading,
       })
     } else {
       return doValidate
