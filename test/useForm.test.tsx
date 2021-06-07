@@ -259,6 +259,32 @@ describe("useForm", () => {
     expect(form().getFieldErrors("name")).toEqual(expectedErrors)
   })
 
+  it("isFieldValid", () => {
+    const { form } = renderTestForm()
+
+    expect(form().isFieldValid("name")).toBe(true)
+
+    // single error
+    form().setFieldError("name", "Empty name")
+    expect(form().isFieldValid("name")).toBe(false)
+
+    // multiple errors
+    form().setFieldError("name", ["Empty name", "Another error"])
+    expect(form().isFieldValid("name")).toBe(false)
+
+    // undefined means no error
+    form().setFieldError("name", undefined)
+    expect(form().isFieldValid("name")).toBe(true)
+
+    // [] means no error
+    form().setFieldError("name", [])
+    expect(form().isFieldValid("name")).toBe(true)
+
+    // "" means no error
+    form().setFieldError("name", "")
+    expect(form().isFieldValid("name")).toBe(true)
+  })
+
   it("handles field touched", () => {
     const { form } = renderTestForm()
 

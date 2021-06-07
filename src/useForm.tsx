@@ -177,6 +177,10 @@ export function useForm<Values extends FormValues>(
     isFieldTouched(field: keyof Values & string) {
       return Boolean(form.touched[field])
     },
+    isFieldValid(field: keyof Values & string) {
+      const error = form.getFieldError(field)
+      return error == null || error === ""
+    },
     async validate() {
       return executeValidate.current()
     },

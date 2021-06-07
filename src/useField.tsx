@@ -26,6 +26,7 @@ export type UseFieldResult<T = any, Values = any> = {
   readonly touched: boolean
   readonly error: string | undefined
   readonly errors: string[] | undefined
+  readonly isValid: boolean
   form: Form<Values>
   setValue: (value: T) => void
   setTouched: (isTouched?: boolean) => void
@@ -106,6 +107,9 @@ export function useField<T = any, Values = any>(
     },
     get errors() {
       return form.getFieldErrors(name)
+    },
+    get isValid() {
+      return form.isFieldValid(name)
     },
     form,
     setValue(value: T) {
