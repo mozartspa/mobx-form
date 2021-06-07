@@ -32,10 +32,10 @@ const App = observer(() => {
       }
       list.forEach((item, index) => {
         if (item.name === "") {
-          errors[`list[${index}].name`] = "Name cannot be blank"
+          errors[`list.${index}.name`] = "Name cannot be blank"
         }
         if (item.surname === "") {
-          errors[`list[${index}].surname`] = "Surname cannot be blank"
+          errors[`list.${index}.surname`] = "Surname cannot be blank"
         }
       })
 
@@ -70,7 +70,7 @@ const App = observer(() => {
             </div>
           )}
         </Field>
-        <FieldScope name="list[0]">
+        <FieldScope name="list.0">
           <Field name="name">
             {(field) => (
               <div>
