@@ -223,4 +223,36 @@ describe("useForm", () => {
     expect(form().getFieldError("friends.0.name")).toEqual("Is it a name?")
     expect(form().getFieldError("friends.0.surname")).toEqual(undefined)
   })
+
+  it("handles field touched", () => {
+    const { form } = renderTestForm()
+
+    form().setFieldTouched("name", true)
+    form().setFieldTouched("surname", false)
+    form().setFieldTouched("preferences.color") // true if not specified
+    form().setFieldTouched("friends.0.name", true)
+
+    expect(form().getFieldTouched("name")).toBe(true)
+    expect(form().getFieldTouched("surname")).toBe(false)
+    expect(form().getFieldTouched("preferences.color")).toBe(true)
+    expect(form().getFieldTouched("friends.0.name")).toBe(true)
+    expect(form().getFieldTouched("friends.0.surname")).toBe(false)
+  })
+
+  it("setTouched", () => {
+    const { form } = renderTestForm()
+
+    form().setTouched({
+      name: true,
+      surname: false,
+      "preferences.color": true,
+      "friends.0.name": true,
+    })
+
+    expect(form().getFieldTouched("name")).toBe(true)
+    expect(form().getFieldTouched("surname")).toBe(false)
+    expect(form().getFieldTouched("preferences.color")).toBe(true)
+    expect(form().getFieldTouched("friends.0.name")).toBe(true)
+    expect(form().getFieldTouched("friends.0.surname")).toBe(false)
+  })
 })
