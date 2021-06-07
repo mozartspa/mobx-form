@@ -1,63 +1,32 @@
 import { render } from "@testing-library/react"
-import { observer } from "mobx-react-lite"
 import * as React from "react"
-import {
-  Field,
-  FieldRenderProps,
-  FormConfig,
-  useForm,
-  UseFormResult,
-} from "../src"
-import { Form } from "../src/types"
+import { Field, FieldRenderProps, FormConfig, UseFormResult } from "../src"
+import { renderForm } from "./__helpers/renderForm"
 
-const initialValues = { name: "murray" }
+const InitialValues = { name: "murray" }
 
-function renderForm(
-  ui: (form: UseFormResult<any>) => React.ReactNode,
+function renderTestForm(
+  ui?: (form: UseFormResult<any>) => React.ReactNode,
   props: FormConfig = {}
 ) {
-  let formHook: Form | undefined = undefined
-  let renderCount = 0
-
-  const MyForm = observer((props: FormConfig = {}) => {
-    const form = useForm({ initialValues, ...props })
-
-    formHook = form
-    renderCount++
-
-    const { Form } = form
-
-    return <Form>{ui(form)}</Form>
+  return renderForm(ui, {
+    initialValues: InitialValues,
+    ...props,
   })
-
-  const { rerender, ...rest } = render(<MyForm {...props} />)
-
-  return {
-    getForm() {
-      return formHook
-    },
-    getRenderCount() {
-      return renderCount
-    },
-    ...rest,
-    rerender(props: FormConfig = {}) {
-      return rerender(<MyForm {...props} />)
-    },
-  }
 }
 
 describe("<Field />", () => {
   it("exposes render props to its children", () => {
     let injectedField: FieldRenderProps | undefined = undefined
 
-    const { getForm } = renderForm((form) => (
+    const { form } = renderTestForm((form) => (
       <form.Field name="name">
         {(field) => ((injectedField = field), (<span />))}
       </form.Field>
     ))
 
     const field = injectedField!
-    expect(field.form).toBe(getForm())
+    expect(field.form).toBe(form())
     expect(field.name).toEqual("name")
     expect(field.value).toEqual("murray")
     expect(field.touched).toBe(false)
@@ -72,7 +41,7 @@ describe("<Field />", () => {
     let injectedField: FieldRenderProps | undefined = undefined
     let injectedField2: FieldRenderProps | undefined = undefined
 
-    const { getForm } = renderForm(() => (
+    const { form } = renderTestForm(() => (
       <>
         <Field name="name">
           {(field) => ((injectedField = field), (<span />))}
@@ -81,14 +50,14 @@ describe("<Field />", () => {
     ))
 
     render(
-      <Field name="name" form={getForm()}>
+      <Field name="name" form={form()}>
         {(field) => ((injectedField2 = field), (<span />))}
       </Field>
     )
 
     const field = injectedField!
     const field2 = injectedField2!
-    expect(field.form).toBe(getForm())
-    expect(field2.form).toBe(getForm())
+    expect(field.form).toBe(form())
+    expect(field2.form).toBe(form())
   })
 })
