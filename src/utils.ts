@@ -98,7 +98,7 @@ export function isError(error: string | string[] | undefined) {
 export function getDebounceValues(
   debounce: ValidateDebounce,
   defaultWait = 300,
-  defaultLeading = true
+  defaultLeading = false
 ) {
   if (!debounce) {
     return false
