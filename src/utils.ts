@@ -1,4 +1,4 @@
-import { useRef, useState } from "react"
+import { DependencyList, useMemo, useRef, useState } from "react"
 import { ValidateDebounce } from "./types"
 
 export const isString = (obj: any): obj is string =>
@@ -78,8 +78,8 @@ export function useCounter() {
   return counter
 }
 
-export function useLatestValue<T>(getValue: () => T) {
-  const value = getValue()
+export function useLatestValue<T>(getValue: () => T, deps?: DependencyList) {
+  const value = useMemo(getValue, deps)
   const ref = useRef(value)
   ref.current = value
   return ref

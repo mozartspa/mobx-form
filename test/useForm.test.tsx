@@ -521,3 +521,96 @@ describe("useForm validation", () => {
     expect(form().getFieldError("name")).toEqual("Error 1")
   })
 })
+
+describe("useForm validation debounce", () => {
+  it("debounce is off by default", () => {
+    const onValidate = jest.fn(() => Promise.resolve({}))
+    const { form } = renderTestForm({
+      onValidate,
+      validateOnChange: true,
+    })
+
+    for (let i = 0; i < 3; i++) {
+      form().setFieldValue("name", `jean${i}`)
+      expect(onValidate).toBeCalledTimes(i + 1)
+    }
+  })
+
+  it("validationDebounce is true - has no leading by default", async () => {
+    const onValidate = jest.fn(() => Promise.resolve({}))
+    const { form } = renderTestForm({
+      onValidate,
+      validateOnChange: true,
+      validateDebounce: true,
+    })
+
+    for (let i = 0; i < 3; i++) {
+      form().setFieldValue("name", `jean${i}`)
+      expect(onValidate).toBeCalledTimes(0)
+    }
+
+    await wait(350)
+
+    expect(onValidate).toBeCalledTimes(1)
+  })
+
+  it("validationDebounce with custom wait - has no leading by default", async () => {
+    const onValidate = jest.fn(() => Promise.resolve({}))
+    const { form } = renderTestForm({
+      onValidate,
+      validateOnChange: true,
+      validateDebounce: 500,
+    })
+
+    for (let i = 0; i < 3; i++) {
+      form().setFieldValue("name", `jean${i}`)
+      expect(onValidate).toBeCalledTimes(0)
+      await wait(100)
+    }
+
+    await wait(450)
+
+    expect(onValidate).toBeCalledTimes(1)
+  })
+
+  it("validationDebounce with custom wait and leading", async () => {
+    const onValidate = jest.fn(() => Promise.resolve({}))
+    const { form } = renderTestForm({
+      onValidate,
+      validateOnChange: true,
+      validateDebounce: { wait: 500, leading: true },
+    })
+
+    for (let i = 0; i < 3; i++) {
+      form().setFieldValue("name", `jean${i}`)
+      expect(onValidate).toBeCalledTimes(1)
+      await wait(100)
+    }
+
+    await wait(450)
+    expect(onValidate).toBeCalledTimes(2)
+  })
+
+  it("validationDebounce with custom wait and leading while rerendering", async () => {
+    const onValidate = jest.fn(() => Promise.resolve({}))
+    const { form, rerender } = renderTestForm({
+      onValidate,
+      validateOnChange: true,
+      validateDebounce: { wait: 500, leading: true },
+    })
+
+    for (let i = 0; i < 3; i++) {
+      form().setFieldValue("name", `jean${i}`)
+      expect(onValidate).toBeCalledTimes(1)
+      rerender({
+        onValidate,
+        validateOnChange: true,
+        validateDebounce: { wait: 500, leading: true },
+      })
+      await wait(100)
+    }
+
+    await wait(450)
+    expect(onValidate).toBeCalledTimes(2)
+  })
+})

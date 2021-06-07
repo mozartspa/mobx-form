@@ -62,6 +62,8 @@ export function useForm<Values extends FormValues>(
 
   const counter = useCounter()
 
+  const debounceValues = getDebounceValues(validateDebounce)
+
   const executeValidate = useLatestValue(() => {
     const doValidate = async () => {
       try {
@@ -84,16 +86,18 @@ export function useForm<Values extends FormValues>(
       }
     }
 
-    const debounce = getDebounceValues(validateDebounce)
-
-    if (debounce) {
-      return debouncePromise(doValidate, debounce.wait, {
-        leading: debounce.leading,
+    if (debounceValues) {
+      return debouncePromise(doValidate, debounceValues.wait, {
+        leading: debounceValues.leading,
       })
     } else {
       return doValidate
     }
-  })
+  }, [
+    onValidate,
+    debounceValues && debounceValues.wait,
+    debounceValues && debounceValues.leading,
+  ])
 
   const optionsRef = useLatestValue(() => ({
     validateOnChange,
