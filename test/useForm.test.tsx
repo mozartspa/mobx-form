@@ -5,6 +5,15 @@ import { renderForm } from "./__helpers/renderForm"
 const InitialValues = {
   name: "bill",
   surname: "murray",
+  preferences: {
+    color: "blue",
+  },
+  friends: [
+    {
+      name: "bax",
+      age: 23,
+    },
+  ],
 }
 
 function renderTestForm(props: FormConfig = {}) {
@@ -125,5 +134,49 @@ describe("useForm", () => {
 
     expect(onValidate).toBeCalledTimes(1)
     expect(onValidate2).toBeCalledTimes(1)
+  })
+
+  it("handles field errors", () => {
+    const { form } = renderTestForm()
+
+    form().setFieldError("name", "Empty name")
+    form().setFieldError("surname", ["Empty surname", "Another error"])
+    form().setFieldError("preferences.color", "Not a nice color")
+    form().setFieldError("friends.0.name", "Is it a name?")
+
+    expect(form().getFieldError("name")).toEqual("Empty name")
+    expect(form().getFieldError("surname")).toEqual("Empty surname")
+    expect(form().getFieldErrors("surname")).toEqual([
+      "Empty surname",
+      "Another error",
+    ])
+    expect(form().getFieldError("preferences.color")).toEqual(
+      "Not a nice color"
+    )
+    expect(form().getFieldError("friends.0.name")).toEqual("Is it a name?")
+    expect(form().getFieldError("friends.0.surname")).toEqual(undefined)
+  })
+
+  it("setErrors", () => {
+    const { form } = renderTestForm()
+
+    form().setErrors({
+      name: "Empty name",
+      surname: ["Empty surname", "Another error"],
+      "preferences.color": "Not a nice color",
+      "friends.0.name": "Is it a name?",
+    })
+
+    expect(form().getFieldError("name")).toEqual("Empty name")
+    expect(form().getFieldError("surname")).toEqual("Empty surname")
+    expect(form().getFieldErrors("surname")).toEqual([
+      "Empty surname",
+      "Another error",
+    ])
+    expect(form().getFieldError("preferences.color")).toEqual(
+      "Not a nice color"
+    )
+    expect(form().getFieldError("friends.0.name")).toEqual("Is it a name?")
+    expect(form().getFieldError("friends.0.surname")).toEqual(undefined)
   })
 })
