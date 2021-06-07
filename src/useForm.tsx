@@ -8,7 +8,7 @@ import isEqual from "react-fast-compare"
 import { DebugForm } from "./DebugForm"
 import { Field, FieldProps } from "./Field"
 import { FieldArray, FieldArrayProps } from "./FieldArray"
-import { Form, FormErrors, FormTouched, FormValues } from "./types"
+import { FieldError, Form, FormErrors, FormTouched, FormValues } from "./types"
 import { FormContext, useFormContext } from "./useFormContext"
 import {
   isFunction,
@@ -110,13 +110,16 @@ export function useForm<Values extends FormValues>(
       return !isEqual(originalValuesRef.current, toJS(form.values))
     },
     get isValid() {
-      return Object.keys(form.errors).length === 0
+      return (
+        Object.keys(form.errors).filter((key) => form.errors[key] != null)
+          .length === 0
+      )
     },
     setErrors(errors: FormErrors<Values>) {
-      form.errors = errors
+      form.errors = errors || {}
     },
     setTouched(touched: FormTouched<Values>) {
-      form.touched = touched
+      form.touched = touched || {}
     },
     setValues(values: Values) {
       form.values = toJS(values)
@@ -130,18 +133,33 @@ export function useForm<Values extends FormValues>(
     getFieldValue(field: keyof Values & string) {
       return get(form.values, field)
     },
-    setFieldError(field: keyof Values & string, message: string) {
-      set(form.errors, field, message)
+    setFieldError(field: keyof Values & string, message: FieldError) {
+      form.errors[field] = message
     },
-    getFieldError(field: keyof Values & string) {
-      return get(form.errors, field) as string
+    getFieldError(field: keyof Values & string): string | undefined {
+      const err = form.errors[field]
+      if (Array.isArray(err)) {
+        return err[0]
+      } else {
+        return err
+      }
+    },
+    getFieldErrors(field: keyof Values & string): string[] | undefined {
+      const err = form.errors[field]
+      if (err == null) {
+        return undefined
+      } else if (Array.isArray(err)) {
+        return err
+      } else {
+        return [err]
+      }
     },
     setFieldTouched(field: keyof Values & string, isTouched: boolean = true) {
-      set(form.touched, field, isTouched)
+      form.touched[field] = isTouched
       isTouched && validateOnBlur && form.validate()
     },
     getFieldTouched(field: keyof Values & string) {
-      return Boolean(get(form.touched, field))
+      return Boolean(form.touched[field])
     },
     async validate() {
       return executeValidate.current()

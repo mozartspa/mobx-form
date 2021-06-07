@@ -1,6 +1,6 @@
 import React, { useCallback } from "react"
 import { FieldScopeContext } from "./FieldScope"
-import { Form } from "./types"
+import { FieldError, Form } from "./types"
 import { FormContext } from "./useFormContext"
 import { getSelectedValues, getValueForCheckbox } from "./utils"
 
@@ -24,11 +24,12 @@ export type UseFieldResult<T = any, Values = any> = {
   readonly name: string
   readonly value: T
   readonly touched: boolean
-  readonly error: string
+  readonly error: string | undefined
+  readonly errors: string[] | undefined
   form: Form<Values>
   setValue: (value: T) => void
   setTouched: (isTouched?: boolean) => void
-  setError: (error: string) => void
+  setError: (error: FieldError) => void
 }
 
 export function useField<T = any, Values = any>(
@@ -102,6 +103,9 @@ export function useField<T = any, Values = any>(
     get error() {
       return form.getFieldError(name)
     },
+    get errors() {
+      return form.getFieldErrors(name)
+    },
     form,
     setValue(value: T) {
       form.setFieldValue(name, value)
@@ -109,7 +113,7 @@ export function useField<T = any, Values = any>(
     setTouched(isTouched = true) {
       form.setFieldTouched(name, isTouched)
     },
-    setError(error: string) {
+    setError(error: FieldError) {
       form.setFieldError(name, error)
     },
   }
