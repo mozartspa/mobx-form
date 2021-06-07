@@ -1,6 +1,7 @@
 import * as React from "react"
 import { FormConfig } from "../src/types"
 import { renderForm } from "./__helpers/renderForm"
+import { wait } from "./__helpers/wait"
 
 const InitialValues = {
   name: "bill",
@@ -485,5 +486,38 @@ describe("useForm validation", () => {
     form().setFieldTouched("name", true)
 
     expect(onValidate).toBeCalledTimes(2)
+  })
+
+  it("only last validation result is used", async () => {
+    let n = 0
+    const onValidate = jest.fn(async () => {
+      const count = n
+      n++
+      await wait(500 - count * 500)
+      return {
+        name: `Error ${count}`,
+      }
+    })
+
+    const { form } = renderTestForm({
+      onValidate,
+      validateOnChange: true,
+    })
+
+    form().setFieldValue("name", "jean")
+
+    await wait(100)
+
+    form().setFieldValue("name", "jean2")
+
+    await wait(10)
+
+    expect(onValidate).toBeCalledTimes(2)
+    expect(form().getFieldError("name")).toEqual("Error 1")
+
+    await wait(500)
+
+    expect(onValidate).toBeCalledTimes(2)
+    expect(form().getFieldError("name")).toEqual("Error 1")
   })
 })
