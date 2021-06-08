@@ -80,6 +80,7 @@ export type UseFieldOptions<T = any, Values = any> = {
   form?: Form<Values> | undefined
   format?: (value: T) => any
   parse?: (value: any) => T
+  parseOnBlur?: (value: any) => T
   validate?: FieldValidate<T, Values>
   validateDebounce?: ValidateDebounce
 }

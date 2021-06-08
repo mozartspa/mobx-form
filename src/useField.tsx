@@ -44,6 +44,7 @@ export function useField<T = any, Values = any>(
   const {
     format,
     parse = defaultParse,
+    parseOnBlur,
     validate,
     validateDebounce = false,
   } = options
@@ -66,8 +67,11 @@ export function useField<T = any, Values = any>(
 
   // blur callback
   const onBlur = useCallback(() => {
+    if (parseOnBlur) {
+      form.setFieldValue(name, parseOnBlur(form.getFieldValue(name)))
+    }
     form.setFieldTouched(name, true)
-  }, [form, name])
+  }, [form, name, parseOnBlur])
 
   // change callback
   const onChange = useCallback(

@@ -133,6 +133,25 @@ describe("<Field />", () => {
     expect(form().getFieldValue("age")).toEqual(42)
     expect(input.value).toEqual("42")
   })
+
+  it("parseOnBlur value", () => {
+    const parse = (value: any) => (value === "" ? "no value" : value)
+
+    const { form, getByTestId } = renderTestForm(() => (
+      <Field name="name" parseOnBlur={parse}>
+        {(field) => <input {...field.input} data-testid="name-input" />}
+      </Field>
+    ))
+
+    form().setFieldValue("name", "")
+
+    const input = getByTestId("name-input") as HTMLInputElement
+    expect(input.value).toEqual("")
+
+    fireEvent.blur(input)
+
+    expect(input.value).toEqual("no value")
+  })
 })
 
 describe("<Field /> validation", () => {
