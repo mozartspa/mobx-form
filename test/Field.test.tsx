@@ -250,4 +250,69 @@ describe("<Field /> validation", () => {
       expect(field.error).toEqual("Uh oh!")
     })
   })
+
+  it("validateField", async () => {
+    let injectedField: FieldRenderProps | undefined = undefined
+    const { form } = renderForm(
+      () => (
+        <Field
+          name="name"
+          validate={(value) =>
+            value === "jack" ? "Name already taken" : undefined
+          }
+        >
+          {(field) => (injectedField = field) && <span />}
+        </Field>
+      ),
+      {
+        initialValues: { name: "jack" },
+      }
+    )
+
+    const error = await form().validateField("name")
+
+    expect(error).toEqual("Name already taken")
+    expect(injectedField!.error).toEqual(error)
+  })
+
+  it("validateField on field without validation or non-existing returns no error", async () => {
+    const { form } = renderForm(() => (
+      <Field name="name">{() => <span />}</Field>
+    ))
+
+    const error = await form().validateField("name")
+
+    expect(error).toBe(undefined)
+    expect(form().getFieldError("name")).toEqual(error)
+
+    const error2 = await form().validateField("non-existing-field")
+
+    expect(error2).toBe(undefined)
+    expect(form().getFieldError("non-existing-field")).toEqual(error2)
+  })
+
+  it("validate on field", async () => {
+    let injectedField: FieldRenderProps | undefined = undefined
+    renderForm(
+      () => (
+        <Field
+          name="name"
+          validate={(value) =>
+            value === "jack" ? "Name already taken" : undefined
+          }
+        >
+          {(field) => (injectedField = field) && <span />}
+        </Field>
+      ),
+      {
+        initialValues: { name: "jack" },
+      }
+    )
+
+    const field = injectedField!
+    const error = await field.validate()
+
+    expect(error).toEqual("Name already taken")
+    expect(field.error).toEqual(error)
+  })
 })

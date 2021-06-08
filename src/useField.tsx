@@ -35,7 +35,7 @@ export type UseFieldResult<T = any, Values = any> = {
   setTouched: (isTouched?: boolean) => void
   setError: (error: FieldError) => void
   addError: (error: FieldError) => void
-  validate: () => Promise<void>
+  validate: () => Promise<FieldError>
 }
 
 export function useField<T = any, Values = any>(
@@ -147,17 +147,6 @@ export function useField<T = any, Values = any>(
     ] /* eslint-enable react-hooks/exhaustive-deps */
   )
 
-  // standalone validator for this field
-  const executeValidate = useMemo(() => {
-    return async () => {
-      const errors = await debouncedValidator(
-        form.getFieldValue(name),
-        form.values
-      )
-      form.setFieldError(name, errors)
-    }
-  }, [debouncedValidator, form, name])
-
   // register the debounced validator to the form
   useEffect(() => {
     const disposer = form.register(name, {
@@ -209,7 +198,7 @@ export function useField<T = any, Values = any>(
       form.addFieldError(name, error)
     },
     validate() {
-      return executeValidate()
+      return form.validateField(name)
     },
     get isValidating() {
       return state.isValidating

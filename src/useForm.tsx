@@ -242,6 +242,18 @@ export function useForm<Values extends FormValues>(
     async validate() {
       return executeValidate.current()
     },
+    async validateField(field: keyof Values & string) {
+      const registrant = registeredFields.current[field]
+      if (!registrant) {
+        return Promise.resolve(undefined)
+      }
+      const errors = await registrant.validate(
+        form.getFieldValue(field),
+        form.values
+      )
+      form.setFieldError(field, errors)
+      return errors
+    },
     reset(values: Values | undefined = undefined, isValid: boolean = true) {
       if (values) {
         originalValuesRef.current = toJS(values)

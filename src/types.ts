@@ -42,6 +42,7 @@ export type Form<Values = FormValues> = {
   isFieldValid(field: keyof Values & string): boolean
   isFieldDirty(field: keyof Values & string): boolean
   validate(): Promise<FormErrors<Error>>
+  validateField(field: keyof Values & string): Promise<FieldError>
   reset(values?: Values, isValid?: boolean): void
   resetField(field: keyof Values & string, value?: any): void
   submit(): Promise<void>
