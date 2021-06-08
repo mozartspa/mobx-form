@@ -10,7 +10,7 @@ describe("<FieldScope />", () => {
       () => (
         <FieldScope name="nested">
           <Field name="name">
-            {(field) => ((injectedField = field), (<span />))}
+            {(field) => (injectedField = field) && <span />}
           </Field>
         </FieldScope>
       ),

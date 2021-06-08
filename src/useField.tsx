@@ -106,36 +106,41 @@ export function useField<T = any, Values = any>(
   // create debounced validator
   const counter = useCounter()
   const debounceValues = getDebounceValues(validateDebounce)
-  const debouncedValidator = useMemo(() => {
-    const doValidate: FieldValidate<T, Values> = async (value, values) => {
-      state.setValidating(true)
-      const validationId = counter.getValue()
+  const debouncedValidator = useMemo(
+    () => {
+      const doValidate: FieldValidate<T, Values> = async (value, values) => {
+        state.setValidating(true)
+        const validationId = counter.getValue()
 
-      let errors: FieldError
-      try {
-        errors = validate ? await validate(value, values) : undefined
-      } catch (err) {
-        errors = err.message
+        let errors: FieldError
+        try {
+          errors = validate ? await validate(value, values) : undefined
+        } catch (err) {
+          errors = err.message
+        }
+
+        if (counter.isLastValue(validationId)) {
+          state.setValidating(false)
+        }
+        return errors
       }
 
-      if (counter.isLastValue(validationId)) {
-        state.setValidating(false)
+      if (debounceValues) {
+        return debounce(doValidate, debounceValues.wait, {
+          leading: debounceValues.leading,
+        }) as FieldValidate<T, Values>
+      } else {
+        return doValidate
       }
-      return errors
-    }
-
-    if (debounceValues) {
-      return debounce(doValidate, debounceValues.wait, {
-        leading: debounceValues.leading,
-      }) as FieldValidate<T, Values>
-    } else {
-      return doValidate
-    }
-  }, [
-    validate,
-    debounceValues && debounceValues.wait,
-    debounceValues && debounceValues.leading,
-  ])
+    },
+    // elint does not understand the usage of `debounceValues`
+    /* eslint-disable react-hooks/exhaustive-deps */
+    [
+      validate,
+      debounceValues && debounceValues.wait,
+      debounceValues && debounceValues.leading,
+    ] /* eslint-enable react-hooks/exhaustive-deps */
+  )
 
   // standalone validator for this field
   const execValidateCounter = useCounter()
@@ -150,7 +155,7 @@ export function useField<T = any, Values = any>(
         form.setFieldError(name, errors)
       }
     }
-  }, [debouncedValidator, form, name])
+  }, [debouncedValidator, form, name, execValidateCounter])
 
   // register the debounced validator to the form
   useEffect(() => {

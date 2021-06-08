@@ -23,7 +23,7 @@ describe("<Field />", () => {
 
     const { form } = renderTestForm((form) => (
       <form.Field name="name">
-        {(field) => ((injectedField = field), (<span />))}
+        {(field) => (injectedField = field) && <span />}
       </form.Field>
     ))
 
@@ -46,14 +46,14 @@ describe("<Field />", () => {
     const { form } = renderTestForm(() => (
       <>
         <Field name="name">
-          {(field) => ((injectedField = field), (<span />))}
+          {(field) => (injectedField = field) && <span />}
         </Field>
       </>
     ))
 
     render(
       <Field name="surname" form={form()}>
-        {(field) => ((injectedField2 = field), (<span />))}
+        {(field) => (injectedField2 = field) && <span />}
       </Field>
     )
 
@@ -193,7 +193,7 @@ describe("<Field /> validation", () => {
     renderTestForm(
       () => (
         <Field name="name" validate={validate}>
-          {(field) => ((injectedField = field), (<span />))}
+          {(field) => (injectedField = field) && <span />}
         </Field>
       ),
       {
@@ -216,7 +216,7 @@ describe("<Field /> validation", () => {
     renderTestForm(
       () => (
         <Field name="name" validate={validate}>
-          {(field) => ((injectedField = field), (<span />))}
+          {(field) => (injectedField = field) && <span />}
         </Field>
       ),
       {
