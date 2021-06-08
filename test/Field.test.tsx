@@ -1,4 +1,4 @@
-import { render } from "@testing-library/react"
+import { fireEvent, render } from "@testing-library/react"
 import * as React from "react"
 import waitForExpect from "wait-for-expect"
 import { Field, FieldRenderProps, UseFormResult } from "../src"
@@ -61,6 +61,77 @@ describe("<Field />", () => {
     const field2 = injectedField2!
     expect(field.form).toBe(form())
     expect(field2.form).toBe(form())
+  })
+
+  it("format value", () => {
+    const format = (value: any) => (value === "" ? "no value" : value)
+
+    const { form, getByTestId } = renderTestForm(() => (
+      <Field name="name" format={format}>
+        {(field) => <input {...field.input} data-testid="name-input" />}
+      </Field>
+    ))
+
+    form().setFieldValue("name", "")
+
+    const input = getByTestId("name-input") as HTMLInputElement
+    expect(form().getFieldValue("name")).toEqual("")
+    expect(input.value).toEqual("no value")
+  })
+
+  it("parse value", () => {
+    const parse = (value: any) => (value === "" ? "no value" : value)
+
+    const { form, getByTestId } = renderTestForm(() => (
+      <Field name="name" parse={parse}>
+        {(field) => <input {...field.input} data-testid="name-input" />}
+      </Field>
+    ))
+
+    const input = getByTestId("name-input") as HTMLInputElement
+    fireEvent.change(input, {
+      target: {
+        value: "",
+      },
+    })
+
+    expect(form().getFieldValue("name")).toEqual("no value")
+    expect(input.value).toEqual("no value")
+  })
+
+  it("format and parse value", () => {
+    const format = (value: any) => `${value}`
+    const parse = (value: any) => {
+      const num = parseInt(value)
+      if (isNaN(num)) {
+        return 0
+      } else {
+        return num
+      }
+    }
+
+    const { form, getByTestId } = renderTestForm(
+      () => (
+        <Field name="age" format={format} parse={parse}>
+          {(field) => <input {...field.input} data-testid="age-input" />}
+        </Field>
+      ),
+      {
+        initialValues: {
+          age: 37,
+        },
+      }
+    )
+
+    const input = getByTestId("age-input") as HTMLInputElement
+    fireEvent.change(input, {
+      target: {
+        value: "42",
+      },
+    })
+
+    expect(form().getFieldValue("age")).toEqual(42)
+    expect(input.value).toEqual("42")
   })
 })
 

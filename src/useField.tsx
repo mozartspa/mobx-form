@@ -90,9 +90,9 @@ export function useField<T = any, Values = any>(
         ? getSelectedValues(options)
         : value
 
-      form.setFieldValue(name, format ? format(val) : val)
+      form.setFieldValue(name, parse ? parse(val) : val)
     },
-    [form, name, format]
+    [form, name, parse]
   )
 
   // validating state managed by mobx
@@ -165,7 +165,7 @@ export function useField<T = any, Values = any>(
       name,
       get value(): T {
         const value = form.getFieldValue(name)
-        return parse ? parse(value) : value
+        return format ? format(value) : value
       },
       onBlur,
       onChange,
