@@ -1,5 +1,6 @@
 import { render } from "@testing-library/react"
 import * as React from "react"
+import waitForExpect from "wait-for-expect"
 import { Field, FieldRenderProps, UseFormResult } from "../src"
 import { FormConfig } from "../src/types"
 import { renderForm } from "./__helpers/renderForm"
@@ -51,7 +52,7 @@ describe("<Field />", () => {
     ))
 
     render(
-      <Field name="name" form={form()}>
+      <Field name="surname" form={form()}>
         {(field) => ((injectedField2 = field), (<span />))}
       </Field>
     )
@@ -60,5 +61,103 @@ describe("<Field />", () => {
     const field2 = injectedField2!
     expect(field.form).toBe(form())
     expect(field2.form).toBe(form())
+  })
+})
+
+describe("<Field /> validation", () => {
+  it("field validation is called when validating form", () => {
+    const validate = jest.fn(() => Promise.resolve(undefined))
+    const { form } = renderTestForm(
+      () => (
+        <Field name="name" validate={validate}>
+          {() => <span />}
+        </Field>
+      ),
+      {
+        validateOnChange: true,
+      }
+    )
+
+    form().setFieldValue("name", "jean")
+
+    expect(validate).toBeCalledTimes(1)
+  })
+
+  it("uses latest validate callback", () => {
+    const validate = jest.fn(() => Promise.resolve(undefined))
+    const validate2 = jest.fn(() => Promise.resolve(undefined))
+    const { form, rerender } = renderTestForm(
+      () => (
+        <Field name="name" validate={validate}>
+          {() => <span />}
+        </Field>
+      ),
+      {
+        validateOnChange: true,
+      }
+    )
+
+    form().setFieldValue("name", "jean")
+
+    expect(validate).toBeCalledTimes(1)
+
+    rerender({
+      ui: () => (
+        <Field name="name" validate={validate2}>
+          {() => <span />}
+        </Field>
+      ),
+    })
+
+    form().setFieldValue("name", "jean2")
+
+    expect(validate).toBeCalledTimes(1)
+    expect(validate2).toBeCalledTimes(1)
+  })
+
+  it("field validation error is merged into errors", async () => {
+    let injectedField: FieldRenderProps | undefined = undefined
+    const validate = jest.fn(() => Promise.resolve("Error!"))
+
+    renderTestForm(
+      () => (
+        <Field name="name" validate={validate}>
+          {(field) => ((injectedField = field), (<span />))}
+        </Field>
+      ),
+      {
+        validateOnChange: true,
+      }
+    )
+
+    const field = injectedField!
+    field.setValue("jean")
+
+    await waitForExpect(() => {
+      expect(field.error).toEqual("Error!")
+    })
+  })
+
+  it("if validation throws, error message is used as error", async () => {
+    let injectedField: FieldRenderProps | undefined = undefined
+    const validate = jest.fn(() => Promise.reject(new Error("Uh oh!")))
+
+    renderTestForm(
+      () => (
+        <Field name="name" validate={validate}>
+          {(field) => ((injectedField = field), (<span />))}
+        </Field>
+      ),
+      {
+        validateOnChange: true,
+      }
+    )
+
+    const field = injectedField!
+    field.setValue("jean")
+
+    await waitForExpect(() => {
+      expect(field.error).toEqual("Uh oh!")
+    })
   })
 })

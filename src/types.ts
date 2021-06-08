@@ -12,6 +12,12 @@ export type FormTouched<Values = any> = {
   [K in keyof Values & string]?: boolean | undefined
 }
 
+export type FieldRegistrant<T = any, Values = any> = {
+  validate: FieldValidate<T, Values>
+}
+
+export type Disposer = () => void
+
 export type Form<Values = FormValues> = {
   values: Values
   validValues: Values
@@ -40,6 +46,10 @@ export type Form<Values = FormValues> = {
   submit(): Promise<void>
   handleSubmit: (e?: React.FormEvent<HTMLFormElement>) => Promise<void>
   handleReset: (e?: React.SyntheticEvent<any>) => void
+  register: (
+    field: keyof Values & string,
+    registrant: FieldRegistrant<any, Values>
+  ) => Disposer
 }
 
 export type FormValidate<Values = any> = (
@@ -61,8 +71,15 @@ export type FormConfig<Values = any> = {
   onFailedSubmit?: () => void
 }
 
+export type FieldValidate<T = any, Values = any> = (
+  value: T,
+  values: Values
+) => FieldError | Promise<FieldError>
+
 export type UseFieldOptions<T = any, Values = any> = {
   form?: Form<Values> | undefined
   format?: (value: T) => any
   parse?: (value: any) => T
+  validate?: FieldValidate<T, Values>
+  validateDebounce?: ValidateDebounce
 }

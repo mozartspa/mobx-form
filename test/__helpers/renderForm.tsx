@@ -4,22 +4,27 @@ import React from "react"
 import { useForm, UseFormResult } from "../../src"
 import { Form, FormConfig } from "../../src/types"
 
-export function renderForm(
-  ui?: (form: UseFormResult<any>) => React.ReactNode,
-  props: FormConfig = {}
-) {
+type UI = (form: UseFormResult<any>) => React.ReactNode
+
+type Props = FormConfig & {
+  ui?: UI
+}
+
+export function renderForm(ui?: UI, props: FormConfig = {}) {
   let formHook: Form | undefined = undefined
   let renderCount = 0
 
-  const MyForm = observer((props: FormConfig = {}) => {
-    const form = useForm(props)
+  const MyForm = observer((props: Props = {}) => {
+    const { ui: propUI, ...rest } = props
+    const form = useForm(rest)
 
     formHook = form
     renderCount++
 
     const { Form } = form
+    const renderUI = propUI || ui
 
-    return <Form>{ui ? ui(form) : null}</Form>
+    return <Form>{renderUI ? renderUI(form) : null}</Form>
   })
 
   const { rerender, ...rest } = render(<MyForm {...props} />)
@@ -32,7 +37,7 @@ export function renderForm(
       return renderCount
     },
     ...rest,
-    rerender(props: FormConfig = {}) {
+    rerender(props: Props = {}) {
       return rerender(<MyForm {...props} />)
     },
   }

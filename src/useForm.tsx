@@ -1,4 +1,4 @@
-import debouncePromise from "debounce-promise"
+import debounce from "debounce-promise"
 import get from "lodash.get"
 import set from "lodash.set"
 import { runInAction, toJS } from "mobx"
@@ -10,6 +10,7 @@ import { Field, FieldProps } from "./Field"
 import { FieldArray, FieldArrayProps } from "./FieldArray"
 import {
   FieldError,
+  FieldRegistrant,
   Form,
   FormConfig,
   FormErrors,
@@ -22,8 +23,11 @@ import {
   getDebounceValues,
   isError,
   isFunction,
+  logError,
+  mergeErrors,
   useCounter,
   useLatestValue,
+  warn,
 } from "./utils"
 
 function withFormProvider<T extends React.ComponentType<any>>(
@@ -36,6 +40,8 @@ function withFormProvider<T extends React.ComponentType<any>>(
     </FormContext.Provider>
   )) as T
 }
+
+type RegisteredFields<Values> = Record<string, FieldRegistrant<any, Values>>
 
 export type UseFormResult<Values> = Form<Values> & {
   FormContext: React.FC<{}>
@@ -60,34 +66,66 @@ export function useForm<Values extends FormValues>(
   )
   const originalValuesRef = useRef<Values>(originalValuesMemoized)
 
+  // validating/submitting state managed by mobx
+  const state = useLocalObservable(() => ({
+    isValidating: false,
+    isSubmitting: false,
+    setValidating(isValidating: boolean) {
+      state.isValidating = isValidating
+    },
+    setSubmitting(isSubmitting: boolean) {
+      state.isSubmitting = isSubmitting
+    },
+  }))
+
+  // create form validator
   const counter = useCounter()
-
   const debounceValues = getDebounceValues(validateDebounce)
-
   const executeValidate = useLatestValue(() => {
-    const doValidate = async () => {
-      try {
-        form.isValidating = true
-        const validationId = counter.getValue()
-        const data = toJS(form.values)
-        const errors = await onValidate(data)
-        if (counter.isLastValue(validationId)) {
-          form.setErrors(errors)
-          if (form.isValid) {
-            runInAction(() => (form.validValues = data))
-          }
-        }
-        return errors
-      } catch (err) {
-        console.error(err)
-        throw err
-      } finally {
-        runInAction(() => (form.isValidating = false))
+    const validateField = async (field: string, values: Values) => {
+      const value = form.getFieldValue(field)
+      const error = await registeredFields.current[field].validate(
+        value,
+        values
+      )
+      return {
+        [field]: error,
       }
     }
 
+    const doValidate = async () => {
+      state.setValidating(true)
+      const validationId = counter.getValue()
+      const values = toJS(form.values)
+
+      let errors: FormErrors<Values>
+      try {
+        errors = mergeErrors(
+          await Promise.all([
+            onValidate(values),
+            ...Object.keys(registeredFields.current).map((field) =>
+              validateField(field, values)
+            ),
+          ])
+        )
+
+        if (counter.isLastValue(validationId)) {
+          form.setErrors(errors)
+        }
+      } catch (err) {
+        logError(err)
+        throw err
+      } finally {
+        if (counter.isLastValue(validationId)) {
+          state.setValidating(false)
+        }
+      }
+
+      return errors
+    }
+
     if (debounceValues) {
-      return debouncePromise(doValidate, debounceValues.wait, {
+      return debounce(doValidate, debounceValues.wait, {
         leading: debounceValues.leading,
       })
     } else {
@@ -99,19 +137,28 @@ export function useForm<Values extends FormValues>(
     debounceValues && debounceValues.leading,
   ])
 
+  // store field registrants
+  const registeredFields = useRef<RegisteredFields<Values>>({})
+
+  // refs to validation options
   const optionsRef = useLatestValue(() => ({
     validateOnChange,
     validateOnBlur,
   }))
 
+  // the form!
   const form: Form<Values> = useLocalObservable(() => ({
     values: originalValuesRef.current,
     validValues: originalValuesRef.current,
     submittedValues: undefined,
     errors: {} as FormErrors<Values>,
     touched: {} as FormTouched<Values>,
-    isSubmitting: false,
-    isValidating: false,
+    get isSubmitting() {
+      return state.isSubmitting
+    },
+    get isValidating() {
+      return state.isValidating
+    },
     get isDirty() {
       return !isEqual(originalValuesRef.current, toJS(form.values))
     },
@@ -245,6 +292,18 @@ export function useForm<Values extends FormValues>(
         e.preventDefault()
       }
       form.reset()
+    },
+    register(
+      field: keyof Values & string,
+      registrant: FieldRegistrant<any, Values>
+    ) {
+      if (registeredFields.current[field]) {
+        warn(
+          `Already registered field "${field}". Maybe you used <Field /> with the same "name" prop? Or you forgot to unregister the field?`
+        )
+      }
+      registeredFields.current[field] = registrant
+      return () => delete registeredFields.current[field]
     },
   }))
 

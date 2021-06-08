@@ -1,5 +1,5 @@
 import { DependencyList, useMemo, useRef, useState } from "react"
-import { ValidateDebounce } from "./types"
+import { FormErrors, ValidateDebounce } from "./types"
 
 export const isString = (obj: any): obj is string =>
   Object.prototype.toString.call(obj) === "[object String]"
@@ -124,4 +124,36 @@ export function getDebounceValues(
     wait,
     leading,
   }
+}
+
+export const warn: typeof console.warn = (...args) => {
+  console && console.warn && console.warn(...args)
+}
+
+export const logError: typeof console.error = (...args) => {
+  console && console.error && console.error(...args)
+}
+
+export function mergeErrors(errors: FormErrors[]) {
+  return errors.reduce((acc, err) => {
+    if (err) {
+      Object.keys(err).forEach((path) => {
+        const curr = acc[path]
+        const mess = err[path]
+
+        if (mess == null) {
+          return
+        }
+
+        if (curr == null) {
+          acc[path] = mess
+        } else if (Array.isArray(curr)) {
+          acc[path] = [...curr].concat(mess)
+        } else {
+          acc[path] = [curr].concat(mess)
+        }
+      })
+    }
+    return acc
+  }, {} as FormErrors)
 }
