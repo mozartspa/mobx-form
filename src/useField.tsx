@@ -148,19 +148,15 @@ export function useField<T = any, Values = any>(
   )
 
   // standalone validator for this field
-  const execValidateCounter = useCounter()
   const executeValidate = useMemo(() => {
     return async () => {
-      const validationId = execValidateCounter.getValue()
       const errors = await debouncedValidator(
         form.getFieldValue(name),
         form.values
       )
-      if (execValidateCounter.isLastValue(validationId)) {
-        form.setFieldError(name, errors)
-      }
+      form.setFieldError(name, errors)
     }
-  }, [debouncedValidator, form, name, execValidateCounter])
+  }, [debouncedValidator, form, name])
 
   // register the debounced validator to the form
   useEffect(() => {
