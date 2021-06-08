@@ -28,13 +28,14 @@ export type UseFieldResult<T = any, Values = any> = {
   readonly error: string | undefined
   readonly errors: string[] | undefined
   readonly isValid: boolean
+  readonly isDirty: boolean
+  readonly isValidating: boolean
   form: Form<Values>
   setValue: (value: T) => void
   setTouched: (isTouched?: boolean) => void
   setError: (error: FieldError) => void
   addError: (error: FieldError) => void
   validate: () => Promise<void>
-  readonly isValidating: boolean
 }
 
 export function useField<T = any, Values = any>(
@@ -194,6 +195,9 @@ export function useField<T = any, Values = any>(
     },
     get isValid() {
       return form.isFieldValid(name)
+    },
+    get isDirty() {
+      return form.isFieldDirty(name)
     },
     form,
     setValue(value: T) {

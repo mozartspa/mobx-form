@@ -233,6 +233,12 @@ export function useForm<Values extends FormValues>(
     isFieldValid(field: keyof Values & string) {
       return !isError(form.getFieldError(field))
     },
+    isFieldDirty(field: keyof Values & string) {
+      return !isEqual(
+        get(originalValuesRef.current, field),
+        toJS(get(form.values, field))
+      )
+    },
     async validate() {
       return executeValidate.current()
     },

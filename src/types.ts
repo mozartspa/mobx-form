@@ -40,6 +40,7 @@ export type Form<Values = FormValues> = {
   getFieldErrors(field: keyof Values & string): string[] | undefined
   isFieldTouched(field: keyof Values & string): boolean
   isFieldValid(field: keyof Values & string): boolean
+  isFieldDirty(field: keyof Values & string): boolean
   validate(): Promise<FormErrors<Error>>
   reset(values?: Values, isValid?: boolean): void
   resetField(field: keyof Values & string, value?: any): void
