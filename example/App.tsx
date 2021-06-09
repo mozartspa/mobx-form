@@ -3,6 +3,7 @@ import { Container, Jumbotron, Nav, Navbar } from "react-bootstrap"
 import { LinkContainer } from "react-router-bootstrap"
 import { HashRouter, Route, Switch } from "react-router-dom"
 import { LoginForm } from "./components/LoginForm"
+import { PerformantForm } from "./components/PerformantForm"
 
 export const App = () => {
   return (
@@ -16,10 +17,16 @@ export const App = () => {
             <LinkContainer to="/">
               <Nav.Link>Login form</Nav.Link>
             </LinkContainer>
+            <LinkContainer to="/performant-form">
+              <Nav.Link>Performant form</Nav.Link>
+            </LinkContainer>
           </Nav>
         </Navbar>
         <Container className="border border-2 p-4 ">
           <Switch>
+            <Route path="/performant-form">
+              <PerformantForm />
+            </Route>
             <Route path="/">
               <LoginForm />
             </Route>
