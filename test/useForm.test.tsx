@@ -455,6 +455,65 @@ describe("useForm submit", () => {
       expect(submit).toBeCalledTimes(1)
     })
   })
+
+  it("uses latest onSubmit callback", async () => {
+    const submit = jest.fn(() => Promise.resolve())
+    const submit2 = jest.fn(() => Promise.resolve())
+    const { form, rerender } = renderTestForm({
+      onSubmit: submit,
+    })
+
+    await form().submit()
+
+    expect(submit).toBeCalledTimes(1)
+
+    rerender({
+      onSubmit: submit2,
+    })
+
+    await form().submit()
+
+    expect(submit).toBeCalledTimes(1)
+    expect(submit2).toBeCalledTimes(1)
+  })
+
+  it("onFailedSubmit should be called instead of onSubmit if form is invalid", async () => {
+    const submit = jest.fn(() => Promise.resolve())
+    const failedSubmit = jest.fn()
+    const { form } = renderTestForm({
+      onSubmit: submit,
+      onFailedSubmit: failedSubmit,
+      onValidate: () => ({ name: "Error" }),
+    })
+
+    await form().submit()
+
+    expect(submit).toBeCalledTimes(0)
+    expect(failedSubmit).toBeCalledTimes(1)
+  })
+
+  it("uses latest onFailedSubmit callback", async () => {
+    const failedSubmit = jest.fn()
+    const failedSubmit2 = jest.fn()
+    const { form, rerender } = renderTestForm({
+      onFailedSubmit: failedSubmit,
+      onValidate: () => ({ name: "Error" }),
+    })
+
+    await form().submit()
+
+    expect(failedSubmit).toBeCalledTimes(1)
+
+    rerender({
+      onFailedSubmit: failedSubmit2,
+      onValidate: () => ({ name: "Error" }),
+    })
+
+    await form().submit()
+
+    expect(failedSubmit).toBeCalledTimes(1)
+    expect(failedSubmit2).toBeCalledTimes(1)
+  })
 })
 
 describe("useForm validation", () => {
