@@ -63,6 +63,25 @@ describe("<Field />", () => {
     expect(field2.form).toBe(form())
   })
 
+  it("input value should be an empty string if field value is undefined or null", () => {
+    let injectedField: FieldRenderProps | undefined = undefined
+
+    renderTestForm((form) => (
+      <form.Field name="name">
+        {(field) => (injectedField = field) && <span />}
+      </form.Field>
+    ))
+
+    const field = injectedField!
+    expect(field.input.value).toEqual("murray")
+
+    field.setValue(undefined)
+    expect(field.input.value).toEqual("")
+
+    field.setValue(null)
+    expect(field.input.value).toEqual("")
+  })
+
   it("format value", () => {
     const format = (value: any) => (value === "" ? "no value" : value)
 

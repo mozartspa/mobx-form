@@ -11,8 +11,8 @@ import {
   useCounter,
 } from "./utils"
 
-function defaultParse(value: any) {
-  return value == null ? undefined : value
+function defaultFormat(value: any) {
+  return value == null ? "" : value
 }
 
 export type UseFieldResult<T = any, Values = any> = {
@@ -43,8 +43,8 @@ export function useField<T = any, Values = any>(
   options: UseFieldOptions<T, Values> = {}
 ): UseFieldResult<T, Values> {
   const {
-    format,
-    parse = defaultParse,
+    format = defaultFormat,
+    parse,
     parseOnBlur,
     validate,
     validateDebounce = false,
