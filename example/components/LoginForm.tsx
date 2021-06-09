@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite"
-import React from "react"
-import { Button, Form as BSForm } from "react-bootstrap"
+import React, { useState } from "react"
+import { Alert, Button, Form as BSForm, Spinner } from "react-bootstrap"
 import { useForm } from "../../dist"
 import { FormErrors } from "../../src/types"
 
@@ -10,10 +10,24 @@ const initialValues = {
 }
 
 export const LoginForm = observer(() => {
-  const { Form, Field } = useForm({
+  const [isLoggedIn, setLoggedIn] = useState<boolean | undefined>(undefined)
+
+  const { Form, Field, isSubmitting } = useForm({
     initialValues,
-    onSubmit: (values) => {
-      console.log("submitted", values)
+    onSubmit: async ({ username, password }) => {
+      // fake api call
+      await new Promise((resolve) => setTimeout(resolve, 1500))
+
+      if (username === "bill" && password === "murray") {
+        setLoggedIn(true)
+        return
+      } else {
+        setLoggedIn(false)
+      }
+
+      return {
+        password: "Invalid credentials",
+      }
     },
     onValidate: ({ username, password }) => {
       let errors: FormErrors = {}
@@ -23,8 +37,6 @@ export const LoginForm = observer(() => {
       }
       if (password === "") {
         errors.password = "Password cannot be blank."
-      } else if (username !== "bill" || password !== "murray") {
-        errors.password = "Invalid credentials"
       }
 
       return errors
@@ -33,6 +45,26 @@ export const LoginForm = observer(() => {
 
   return (
     <Form debug>
+      {isLoggedIn === true && (
+        <Alert
+          variant="success"
+          onClose={() => setLoggedIn(undefined)}
+          dismissible
+        >
+          <Alert.Heading>You did it! 🎉</Alert.Heading>
+          You're logged in now.
+        </Alert>
+      )}
+      {isLoggedIn === false && (
+        <Alert
+          variant="danger"
+          onClose={() => setLoggedIn(undefined)}
+          dismissible
+        >
+          <Alert.Heading>Uh oh, wrong credentials</Alert.Heading>
+          Hint: try with <strong>bill</strong> and <strong>murray</strong>.
+        </Alert>
+      )}
       <Field name="username">
         {(field) => (
           <BSForm.Group>
@@ -67,7 +99,10 @@ export const LoginForm = observer(() => {
           </BSForm.Group>
         )}
       </Field>
-      <Button type="submit" className="mb-4">
+      <Button type="submit" className="mb-4" disabled={isSubmitting}>
+        {isSubmitting && (
+          <Spinner as="span" animation="border" size="sm" className="mr-2" />
+        )}
         Submit form
       </Button>
     </Form>
