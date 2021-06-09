@@ -21,6 +21,7 @@ import { FormContext, useFormContext } from "./useFormContext"
 import {
   buildObjectPaths,
   getDebounceValues,
+  hasErrors,
   isError,
   isFunction,
   logError,
@@ -59,24 +60,15 @@ export function useForm<Values extends FormValues>(
     validateOnBlur = false,
     validateDebounce = false,
     onValidate = async () => ({}),
+    onFailedSubmit,
+    onSubmit,
   } = config
 
+  // initialValues
   const [originalValuesMemoized] = useState(() =>
     toJS(isFunction(initialValues) ? initialValues() : initialValues)
   )
   const originalValuesRef = useRef<Values>(originalValuesMemoized)
-
-  // validating/submitting state managed by mobx
-  const state = useLocalObservable(() => ({
-    isValidating: false,
-    isSubmitting: false,
-    setValidating(isValidating: boolean) {
-      state.isValidating = isValidating
-    },
-    setSubmitting(isSubmitting: boolean) {
-      state.isSubmitting = isSubmitting
-    },
-  }))
 
   // create form validator
   const counter = useCounter()
@@ -94,7 +86,10 @@ export function useForm<Values extends FormValues>(
     }
 
     const doValidate = async () => {
-      state.setValidating(true)
+      runInAction(() => {
+        form.isValidating = true
+      })
+
       const validationId = counter.getValue()
       const values = toJS(form.values)
 
@@ -117,7 +112,9 @@ export function useForm<Values extends FormValues>(
         throw err
       } finally {
         if (counter.isLastValue(validationId)) {
-          state.setValidating(false)
+          runInAction(() => {
+            form.isValidating = false
+          })
         }
       }
 
@@ -137,6 +134,41 @@ export function useForm<Values extends FormValues>(
     debounceValues && debounceValues.leading,
   ])
 
+  // submitter
+  const executeSubmit = useLatestValue(() => {
+    const doSubmit = async () => {
+      const values = toJS(form.values)
+
+      runInAction(() => {
+        form.isSubmitting = true
+        form.touched = buildObjectPaths(values, true)
+      })
+
+      const errors = await form.validate()
+      const isValid = !hasErrors(errors)
+
+      try {
+        if (isValid) {
+          runInAction(() => {
+            form.submittedValues = values
+          })
+          await onSubmit?.(values)
+        } else {
+          onFailedSubmit?.()
+        }
+      } catch (err) {
+        logError(err)
+        throw err
+      } finally {
+        runInAction(() => {
+          form.isSubmitting = false
+        })
+      }
+    }
+
+    return doSubmit
+  }, [onSubmit, onFailedSubmit])
+
   // store field registrants
   const registeredFields = useRef<RegisteredFields<Values>>({})
 
@@ -153,20 +185,13 @@ export function useForm<Values extends FormValues>(
     submittedValues: undefined,
     errors: {} as FormErrors<Values>,
     touched: {} as FormTouched<Values>,
-    get isSubmitting() {
-      return state.isSubmitting
-    },
-    get isValidating() {
-      return state.isValidating
-    },
+    isSubmitting: false,
+    isValidating: false,
     get isDirty() {
       return !isEqual(originalValuesRef.current, toJS(form.values))
     },
     get isValid() {
-      return (
-        Object.keys(form.errors).filter((key) => isError(form.errors[key]))
-          .length === 0
-      )
+      return !hasErrors(form.errors)
     },
     setErrors(errors: FormErrors<Values>) {
       form.errors = errors || {}
@@ -277,27 +302,7 @@ export function useForm<Values extends FormValues>(
       form.setFieldValue(field, toJS(get(originalValuesRef.current, field)))
     },
     async submit() {
-      try {
-        form.isSubmitting = true
-        const data = toJS(form.values)
-        form.touched = buildObjectPaths(data, true)
-        const errors = await form.validate()
-        if (Object.keys(errors).length === 0) {
-          runInAction(() => (form.submittedValues = data))
-          if (config.onSubmit) {
-            await config.onSubmit(data)
-          }
-        } else {
-          if (config.onFailedSubmit) {
-            config.onFailedSubmit()
-          }
-        }
-      } catch (err) {
-        console.error(err)
-        throw err
-      } finally {
-        runInAction(() => (form.isSubmitting = false))
-      }
+      return executeSubmit.current()
     },
     async handleSubmit(e?: React.FormEvent<HTMLFormElement>) {
       if (e) {

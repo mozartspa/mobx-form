@@ -1,4 +1,5 @@
 import * as React from "react"
+import waitForExpect from "wait-for-expect"
 import { FormConfig } from "../src/types"
 import { renderForm } from "./__helpers/renderForm"
 import { wait } from "./__helpers/wait"
@@ -408,6 +409,50 @@ describe("useForm", () => {
       form().setFieldValue("friends", [{ name: "bax", age: 99 }])
 
       expect(form().isFieldDirty("friends")).toBe(true)
+    })
+  })
+})
+
+describe("useForm submit", () => {
+  it("should happen when form is valid", async () => {
+    const submit = jest.fn(() => Promise.resolve())
+    const { form } = renderTestForm({ onSubmit: submit })
+
+    expect(form().isValid).toBe(true)
+
+    await form().submit()
+
+    expect(submit).toBeCalledTimes(1)
+  })
+
+  it("should not happen when form is invalid", async () => {
+    const submit = jest.fn(() => Promise.resolve())
+    const { form } = renderTestForm({
+      onSubmit: submit,
+      onValidate: () => {
+        return {
+          name: "Error",
+        }
+      },
+    })
+
+    await form().submit()
+
+    expect(form().isValid).toBe(false)
+    expect(submit).toBeCalledTimes(0)
+  })
+
+  it("handleSubmit should prevent default event", async () => {
+    const preventDefault = jest.fn()
+    const submit = jest.fn(() => Promise.resolve())
+
+    const { form } = renderTestForm({ onSubmit: submit })
+
+    form().handleSubmit({ preventDefault } as any)
+
+    await waitForExpect(() => {
+      expect(preventDefault).toBeCalledTimes(1)
+      expect(submit).toBeCalledTimes(1)
     })
   })
 })

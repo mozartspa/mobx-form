@@ -95,6 +95,16 @@ export function isError(error: string | string[] | undefined) {
   return true
 }
 
+export function hasErrors(errors: FormErrors) {
+  for (let key of Object.keys(errors)) {
+    if (isError(errors[key])) {
+      return true
+    }
+  }
+
+  return false
+}
+
 export function getDebounceValues(
   debounce: ValidateDebounce,
   defaultWait = 300,
