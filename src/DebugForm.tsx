@@ -5,7 +5,6 @@ import { useFormContext } from "./useFormContext"
 export type DebugFormProps = {
   showAll?: boolean
   showValues?: boolean
-  showValidValues?: boolean
   showErrors?: boolean
   showTouched?: boolean
   showInfo?: boolean
@@ -17,7 +16,6 @@ export const DebugForm = observer((props: DebugFormProps) => {
   const {
     showAll = false,
     showValues = true,
-    showValidValues = showAll,
     showErrors = showAll,
     showTouched = showAll,
     showInfo = showAll,
@@ -25,7 +23,6 @@ export const DebugForm = observer((props: DebugFormProps) => {
 
   const {
     values,
-    validValues,
     errors,
     touched,
     isDirty,
@@ -38,9 +35,6 @@ export const DebugForm = observer((props: DebugFormProps) => {
 
   if (showValues) {
     data.values = values
-  }
-  if (showValidValues) {
-    data.validValues = validValues
   }
   if (showErrors) {
     data.errors = errors

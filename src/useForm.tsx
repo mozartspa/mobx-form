@@ -178,7 +178,6 @@ export function useForm<Values extends FormValues>(
   // the form!
   const form: Form<Values> = useLocalObservable(() => ({
     values: originalValuesRef.current,
-    validValues: originalValuesRef.current,
     errors: {} as FormErrors<Values>,
     touched: {} as FormTouched<Values>,
     isSubmitting: false,
@@ -275,7 +274,7 @@ export function useForm<Values extends FormValues>(
       form.setFieldError(field, errors)
       return errors
     },
-    reset(values: Values | undefined = undefined, isValid: boolean = true) {
+    reset(values: Values | undefined = undefined) {
       if (values) {
         originalValuesRef.current = toJS(values)
       }
@@ -283,12 +282,6 @@ export function useForm<Values extends FormValues>(
       form.setValues(originalValuesRef.current)
       form.setErrors({})
       form.setTouched({})
-
-      if (isValid) {
-        form.validValues = toJS(form.values)
-      } else {
-        form.validate()
-      }
     },
     resetField(field: keyof Values & string, value: any = undefined) {
       if (value !== undefined) {

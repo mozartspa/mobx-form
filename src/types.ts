@@ -20,7 +20,6 @@ export type Disposer = () => void
 
 export type Form<Values = FormValues> = {
   values: Values
-  validValues: Values
   errors: FormErrors<Values>
   touched: FormTouched<Values>
   isSubmitting: boolean
