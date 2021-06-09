@@ -797,6 +797,11 @@
     lodash "^4.17.20"
     lodash-es "^4.17.20"
 
+"@types/faker@^5.5.6":
+  version "5.5.6"
+  resolved "https://registry.yarnpkg.com/@types/faker/-/faker-5.5.6.tgz#039b700a9d8ad9150ecc842bf5e717e2027b6f75"
+  integrity sha512-UCRj0kLg4sXs2XFVm48OU/wIjyJZkpRkwxhRGVQb5l5GmemkeW22WTz9iiDhYPBUqTzDsIWzhFRuF/4DD5+q2Q==
+
 "@types/history@*":
   version "4.7.8"
   resolved "https://registry.yarnpkg.com/@types/history/-/history-4.7.8.tgz#49348387983075705fe8f4e02fb67f7daaec4934"
@@ -824,7 +829,15 @@
   dependencies:
     "@types/react" "^16"
 
-"@types/react-router-dom@^5.1.7":
+"@types/react-router-bootstrap@^0.24.5":
+  version "0.24.5"
+  resolved "https://registry.yarnpkg.com/@types/react-router-bootstrap/-/react-router-bootstrap-0.24.5.tgz#9257ba3dfb01cda201aac9fa05cde3eb09ea5b27"
+  integrity sha512-GRx/8xF/skw4/Pmm6d+xbExi8gobCLOe8Eoz9kXPQGbYo7p5Wbi61tjpOF5AbfJ5XMN+fIzweToTi56odj/LOQ==
+  dependencies:
+    "@types/react" "*"
+    "@types/react-router-dom" "*"
+
+"@types/react-router-dom@*", "@types/react-router-dom@^5.1.7":
   version "5.1.7"
   resolved "https://registry.yarnpkg.com/@types/react-router-dom/-/react-router-dom-5.1.7.tgz#a126d9ea76079ffbbdb0d9225073eb5797ab7271"
   integrity sha512-D5mHD6TbdV/DNHYsnwBTv+y73ei+mMjrkGrla86HthE4/PVvL1J94Bu3qABU+COXzpL23T1EZapVVpwHuBXiUg==
@@ -2277,6 +2290,11 @@ extsprintf@^1.2.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/extsprintf/-/extsprintf-1.4.0.tgz#e2689f8f356fad62cca65a3a91c5df5f9551692f"
   integrity sha1-4mifjzVvrWLMplo6kcXfX5VRaS8=
+
+faker@^5.5.3:
+  version "5.5.3"
+  resolved "https://registry.yarnpkg.com/faker/-/faker-5.5.3.tgz#c57974ee484431b25205c2c8dc09fda861e51e0e"
+  integrity sha512-wLTv2a28wjUyWkbnX7u/ABZBkUkIF2fCd73V6P2oFqEGEktDfzWx4UxrSqtPRw0xPRAcjeAOIiJWqZm3pP4u3g==
 
 falafel@^2.1.0:
   version "2.2.4"
