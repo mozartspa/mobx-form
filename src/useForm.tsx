@@ -149,9 +149,6 @@ export function useForm<Values extends FormValues>(
 
       try {
         if (isValid) {
-          runInAction(() => {
-            form.submittedValues = values
-          })
           await onSubmit?.(values)
         } else {
           onFailedSubmit?.()
@@ -182,7 +179,6 @@ export function useForm<Values extends FormValues>(
   const form: Form<Values> = useLocalObservable(() => ({
     values: originalValuesRef.current,
     validValues: originalValuesRef.current,
-    submittedValues: undefined,
     errors: {} as FormErrors<Values>,
     touched: {} as FormTouched<Values>,
     isSubmitting: false,
