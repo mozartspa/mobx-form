@@ -149,9 +149,14 @@ export function useForm<Values extends FormValues>(
 
       try {
         if (isValid) {
-          await onSubmit?.(values)
+          const maybeErrors = await onSubmit?.(values)
+          if (maybeErrors) {
+            form.setErrors(maybeErrors)
+          }
+          return maybeErrors || ({} as FormErrors<Values>)
         } else {
           onFailedSubmit?.()
+          return errors
         }
       } catch (err) {
         logError(err)

@@ -442,6 +442,19 @@ describe("useForm submit", () => {
     expect(submit).toBeCalledTimes(0)
   })
 
+  it("should consider the form errors returned by onSubmit", async () => {
+    const submit = jest.fn(() => Promise.resolve({ name: "Error" }))
+    const { form } = renderTestForm({ onSubmit: submit })
+
+    expect(form().isValid).toBe(true)
+
+    const errors = await form().submit()
+
+    expect(errors).toEqual({ name: "Error" })
+    expect(form().isValid).toBe(false)
+    expect(form().getFieldError("name")).toEqual("Error")
+  })
+
   it("handleSubmit should prevent default event", async () => {
     const preventDefault = jest.fn()
     const submit = jest.fn(() => Promise.resolve())

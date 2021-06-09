@@ -43,8 +43,10 @@ export type Form<Values = FormValues> = {
   validateField(field: keyof Values & string): Promise<FieldError>
   reset(values?: Values, isValid?: boolean): void
   resetField(field: keyof Values & string, value?: any): void
-  submit(): Promise<void>
-  handleSubmit: (e?: React.FormEvent<HTMLFormElement>) => Promise<void>
+  submit(): Promise<FormErrors<Values>>
+  handleSubmit: (
+    e?: React.FormEvent<HTMLFormElement>
+  ) => Promise<FormErrors<Values>>
   handleReset: (e?: React.SyntheticEvent<any>) => void
   register: (
     field: keyof Values & string,
@@ -66,7 +68,9 @@ export type FormConfig<Values = any> = {
   validateOnChange?: boolean
   validateOnBlur?: boolean
   validateDebounce?: ValidateDebounce
-  onSubmit?: (values: Values) => void | Promise<any>
+  onSubmit?: (
+    values: Values
+  ) => void | FormErrors<Values> | Promise<void | FormErrors<Values>>
   onValidate?: FormValidate<Values>
   onFailedSubmit?: () => void
 }
