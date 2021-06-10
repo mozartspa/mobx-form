@@ -57,7 +57,7 @@ export const ArrayForm = observer(() => {
           <Card>
             <Card.Header>Friends</Card.Header>
             <Card.Body>
-              {field.fields.map((name, index) => (
+              {field.names.map((name, index) => (
                 <FieldScope key={index} name={name}>
                   <BSForm.Row>
                     <Col md="6">
@@ -78,7 +78,7 @@ export const ArrayForm = observer(() => {
               <Button
                 variant="secondary"
                 onClick={() => {
-                  field.fields.push({
+                  field.push({
                     name: faker.name.findName(),
                     age: faker.datatype.number({ min: 1, max: 99 }),
                   })
