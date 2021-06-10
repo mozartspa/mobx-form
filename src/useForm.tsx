@@ -47,8 +47,8 @@ type RegisteredFields<Values> = Record<string, FieldRegistrant<any, Values>>
 export type UseFormResult<Values> = Form<Values> & {
   FormContext: React.FC<{}>
   Form: React.FC<FormProps>
-  Field: React.FC<FieldProps>
-  FieldArray: React.FC<FieldArrayProps>
+  Field: React.FC<FieldProps<any, Values>>
+  FieldArray: React.FC<FieldArrayProps<any, Values>>
 }
 
 export function useForm<Values extends FormValues>(
