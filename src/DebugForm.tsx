@@ -1,12 +1,10 @@
 import { observer } from "mobx-react-lite"
 import React from "react"
-
-import { useFormContext } from "./useForm"
+import { useFormContext } from "./useFormContext"
 
 export type DebugFormProps = {
   showAll?: boolean
-  showModel?: boolean
-  showValidModel?: boolean
+  showValues?: boolean
   showErrors?: boolean
   showTouched?: boolean
   showInfo?: boolean
@@ -17,16 +15,14 @@ export const DebugForm = observer((props: DebugFormProps) => {
 
   const {
     showAll = false,
-    showModel = true,
-    showValidModel = showAll,
+    showValues = true,
     showErrors = showAll,
     showTouched = showAll,
     showInfo = showAll,
   } = props
 
   const {
-    model,
-    validModel,
+    values,
     errors,
     touched,
     isDirty,
@@ -37,11 +33,8 @@ export const DebugForm = observer((props: DebugFormProps) => {
 
   let data = {} as any
 
-  if (showModel) {
-    data.model = model
-  }
-  if (showValidModel) {
-    data.validModel = validModel
+  if (showValues) {
+    data.values = values
   }
   if (showErrors) {
     data.errors = errors

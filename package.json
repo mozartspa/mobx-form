@@ -15,6 +15,7 @@
     "build": "tsdx build",
     "test": "tsdx test --passWithNoTests",
     "lint": "tsdx lint",
+    "format": "prettier --write '**/*'",
     "prepare": "tsdx build",
     "size": "size-limit",
     "analyze": "size-limit --why"
@@ -28,12 +29,6 @@
     "hooks": {
       "pre-commit": "tsdx lint"
     }
-  },
-  "prettier": {
-    "printWidth": 80,
-    "semi": false,
-    "singleQuote": false,
-    "trailingComma": "es5"
   },
   "name": "@mozartspa/mobx-form",
   "author": "Filippo Dossena",
@@ -50,20 +45,25 @@
   ],
   "devDependencies": {
     "@size-limit/preset-small-lib": "^4.11.0",
+    "@testing-library/react": "^11.2.7",
     "@types/debounce-promise": "^3.1.3",
     "@types/lodash.get": "^4.4.6",
     "@types/lodash.set": "^4.3.6",
     "@types/react": "^17.0.9",
     "@types/react-dom": "^17.0.6",
+    "eslint-plugin-prettier": "^3.4.0",
     "husky": "^6.0.0",
     "mobx": "^6.3.2",
     "mobx-react-lite": "^3.2.0",
+    "prettier": "^2.3.1",
+    "prettier-plugin-organize-imports": "^2.1.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "size-limit": "^4.11.0",
     "tsdx": "^0.14.1",
     "tslib": "^2.2.0",
-    "typescript": "^4.3.2"
+    "typescript": "^4.3.2",
+    "wait-for-expect": "^3.0.2"
   },
   "dependencies": {
     "debounce-promise": "^3.1.2",
@@ -71,5 +71,10 @@
     "lodash.get": "^4.4.2",
     "lodash.set": "^4.3.2",
     "react-fast-compare": "^3.2.0"
+  },
+  "resolutions": {
+    "typescript": "^4.3.2",
+    "ts-jest": "^26.5.6",
+    "jest": "^26.6.3"
   }
 }
