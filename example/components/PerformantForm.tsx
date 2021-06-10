@@ -1,10 +1,10 @@
 import { observer } from "mobx-react-lite"
 import React from "react"
 import { Button, Form as BSForm, Spinner } from "react-bootstrap"
-import { useForm } from "../../dist"
+import { Field, useForm } from "../../dist"
 
 export const PerformantForm = observer(() => {
-  const { Form, Field, isSubmitting, values } = useForm({
+  const { Form, isSubmitting, values } = useForm({
     initialValues: {
       count: 5,
     },

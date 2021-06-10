@@ -2,7 +2,13 @@ import faker from "faker"
 import { observer } from "mobx-react-lite"
 import React from "react"
 import { Button, Card, Col, Form as BSForm, Spinner } from "react-bootstrap"
-import { FieldRenderProps, FieldScope, useForm } from "../../dist"
+import {
+  Field,
+  FieldArray,
+  FieldRenderProps,
+  FieldScope,
+  useForm,
+} from "../../dist"
 
 type TextInputProps = {
   field: FieldRenderProps
@@ -31,7 +37,7 @@ const TextInput = observer((props: TextInputProps) => {
 })
 
 export const ArrayForm = observer(() => {
-  const { Form, Field, FieldArray, isSubmitting } = useForm({
+  const { Form, isSubmitting } = useForm({
     initialValues: {
       name: "",
       age: 36,

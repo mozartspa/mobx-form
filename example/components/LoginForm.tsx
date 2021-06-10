@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite"
 import React, { useState } from "react"
 import { Alert, Button, Form as BSForm, Spinner } from "react-bootstrap"
-import { useForm } from "../../dist"
+import { Field, useForm } from "../../dist"
 import { FormErrors } from "../../src/types"
 
 const initialValues = {
@@ -12,7 +12,7 @@ const initialValues = {
 export const LoginForm = observer(() => {
   const [isLoggedIn, setLoggedIn] = useState<boolean | undefined>(undefined)
 
-  const { Form, Field, isSubmitting } = useForm({
+  const { Form, isSubmitting } = useForm({
     initialValues,
     onSubmit: async ({ username, password }) => {
       // fake api call

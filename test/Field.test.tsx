@@ -21,10 +21,10 @@ describe("<Field />", () => {
   it("exposes render props to its children", () => {
     let injectedField: FieldRenderProps | undefined = undefined
 
-    const { form } = renderTestForm((form) => (
-      <form.Field name="name">
+    const { form } = renderTestForm(() => (
+      <Field name="name">
         {(field) => (injectedField = field) && <span />}
-      </form.Field>
+      </Field>
     ))
 
     const field = injectedField!
@@ -66,10 +66,10 @@ describe("<Field />", () => {
   it("input value should be an empty string if field value is undefined or null", () => {
     let injectedField: FieldRenderProps | undefined = undefined
 
-    renderTestForm((form) => (
-      <form.Field name="name">
+    renderTestForm(() => (
+      <Field name="name">
         {(field) => (injectedField = field) && <span />}
-      </form.Field>
+      </Field>
     ))
 
     const field = injectedField!

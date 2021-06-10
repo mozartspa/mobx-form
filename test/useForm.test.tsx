@@ -1,5 +1,6 @@
 import * as React from "react"
 import waitForExpect from "wait-for-expect"
+import { Field } from "../src"
 import { FormConfig } from "../src/types"
 import { renderForm } from "./__helpers/renderForm"
 import { wait } from "./__helpers/wait"
@@ -22,8 +23,7 @@ function renderTestForm(props: FormConfig = {}) {
   let renderNameCount = 0
 
   const result = renderForm(
-    (form) => {
-      const { Field } = form
+    () => {
       return (
         <>
           <Field name="name">

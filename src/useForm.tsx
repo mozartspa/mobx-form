@@ -6,8 +6,6 @@ import { observer, useLocalObservable } from "mobx-react-lite"
 import React, { useRef, useState } from "react"
 import isEqual from "react-fast-compare"
 import { DebugForm } from "./DebugForm"
-import { Field, FieldProps } from "./Field"
-import { FieldArray, FieldArrayProps } from "./FieldArray"
 import {
   FieldError,
   FieldRegistrant,
@@ -47,8 +45,6 @@ type RegisteredFields<Values> = Record<string, FieldRegistrant<any, Values>>
 export type UseFormResult<Values> = Form<Values> & {
   FormContext: React.FC<{}>
   Form: React.FC<FormProps>
-  Field: React.FC<FieldProps<any, Values>>
-  FieldArray: React.FC<FieldArrayProps<any, Values>>
 }
 
 export function useForm<Values extends FormValues>(
@@ -328,8 +324,6 @@ export function useForm<Values extends FormValues>(
         (({ children }) => children) as React.FC<{}>
       ),
       Form: withFormProvider(form, FormComp),
-      Field: withFormProvider(form, Field),
-      FieldArray: withFormProvider(form, FieldArray),
     })
   )
 

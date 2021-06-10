@@ -20,10 +20,10 @@ describe("<FieldArray />", () => {
   it("exposes render props to its children", () => {
     let injectedField: FieldArrayRenderProps | undefined = undefined
 
-    const { form } = renderTestForm((form) => (
-      <form.FieldArray name="friends">
+    const { form } = renderTestForm(() => (
+      <FieldArray name="friends">
         {(field) => (injectedField = field) && <span />}
-      </form.FieldArray>
+      </FieldArray>
     ))
 
     const field = injectedField!
@@ -60,10 +60,10 @@ describe("<FieldArray />", () => {
     const onValidate = jest.fn(() => ({}))
 
     renderTestForm(
-      (form) => (
-        <form.FieldArray name="friends">
+      () => (
+        <FieldArray name="friends">
           {(field) => (injectedField = field) && <span />}
-        </form.FieldArray>
+        </FieldArray>
       ),
       {
         validateOnChange: true,
@@ -111,10 +111,10 @@ describe("<FieldArray />", () => {
     let injectedField: FieldArrayRenderProps | undefined = undefined
 
     renderTestForm(
-      (form) => (
-        <form.FieldArray name="friends">
+      () => (
+        <FieldArray name="friends">
           {(field) => (injectedField = field) && <span />}
-        </form.FieldArray>
+        </FieldArray>
       ),
       {
         initialValues: {
