@@ -1,106 +1,94 @@
-import { Form } from "./types"
+import { Form, UseFieldArrayOptions } from "./types"
 import { useField } from "./useField"
 
-export type UseFieldArrayOptions = {
-  form?: Form
-  validateOnChange?: boolean
+export type UseFieldArrayResult<T = any, Values = any> = {
+  readonly name: string
+  readonly names: string[]
+  readonly value: T[]
+  readonly form: Form<Values>
+  setValue: (value: T[]) => void
+  push: (...items: T[]) => void
+  pop: () => T | undefined
+  unshift: (...items: T[]) => void
+  insertAt: (index: number, item: T) => void
+  removeAt: (index: number) => T | undefined
+  remove: (item: T) => void
+  clear: () => void
 }
 
-export function useFieldArray<T>(
-  name: string,
-  options: UseFieldArrayOptions = {}
-) {
-  const { form, validateOnChange = true } = options
+export function useFieldArray<T = any, Values = any>(
+  name: keyof Values & string,
+  options: UseFieldArrayOptions<Values> = {}
+): UseFieldArrayResult<T, Values> {
+  const { form } = options
 
   const field = useField(name, { form })
 
-  function update<TResult>(fn: (array: T[]) => TResult) {
-    const result = fn(ensureArray())
-    if (validateOnChange) {
-      field.form.validate()
-    }
-    return result
-  }
-
-  const ensureArray = (): T[] => {
+  const getValue = (): T[] => {
     if (!Array.isArray(field.value)) {
-      field.setValue([])
-      return field.value
+      return []
     } else {
       return field.value
     }
   }
 
-  const getLength = () => (Array.isArray(field.value) ? field.value.length : 0)
-
-  const forEach = (iterator: (name: string, index: number) => void): void => {
-    const len = getLength()
-    for (let i = 0; i < len; i++) {
-      iterator(`${name}[${i}]`, i)
-    }
-  }
-
-  const map = (iterator: (name: string, index: number) => any): any[] => {
-    const len = getLength()
-    const results: any[] = []
-    for (let i = 0; i < len; i++) {
-      results.push(iterator(`${name}[${i}]`, i))
-    }
-    return results
-  }
-
   const push = (...items: T[]) => {
-    return update((array) => array.push(...items))
+    return field.setValue([...getValue(), ...items])
   }
 
   const pop = () => {
-    return update((array) => array.pop())
+    const value = getValue()
+    const item = value.length > 0 ? value[value.length - 1] : undefined
+    field.setValue(value.slice(0, -1))
+    return item
+  }
+
+  const unshift = (...items: T[]) => {
+    return field.setValue([...items, ...getValue()])
   }
 
   const clear = () => {
-    return update((array) => array.splice(0, array.length))
+    field.setValue([])
   }
 
   const insertAt = (index: number, item: T) => {
-    update((array) => array.splice(index, 0, item))
+    const copy = [...getValue()]
+    copy.splice(index, 0, item)
+    field.setValue(copy)
   }
 
   const removeAt = (index: number) => {
-    return update((array) => array.splice(index, 1)[0])
+    const copy = [...getValue()]
+    const item = copy.splice(index, 1)[0]
+    field.setValue(copy)
+    return item
   }
 
   const remove = (item: T) => {
-    const index = ensureArray().indexOf(item)
+    const index = getValue().indexOf(item)
     if (index !== -1) {
       removeAt(index)
     }
   }
 
-  const setValue = (value: T[]) => {
-    field.setValue(value)
-  }
-
-  const fields = {
+  return {
+    form: field.form,
     name,
-    get value(): T[] {
-      return field.value || []
+    get value() {
+      return getValue()
     },
-    get length() {
-      return getLength()
+    get names() {
+      return getValue().map((_, index) => `${name}.${index}`)
     },
-    forEach,
-    map,
+    setValue(value) {
+      field.setValue(value)
+    },
     push,
     pop,
+    unshift,
+    clear,
     insertAt,
     removeAt,
     remove,
-    clear,
-    setValue,
-  }
-
-  return {
-    fields,
-    form: field.form,
   }
 }

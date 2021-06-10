@@ -88,3 +88,7 @@ export type UseFieldOptions<T = any, Values = any> = {
   validate?: FieldValidate<T, Values>
   validateDebounce?: ValidateDebounce
 }
+
+export type UseFieldArrayOptions<Values = any> = {
+  form?: Form<Values>
+}

@@ -1,16 +1,26 @@
 import { Observer } from "mobx-react-lite"
 import React, { ReactElement } from "react"
-import { useFieldArray } from "./useFieldArray"
+import { UseFieldArrayOptions } from "./types"
+import { useFieldArray, UseFieldArrayResult } from "./useFieldArray"
 
-export type FieldArrayRenderProps = ReturnType<typeof useFieldArray>
+export type FieldArrayRenderProps<T = any, Values = any> = UseFieldArrayResult<
+  T,
+  Values
+>
 
-export type FieldArrayProps = {
-  name: string
-  children: (props: FieldArrayRenderProps) => ReactElement
+export type FieldArrayProps<
+  T = any,
+  Values = any
+> = UseFieldArrayOptions<Values> & {
+  name: keyof Values & string
+  children: (props: FieldArrayRenderProps<T, Values>) => ReactElement
 }
 
-export const FieldArray: React.FC<FieldArrayProps> = ({ name, children }) => {
-  const fieldArray = useFieldArray(name)
+export function FieldArray<T = any, Values = any>(
+  props: FieldArrayProps<T, Values>
+) {
+  const { name, children, ...options } = props
+  const fieldArray = useFieldArray<T, Values>(name, options)
 
   return <Observer>{() => children(fieldArray)}</Observer>
 }
