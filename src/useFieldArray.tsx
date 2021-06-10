@@ -17,7 +17,7 @@ export type UseFieldArrayResult<T = any, Values = any> = {
 }
 
 export function useFieldArray<T = any, Values = any>(
-  name: keyof Values & string,
+  name: string,
   options: UseFieldArrayOptions<Values> = {}
 ): UseFieldArrayResult<T, Values> {
   const { form } = options

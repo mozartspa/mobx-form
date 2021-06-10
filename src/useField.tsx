@@ -39,7 +39,7 @@ export type UseFieldResult<T = any, Values = any> = {
 }
 
 export function useField<T = any, Values = any>(
-  name: keyof Values & string,
+  name: string,
   options: UseFieldOptions<T, Values> = {}
 ): UseFieldResult<T, Values> {
   const {
@@ -64,7 +64,7 @@ export function useField<T = any, Values = any>(
 
   // prefix field name with the current scope (if any)
   const fieldPrefix = React.useContext(FieldScopeContext)
-  name = (fieldPrefix + name) as keyof Values & string
+  name = fieldPrefix + name
 
   // blur callback
   const onBlur = useCallback(() => {

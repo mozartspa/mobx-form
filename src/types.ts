@@ -4,12 +4,12 @@ export type FormValues = {
 
 export type FieldError = string | string[] | undefined
 
-export type FormErrors<Values = any> = {
-  [K in keyof Values & string]?: FieldError
+export type FormErrors = {
+  [index: string]: FieldError
 }
 
-export type FormTouched<Values = any> = {
-  [K in keyof Values & string]?: boolean | undefined
+export type FormTouched = {
+  [index: string]: boolean | undefined
 }
 
 export type FieldRegistrant<T = any, Values = any> = {
@@ -20,43 +20,41 @@ export type Disposer = () => void
 
 export type Form<Values = FormValues> = {
   values: Values
-  errors: FormErrors<Values>
-  touched: FormTouched<Values>
+  errors: FormErrors
+  touched: FormTouched
   isSubmitting: boolean
   isValidating: boolean
   readonly isDirty: boolean
   readonly isValid: boolean
-  setErrors(errors: FormErrors<Values>): void
-  setTouched(touched: FormTouched<Values>): void
+  setErrors(errors: FormErrors): void
+  setTouched(touched: FormTouched): void
   setValues(values: Values): void
-  setFieldValue(field: keyof Values & string, value: any): void
-  setFieldError(field: keyof Values & string, message: FieldError): void
-  addFieldError(field: keyof Values & string, message: FieldError): void
-  setFieldTouched(field: keyof Values & string, isTouched?: boolean): void
-  getFieldValue(field: keyof Values & string): any
-  getFieldError(field: keyof Values & string): string | undefined
-  getFieldErrors(field: keyof Values & string): string[] | undefined
-  isFieldTouched(field: keyof Values & string): boolean
-  isFieldValid(field: keyof Values & string): boolean
-  isFieldDirty(field: keyof Values & string): boolean
-  validate(): Promise<FormErrors<Error>>
-  validateField(field: keyof Values & string): Promise<FieldError>
-  reset(values?: Values, isValid?: boolean): void
-  resetField(field: keyof Values & string, value?: any): void
-  submit(): Promise<FormErrors<Values>>
-  handleSubmit: (
-    e?: React.FormEvent<HTMLFormElement>
-  ) => Promise<FormErrors<Values>>
+  setFieldValue(field: string, value: any): void
+  setFieldError(field: string, message: FieldError): void
+  addFieldError(field: string, message: FieldError): void
+  setFieldTouched(field: string, isTouched?: boolean): void
+  getFieldValue(field: string): any
+  getFieldError(field: string): string | undefined
+  getFieldErrors(field: string): string[] | undefined
+  isFieldTouched(field: string): boolean
+  isFieldValid(field: string): boolean
+  isFieldDirty(field: string): boolean
+  validate(): Promise<FormErrors>
+  validateField(field: string): Promise<FieldError>
+  reset(values?: Values): void
+  resetField(field: string, value?: any): void
+  submit(): Promise<FormErrors>
+  handleSubmit: (e?: React.FormEvent<HTMLFormElement>) => Promise<FormErrors>
   handleReset: (e?: React.SyntheticEvent<any>) => void
   register: (
-    field: keyof Values & string,
+    field: string,
     registrant: FieldRegistrant<any, Values>
   ) => Disposer
 }
 
 export type FormValidate<Values = any> = (
   values: Values
-) => FormErrors<Values> | Promise<FormErrors<Values>>
+) => FormErrors | Promise<FormErrors>
 
 export type ValidateDebounce =
   | boolean
@@ -68,9 +66,7 @@ export type FormConfig<Values = any> = {
   validateOnChange?: boolean
   validateOnBlur?: boolean
   validateDebounce?: ValidateDebounce
-  onSubmit?: (
-    values: Values
-  ) => void | FormErrors<Values> | Promise<void | FormErrors<Values>>
+  onSubmit?: (values: Values) => void | FormErrors | Promise<void | FormErrors>
   onValidate?: FormValidate<Values>
   onFailedSubmit?: () => void
 }

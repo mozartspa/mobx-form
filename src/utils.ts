@@ -15,7 +15,7 @@ export function buildObjectPaths<TObject, TValue>(
   value: TValue,
   parentKey: string = "",
   response: any = {}
-): Record<keyof TObject & string, TValue> {
+): Record<string, TValue> {
   for (let k of Object.keys(object)) {
     const path = parentKey + k
     response[path] = value

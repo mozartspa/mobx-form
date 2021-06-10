@@ -6,7 +6,7 @@ import { useField, UseFieldResult } from "./useField"
 export type FieldRenderProps<T = any, Values = any> = UseFieldResult<T, Values>
 
 export type FieldProps<T = any, Values = any> = UseFieldOptions<T, Values> & {
-  name: keyof Values & string
+  name: string
   children: (props: FieldRenderProps<T, Values>) => ReactElement
 }
 

@@ -93,7 +93,7 @@ export function useForm<Values extends FormValues>(
       const validationId = counter.getValue()
       const values = toJS(form.values)
 
-      let errors: FormErrors<Values>
+      let errors: FormErrors
       try {
         errors = mergeErrors(
           await Promise.all([
@@ -153,7 +153,7 @@ export function useForm<Values extends FormValues>(
           if (maybeErrors) {
             form.setErrors(maybeErrors)
           }
-          return maybeErrors || ({} as FormErrors<Values>)
+          return maybeErrors || ({} as FormErrors)
         } else {
           onFailedSubmit?.()
           return errors
@@ -183,8 +183,8 @@ export function useForm<Values extends FormValues>(
   // the form!
   const form: Form<Values> = useLocalObservable(() => ({
     values: originalValuesRef.current,
-    errors: {} as FormErrors<Values>,
-    touched: {} as FormTouched<Values>,
+    errors: {} as FormErrors,
+    touched: {} as FormTouched,
     isSubmitting: false,
     isValidating: false,
     get isDirty() {
@@ -193,28 +193,28 @@ export function useForm<Values extends FormValues>(
     get isValid() {
       return !hasErrors(form.errors)
     },
-    setErrors(errors: FormErrors<Values>) {
+    setErrors(errors: FormErrors) {
       form.errors = errors || {}
     },
-    setTouched(touched: FormTouched<Values>) {
+    setTouched(touched: FormTouched) {
       form.touched = touched || {}
     },
     setValues(values: Values) {
       form.values = toJS(values)
     },
-    setFieldValue(field: keyof Values & string, value: any) {
+    setFieldValue(field: string, value: any) {
       if (form.getFieldValue(field) !== value) {
         set(form.values, field, value)
         optionsRef.current.validateOnChange && form.validate()
       }
     },
-    getFieldValue(field: keyof Values & string) {
+    getFieldValue(field: string) {
       return get(form.values, field)
     },
-    setFieldError(field: keyof Values & string, message: FieldError) {
+    setFieldError(field: string, message: FieldError) {
       form.errors[field] = message
     },
-    addFieldError(field: keyof Values & string, message: FieldError) {
+    addFieldError(field: string, message: FieldError) {
       if (message == null) {
         return // do nothing
       }
@@ -230,7 +230,7 @@ export function useForm<Values extends FormValues>(
         form.errors[field] = [current, ...error]
       }
     },
-    getFieldError(field: keyof Values & string): string | undefined {
+    getFieldError(field: string): string | undefined {
       const err = form.errors[field]
       if (Array.isArray(err)) {
         return err.length > 0 ? err[0] : undefined
@@ -238,7 +238,7 @@ export function useForm<Values extends FormValues>(
         return err
       }
     },
-    getFieldErrors(field: keyof Values & string): string[] | undefined {
+    getFieldErrors(field: string): string[] | undefined {
       const err = form.errors[field]
       if (err == null) {
         return undefined
@@ -248,17 +248,17 @@ export function useForm<Values extends FormValues>(
         return [err]
       }
     },
-    setFieldTouched(field: keyof Values & string, isTouched: boolean = true) {
+    setFieldTouched(field: string, isTouched: boolean = true) {
       form.touched[field] = isTouched
       isTouched && optionsRef.current.validateOnBlur && form.validate()
     },
-    isFieldTouched(field: keyof Values & string) {
+    isFieldTouched(field: string) {
       return Boolean(form.touched[field])
     },
-    isFieldValid(field: keyof Values & string) {
+    isFieldValid(field: string) {
       return !isError(form.getFieldError(field))
     },
-    isFieldDirty(field: keyof Values & string) {
+    isFieldDirty(field: string) {
       return !isEqual(
         get(originalValuesRef.current, field),
         toJS(get(form.values, field))
@@ -267,7 +267,7 @@ export function useForm<Values extends FormValues>(
     async validate() {
       return executeValidate.current()
     },
-    async validateField(field: keyof Values & string) {
+    async validateField(field: string) {
       const registrant = registeredFields.current[field]
       if (!registrant) {
         return Promise.resolve(undefined)
@@ -288,7 +288,7 @@ export function useForm<Values extends FormValues>(
       form.setErrors({})
       form.setTouched({})
     },
-    resetField(field: keyof Values & string, value: any = undefined) {
+    resetField(field: string, value: any = undefined) {
       if (value !== undefined) {
         set(originalValuesRef.current, field, toJS(value))
       }
@@ -310,10 +310,7 @@ export function useForm<Values extends FormValues>(
       }
       form.reset()
     },
-    register(
-      field: keyof Values & string,
-      registrant: FieldRegistrant<any, Values>
-    ) {
+    register(field: string, registrant: FieldRegistrant<any, Values>) {
       if (registeredFields.current[field]) {
         warn(
           `Already registered field "${field}". Maybe you used <Field /> with the same "name" prop? Or you forgot to unregister the field?`

@@ -12,7 +12,7 @@ export type FieldArrayProps<
   T = any,
   Values = any
 > = UseFieldArrayOptions<Values> & {
-  name: keyof Values & string
+  name: string
   children: (props: FieldArrayRenderProps<T, Values>) => ReactElement
 }
 
