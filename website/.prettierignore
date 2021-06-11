@@ -6,7 +6,8 @@ yarn.lock
 yarn-error.logs
 
 # other
+.docusaurus
+build
 dist
-LICENSE
-coverage
-website
+static
+README.md
