@@ -20,7 +20,7 @@ export const MinimalForm = observer(() => {
   return (
     <Form debug>
       <BSForm.Group>
-        <BSForm.Label>Username</BSForm.Label>
+        <BSForm.Label>Name</BSForm.Label>
         <BSForm.Control
           type="text"
           {...nameField.input}
