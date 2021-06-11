@@ -22,7 +22,7 @@ module.exports = {
           type: "doc",
           docId: "intro",
           position: "left",
-          label: "Tutorial",
+          label: "Overview",
         },
         {
           href: "https://github.com/mozartspa/mobx-form",

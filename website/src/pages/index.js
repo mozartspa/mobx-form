@@ -18,7 +18,13 @@ function HomepageHeader() {
             className="button button--secondary button--lg"
             to="/docs/intro"
           >
-            Docusaurus Tutorial - 5min ⏱️
+            Get Started
+          </Link>
+          <Link
+            className="button button--outline button--lg margin-left--md"
+            to="https://github.com/mozartspa/mobx-form"
+          >
+            GitHub
           </Link>
         </div>
       </div>
