@@ -2,7 +2,7 @@ import React from "react"
 
 export default function EmbedCodesandbox({ src }) {
   return (
-    <section className="margin-bottom">
+    <section className="margin-bottom--xl">
       <div className="container">
         <iframe
           src={src}
