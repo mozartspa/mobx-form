@@ -14,7 +14,7 @@ export const PerformantForm = observer(() => {
     },
   })
 
-  const count = Math.max(0, values.count)
+  const count = Math.max(0, values.count ?? 0)
 
   return (
     <Form debug>
