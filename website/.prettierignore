@@ -11,3 +11,6 @@ build
 dist
 static
 README.md
+
+# markdown
+*.md
