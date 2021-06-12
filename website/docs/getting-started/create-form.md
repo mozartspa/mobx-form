@@ -190,8 +190,8 @@ const App = observer(() => {
 
   return (
     <Form>
-      <Input name="name" />
-      <Input name="age" type="number" />
+      <Input name="name" label="Your name" />
+      <Input name="age" type="number" label="Your age" />
       <button type="submit">Submit</button>
     </Form>
   )
@@ -245,8 +245,8 @@ const App = observer(() => {
 
   return (
     <Form>
-      <Input name="name" />
-      <Input name="age" type="number" />
+      <Input name="name" label="Your name" />
+      <Input name="age" type="number" label="Your age" />
       <button type="submit">Submit</button>
     </Form>
   )
@@ -304,8 +304,8 @@ const App = observer(() => {
 
   return (
     <Form debug>
-      <Input name="name" />
-      <Input name="age" type="number" />
+      <Input name="name" label="Your name" />
+      <Input name="age" type="number" label="Your age" />
       <button type="submit">Submit</button>
     </Form>
   )
