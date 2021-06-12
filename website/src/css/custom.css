@@ -27,7 +27,7 @@
 /*
  * Reset the line-number counter for each .prism-code scope
  */
- .prism-code {
+.prism-code {
   counter-reset: line-number;
 }
 
@@ -42,7 +42,7 @@
   text-align: right;
   min-width: 1rem;
   display: inline-block;
-  opacity: .3;
+  opacity: 0.3;
   position: sticky;
   left: var(--ifm-pre-padding);
 }

@@ -8,8 +8,8 @@ const FeatureList = [
     Svg: require("../../static/img/undraw_react.svg").default,
     description: (
       <>
-        No need to pollute your app with fancy components, only simple and <i>easy to use</i> hooks.
-        But sure, we have those too.
+        No need to pollute your app with fancy components, only simple and{" "}
+        <i>easy to use</i> hooks. But sure, we have those too.
       </>
     ),
   },
@@ -18,8 +18,8 @@ const FeatureList = [
     Svg: require("../../static/img/undraw_fast_loading.svg").default,
     description: (
       <>
-        Faster than light speed is not possible, but we come very close.
-        Give it a try and let us know.
+        Faster than light speed is not possible, but we come very close. Give it
+        a try and let us know.
       </>
     ),
   },
@@ -28,8 +28,8 @@ const FeatureList = [
     Svg: require("../../static/img/undraw_design_components.svg").default,
     description: (
       <>
-        Standing on the shoulders of giants, we use MobX to re-render
-        only what it really needs to re-render.
+        Standing on the shoulders of giants, we use MobX to re-render only what
+        it really needs to re-render.
       </>
     ),
   },
