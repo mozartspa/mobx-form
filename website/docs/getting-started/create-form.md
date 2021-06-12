@@ -48,7 +48,7 @@ Few things to note:
 - We import `useForm` and `useField` from the package `@mozartspa/mobx-form`.
 - We wrap our component with [`observer()`](https://mobx.js.org/react-integration.html), since we're using MobX.
 - `useForm()` gives us back a stable reference to our form instance.
-- `useField()` gives us back a stable reference to a specific field of our form. We pass it the `form` instance, to make it know which form it should be bound to. It's required here, but in other examples we'll leverage the React Context.
+- `useField()` gives us back a reference to a specific field of our form. We pass it the `form` instance, to make it know which form it should be bound to. It's required here, but in other examples we'll leverage the React Context.
 - With `onSubmit={form.handleSubmit}` we let our form instance handle the onSubmit event.
 - `{...nameField.input}` gives the input the necessary props to be a controlled input: `name`, `value`, `onChange`, `onBlur`.
 - With `{nameField.touched && nameField.error}` we display the possible error only after the user _touched_ the input. Anyway, in this case there's no input validation.
@@ -96,7 +96,7 @@ export default App
 The `<Form />` component:
 - is already bound to our `form` instance (after all, it's the `form` instance that gives it to us);
 - handles `onSubmit` and `onReset` events automatically;
-- creates a React Context that children can use.
+- creates a React Context (FormContext) that children can use.
 
 Note: the `Form` component is exposed by our `form` instance, we're not importing it.
 
@@ -146,7 +146,7 @@ The `<Field />` component:
 - is a thin wrapper around `useField`;
 - requires a `name` prop with the name of the field;
 - requires `children` prop to be a function the receives as input the `field` instance (exactly the same returned by `useField`);
-- uses the React Context created by `<Form />` to understand which form instance it belongs to.
+- uses the FormContext created by `<Form />` to understand which form instance it belongs to.
 
 ## Custom Input component
 
