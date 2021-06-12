@@ -4,32 +4,32 @@ import styles from "./HomepageFeatures.module.css"
 
 const FeatureList = [
   {
-    title: "Easy to Use",
-    Svg: require("../../static/img/undraw_docusaurus_mountain.svg").default,
+    title: "Hook based",
+    Svg: require("../../static/img/undraw_react.svg").default,
     description: (
       <>
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
+        No need to pollute your app with fancy components, only simple and <i>easy to use</i> hooks.
+        But sure, we have those too.
       </>
     ),
   },
   {
-    title: "Focus on What Matters",
-    Svg: require("../../static/img/undraw_docusaurus_tree.svg").default,
+    title: "High performance",
+    Svg: require("../../static/img/undraw_fast_loading.svg").default,
     description: (
       <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-        ahead and move your docs into the <code>docs</code> directory.
+        Faster than light speed is not possible, but we come very close.
+        Give it a try and let us know.
       </>
     ),
   },
   {
-    title: "Powered by React",
-    Svg: require("../../static/img/undraw_docusaurus_react.svg").default,
+    title: "Powered by MobX",
+    Svg: require("../../static/img/undraw_design_components.svg").default,
     description: (
       <>
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
+        Standing on the shoulders of giants, we use MobX to re-render
+        only what it really needs to re-render.
       </>
     ),
   },
@@ -39,7 +39,7 @@ function Feature({ Svg, title, description }) {
   return (
     <div className={clsx("col col--4")}>
       <div className="text--center">
-        {/*<Svg className={styles.featureSvg} alt={title} />*/}
+        {Svg && <Svg className={styles.featureSvg} alt={title} />}
       </div>
       <div className="text--center padding-horiz--md">
         <h3>{title}</h3>
