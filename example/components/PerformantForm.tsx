@@ -12,6 +12,9 @@ export const PerformantForm = observer(() => {
       // fake api call
       await new Promise((resolve) => setTimeout(resolve, 1500))
     },
+    validateOnBlur: false,
+    validateOnChange: false,
+    validateDebounce: true,
   })
 
   const count = Math.max(0, values.count ?? 0)
@@ -43,16 +46,28 @@ export const PerformantForm = observer(() => {
       {Array(count)
         .fill(0)
         .map((_, i) => (
-          <Field key={i} name={`field${i}`}>
+          <Field
+            key={i}
+            name={`field${i}`}
+            validateOnChangeFields={[]}
+            validateDebounce={true}
+            validate={(value) =>
+              value && value.length < 8
+                ? "Please, insert at least 8 characters."
+                : !value
+                ? `Field ${i + 1} is required.`
+                : undefined
+            }
+          >
             {(field) => (
               <BSForm.Group>
                 <BSForm.Label>Field {i}</BSForm.Label>
                 <BSForm.Control
                   type="text"
                   {...field.input}
-                  isInvalid={field.touched && !field.isValid}
+                  isInvalid={(field.isDirty || field.touched) && !field.isValid}
                 />
-                {field.touched && field.error && (
+                {(field.isDirty || field.touched) && field.error && (
                   <BSForm.Control.Feedback type="invalid">
                     {field.error}
                   </BSForm.Control.Feedback>

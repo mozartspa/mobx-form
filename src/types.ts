@@ -83,6 +83,9 @@ export type UseFieldOptions<T = any, Values = any> = {
   parseOnBlur?: (value: any) => T
   validate?: FieldValidate<T, Values>
   validateDebounce?: ValidateDebounce
+  validateOnChangeFields?: string[]
+  validateOnChange?: boolean
+  validateOnBlur?: boolean
 }
 
 export type UseFieldArrayOptions<Values = any> = {
