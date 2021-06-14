@@ -4,8 +4,7 @@ sidebar_position: 1
 
 # Create a Form
 
-Let's start with a minimal example, then we'll iterate over it in order to arrive to a final concrete example.
-In this way, we have the chance to understand how each piece connects to each other.
+Let's start with a minimal example, then we'll iterate over it in order to arrive to a final concrete example. In this way, we have the chance to understand how each piece connects to each other.
 
 ## Minimal example
 
@@ -33,7 +32,7 @@ const App = observer(() => {
       <div>
         <label>Name</label>
         <input type="text" {...nameField.input} />
-        {nameField.touched && nameField.error}
+        {nameField.isTouched && nameField.error}
       </div>
       <button type="submit">Submit</button>
     </form>
@@ -51,13 +50,11 @@ Few things to note:
 - `useField()` gives us back a reference to a specific field of our form. We pass it the `form` instance, to make it know which form it should be bound to. It's required here, but in other examples we'll leverage the React Context.
 - With `onSubmit={form.handleSubmit}` we let our form instance handle the onSubmit event.
 - `{...nameField.input}` gives the input the necessary props to be a controlled input: `name`, `value`, `onChange`, `onBlur`.
-- With `{nameField.touched && nameField.error}` we display the possible error only after the user _touched_ the input. Anyway, in this case there's no input validation.
+- With `{nameField.isTouched && nameField.error}` we display the possible error only after the user _touched_ the input. Anyway, in this case there's no input validation.
 
 ## `<Form />` component
 
-In the previous example we did not use any fancy component, just only HTML.
-It's a great thing, but we can do better using the `<Form />` component provided by `useForm()`.
-Let's how it looks:
+In the previous example we did not use any fancy component, just only HTML. It's a great thing, but we can do better using the `<Form />` component provided by `useForm()`. Let's how it looks:
 
 ```typescript {17,20,27}
 import React from "react"
@@ -76,14 +73,14 @@ const App = observer(() => {
 
   const nameField = useField("name", { form })
 
-  const { Form } = form
+  const { Form } = form
 
   return (
     <Form>
       <div>
         <label>Name</label>
         <input type="text" {...nameField.input} />
-        {nameField.touched && nameField.error}
+        {nameField.isTouched && nameField.error}
       </div>
       <button type="submit">Submit</button>
     </Form>
@@ -94,6 +91,7 @@ export default App
 ```
 
 The `<Form />` component:
+
 - is already bound to our `form` instance (after all, it's the `form` instance that gives it to us);
 - handles `onSubmit` and `onReset` events automatically;
 - creates a React Context (FormContext) that children can use.
@@ -102,9 +100,7 @@ Note: the `Form` component is exposed by our `form` instance, we're not importin
 
 ## `<Field />` component
 
-In this case we have just one field, but thinking a more complex form we should go with many `useField` hooks.
-To make things easier, we can use the `<Field />` component, exposed by the library.
-Let's use it:
+In this case we have just one field, but thinking a more complex form we should go with many `useField` hooks. To make things easier, we can use the `<Field />` component, exposed by the library. Let's use it:
 
 ```typescript {3,19-27}
 import React from "react"
@@ -121,7 +117,7 @@ const App = observer(() => {
     },
   })
 
-  const { Form } = form
+  const { Form } = form
 
   return (
     <Form>
@@ -130,7 +126,7 @@ const App = observer(() => {
           <div>
             <label>Name</label>
             <input type="text" {...field.input} />
-            {field.touched && field.error}
+            {field.isTouched && field.error}
           </div>
         )}
       </Field>
@@ -143,6 +139,7 @@ export default App
 ```
 
 The `<Field />` component:
+
 - is a thin wrapper around `useField`;
 - requires a `name` prop with the name of the field;
 - requires `children` prop to be a function the receives as input the `field` instance (exactly the same returned by `useField`);
@@ -169,7 +166,7 @@ const Input = ({ name, label, type }: InputProps) => (
       <div>
         <label>{label}</label>
         <input type={type} {...field.input} />
-        {field.touched && field.error}
+        {field.isTouched && field.error}
       </div>
     )}
   </Field>
@@ -204,8 +201,7 @@ Here we have also added an `age` field of type `number`. The conversion between 
 
 ### Using `useField`
 
-The custom component can be written using only the `useField` hook. Remember: `<Field />` is just a thin wrapper around `useField`.
-Let's change it:
+The custom component can be written using only the `useField` hook. Remember: `<Field />` is just a thin wrapper around `useField`. Let's change it:
 
 ```typescript {11-21}
 import React from "react"
@@ -225,7 +221,7 @@ const Input = observer(({ name, label, type }: InputProps) => {
     <div>
       <label>{label}</label>
       <input type={type} {...field.input} />
-      {field.touched && field.error}
+      {field.isTouched && field.error}
     </div>
   )
 })
@@ -256,15 +252,14 @@ export default App
 ```
 
 Few things to note:
+
 - Our custom component is wrapped with `observer()`, because we're accessing directly the values of `field`, and they are MobX observables. Without it, our component would not re-render every time something changes.
 - The `<Field />` component didn't need the `observer()` wrapper, because under the hood it was already using it.
 - We didn't pass the `form` instance to the `useField` hook. Because, if not explicitely set, `useField` uses the React Context created by `<Form />` to get access to the `form` instance.
 
 ## Debugging the state of the form instance
 
-To be sure that `age` value is converted correctly to a number, we should inspect the values of the form.
-For this reason, there is a `debug` prop available on the `<Form />` component. It's only for development purposes, of course.
-Let's apply it:
+To be sure that `age` value is converted correctly to a number, we should inspect the values of the form. For this reason, there is a `debug` prop available on the `<Form />` component. It's only for development purposes, of course. Let's apply it:
 
 ```typescript {37}
 import React from "react"
@@ -283,7 +278,7 @@ const Input = ({ name, label, type }: InputProps) => (
       <div>
         <label>{label}</label>
         <input type={type} {...field.input} />
-        {field.touched && field.error}
+        {field.isTouched && field.error}
       </div>
     )}
   </Field>
@@ -335,6 +330,4 @@ If you **run the code** and edit the age field (setting it to `40` for example),
 
 This is the state of our form, exposed by our `form` instance. `age` is actually a number (it does not have double quotes). Great!
 
-Another thing: have you noticed that `"touched"` object? It contains the field names that triggered an `onBlur` event.
-It's a useful information in order to display the field error only when the user already interacted with the input.
-More on this in the [Validation](#todo) section.
+Another thing: have you noticed that `"touched"` object? It contains the field names that triggered an `onBlur` event. It's a useful information in order to display the field error only when the user already interacted with the input. More on this in the [Validation](#todo) section.

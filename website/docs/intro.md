@@ -1,6 +1,7 @@
 ---
 sidebar_position: 1
 ---
+
 # Overview
 
 **@mozartspa/mobx-react** is a high performance, hook-based forms library for React, powered by MobX.
@@ -58,7 +59,7 @@ const App = observer(() => {
       <div>
         <label>Name</label>
         <input type="text" {...nameField.input} />
-        {nameField.touched && nameField.error}
+        {nameField.isTouched && nameField.error}
       </div>
       <button type="submit">Submit</button>
     </form>
@@ -76,4 +77,4 @@ Few things to note:
 - `useField()` gives us back a stable reference to a specific field of our form. We pass it the `form` instance, to make it know which form it should be bound to. It's required here, but in other examples we'll leverage the React Context.
 - With `onSubmit={form.handleSubmit}` we let our form instance handle the onSubmit event.
 - `{...nameField.input}` gives the input the necessary props to be a controlled input: `name`, `value`, `onChange`, `onBlur`.
-- With `{nameField.touched && nameField.error}` we display the possible error only after the user _touched_ the input. Anyway, in this case there's no input validation.
+- With `{nameField.isTouched && nameField.error}` we display the possible error only after the user _touched_ the input. Anyway, in this case there's no input validation.

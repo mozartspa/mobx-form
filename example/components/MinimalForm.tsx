@@ -24,9 +24,9 @@ export const MinimalForm = observer(() => {
         <BSForm.Control
           type="text"
           {...nameField.input}
-          isInvalid={nameField.touched && !nameField.isValid}
+          isInvalid={nameField.isTouched && !nameField.isValid}
         />
-        {nameField.touched && nameField.error && (
+        {nameField.isTouched && nameField.error && (
           <BSForm.Control.Feedback type="invalid">
             {nameField.error}
           </BSForm.Control.Feedback>

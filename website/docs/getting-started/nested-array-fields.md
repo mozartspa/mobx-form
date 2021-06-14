@@ -4,8 +4,7 @@ sidebar_position: 2
 
 # Nested and array fields
 
-A good form library should adapt to the shape of your data structure, not viceversa.
-And this is no exception.
+A good form library should adapt to the shape of your data structure, not viceversa. And this is no exception.
 
 ## Nested fields
 
@@ -22,12 +21,13 @@ const initialValues = {
       street: "",
       city: "",
       state: "",
-    }
-  }
+    },
+  },
 }
 ```
 
 We can reference these fields using the **dot notation**:
+
 - `preferences.color`
 - `preferences.dish`
 - `preferences.place.street`
@@ -53,7 +53,7 @@ const Input = ({ name, label, type }: InputProps) => (
       <div>
         <label>{label || name}</label>
         <input type={type} {...field.input} />
-        {field.touched && field.error}
+        {field.isTouched && field.error}
       </div>
     )}
   </Field>
@@ -121,6 +121,7 @@ const initialValues = {
 ```
 
 You can also use the **dot notation**, with a **number** as key:
+
 - `preferences.dishes.0`
 - `preferences.dishes.1`
 - `preferences.places.0.street`
@@ -140,8 +141,7 @@ Other form libraries supports the dot notation with brackets. This is **not supp
 
 ### `<FieldArray/>`
 
-If you have arrays, probably you want the user to be able to add or remove items.
-To make your life easier, use the `<FieldArray/>` component:
+If you have arrays, probably you want the user to be able to add or remove items. To make your life easier, use the `<FieldArray/>` component:
 
 ```typescript {1,31-60}
 import { Field, FieldArray, useForm } from "@mozartspa/mobx-form"
@@ -213,8 +213,9 @@ export default App
 ```
 
 Few things to note:
+
 - `<FieldArray/>` is very similar to `<Field/>`, but it exposes useful properties to manage arrays.
-- `fields.names` is an array of field names; in the *dishes* example: `["preferences.dishes.0", "preferences.dishes.1"]`.
+- `fields.names` is an array of field names; in the _dishes_ example: `["preferences.dishes.0", "preferences.dishes.1"]`.
 - `fields.push()` adds a new item to the array
 
 ### useFieldArray
@@ -292,31 +293,35 @@ export default App
 In the previous example we wrote:
 
 ```typescript {3-4}
-{placesField.names.map((name, index) => (
-  <div key={index}>
-    <Input name={`${name}.street`} />
-    <Input name={`${name}.city`} />
-  </div>
-))}
+{
+  placesField.names.map((name, index) => (
+    <div key={index}>
+      <Input name={`${name}.street`} />
+      <Input name={`${name}.city`} />
+    </div>
+  ))
+}
 ```
 
-In this case we are concatenating the name of the array field (*"preferences.places.0"*, *"preferences.places.1"*, *...*) with the name of the subfields (*"street"* and *"city"*). To avoid this, we can use the `<FieldScope />` component:
+In this case we are concatenating the name of the array field (_"preferences.places.0"_, _"preferences.places.1"_, _..._) with the name of the subfields (_"street"_ and _"city"_). To avoid this, we can use the `<FieldScope />` component:
 
 ```typescript {3-6}
-{placesField.names.map((name, index) => (
-  <div key={index}>
-    <FieldScope name={name}>
-      <Input name="street" />
-      <Input name="city" />
-    </FieldScope>
-  </div>
-))}
+{
+  placesField.names.map((name, index) => (
+    <div key={index}>
+      <FieldScope name={name}>
+        <Input name="street" />
+        <Input name="city" />
+      </FieldScope>
+    </div>
+  ))
+}
 ```
 
 `<FieldScope />` is very useful when you have an entire component that manages a subset of your form, for example:
 
 ```typescript {1-6,13}
-const PlaceInput = ({name}) => (
+const PlaceInput = ({ name }) => (
   <FieldScope name={name}>
     <Input name="street" />
     <Input name="city" />
@@ -327,7 +332,7 @@ const PlaceInput = ({name}) => (
 
 // then, in your form:
 
-{placesField.names.map((name, index) => (
-  <PlaceInput key={index} name={name} />
-))}
+{
+  placesField.names.map((name, index) => <PlaceInput key={index} name={name} />)
+}
 ```
