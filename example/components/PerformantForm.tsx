@@ -65,9 +65,11 @@ export const PerformantForm = observer(() => {
                 <BSForm.Control
                   type="text"
                   {...field.input}
-                  isInvalid={(field.isDirty || field.touched) && !field.isValid}
+                  isInvalid={
+                    (field.isDirty || field.isTouched) && !field.isValid
+                  }
                 />
-                {(field.isDirty || field.touched) && field.error && (
+                {(field.isDirty || field.isTouched) && field.error && (
                   <BSForm.Control.Feedback type="invalid">
                     {field.error}
                   </BSForm.Control.Feedback>

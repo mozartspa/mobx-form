@@ -31,7 +31,7 @@ describe("<Field />", () => {
     expect(field.form).toBe(form())
     expect(field.name).toEqual("name")
     expect(field.value).toEqual("murray")
-    expect(field.touched).toBe(false)
+    expect(field.isTouched).toBe(false)
     expect(field.error).toBeUndefined()
 
     const input = field.input

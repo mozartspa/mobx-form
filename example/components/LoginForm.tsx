@@ -72,9 +72,9 @@ export const LoginForm = observer(() => {
             <BSForm.Control
               type="text"
               {...field.input}
-              isInvalid={field.touched && !field.isValid}
+              isInvalid={field.isTouched && !field.isValid}
             />
-            {field.touched && field.error && (
+            {field.isTouched && field.error && (
               <BSForm.Control.Feedback type="invalid">
                 {field.error}
               </BSForm.Control.Feedback>
@@ -89,9 +89,9 @@ export const LoginForm = observer(() => {
             <BSForm.Control
               type="password"
               {...field.input}
-              isInvalid={field.touched && !field.isValid}
+              isInvalid={field.isTouched && !field.isValid}
             />
-            {field.touched && field.error && (
+            {field.isTouched && field.error && (
               <BSForm.Control.Feedback type="invalid">
                 {field.error}
               </BSForm.Control.Feedback>

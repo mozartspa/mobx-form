@@ -25,9 +25,9 @@ const TextInput = observer((props: TextInputProps) => {
       <BSForm.Control
         type={type}
         {...field.input}
-        isInvalid={field.touched && !field.isValid}
+        isInvalid={field.isTouched && !field.isValid}
       />
-      {field.touched && field.error && (
+      {field.isTouched && field.error && (
         <BSForm.Control.Feedback type="invalid">
           {field.error}
         </BSForm.Control.Feedback>

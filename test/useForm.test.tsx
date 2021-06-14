@@ -36,7 +36,7 @@ function renderTestForm(props: FormConfig = {}) {
                     {...field.input}
                     data-testid="name-input"
                   />
-                  {field.touched && field.error}
+                  {field.isTouched && field.error}
                 </div>
               )
             }}
@@ -49,7 +49,7 @@ function renderTestForm(props: FormConfig = {}) {
                   {...field.input}
                   data-testid="surname-input"
                 />
-                {field.touched && field.error}
+                {field.isTouched && field.error}
               </div>
             )}
           </Field>
@@ -57,7 +57,7 @@ function renderTestForm(props: FormConfig = {}) {
             {(field) => (
               <div>
                 <input type="text" {...field.input} data-testid="color-input" />
-                {field.touched && field.error}
+                {field.isTouched && field.error}
               </div>
             )}
           </Field>
@@ -69,7 +69,7 @@ function renderTestForm(props: FormConfig = {}) {
                   {...field.input}
                   data-testid="friend-name-input"
                 />
-                {field.touched && field.error}
+                {field.isTouched && field.error}
               </div>
             )}
           </Field>
@@ -81,7 +81,7 @@ function renderTestForm(props: FormConfig = {}) {
                   {...field.input}
                   data-testid="friend-age-input"
                 />
-                {field.touched && field.error}
+                {field.isTouched && field.error}
               </div>
             )}
           </Field>
