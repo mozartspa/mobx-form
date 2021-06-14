@@ -24,9 +24,9 @@ import {
   isFunction,
   logError,
   mergeErrors,
+  mergeFieldErrors,
   useCounter,
   useLatestValue,
-  warn,
 } from "./utils"
 
 function withFormProvider<T extends React.ComponentType<any>>(
@@ -40,7 +40,24 @@ function withFormProvider<T extends React.ComponentType<any>>(
   )) as T
 }
 
-type RegisteredFields<Values> = Record<string, FieldRegistrant<any, Values>>
+type RegisteredFields<Values> = Record<string, FieldRegistrant<any, Values>[]>
+
+async function validateFieldRegistrants(
+  registrants: FieldRegistrant[],
+  value: any,
+  values: any
+): Promise<FieldError> {
+  if (registrants.length === 0) {
+    return Promise.resolve(undefined)
+  } else if (registrants.length === 1) {
+    return await registrants[0].validate(value, values)
+  } else {
+    const errors = await Promise.all(
+      registrants.map((reg) => reg.validate(value, values))
+    )
+    return mergeFieldErrors(...errors)
+  }
+}
 
 export type UseFormResult<Values> = Form<Values> & {
   FormContext: React.FC<{}>
@@ -72,12 +89,12 @@ export function useForm<Values extends FormValues>(
   const executeValidate = useLatestValue(() => {
     const validateField = async (field: string, values: Values) => {
       const value = form.getFieldValue(field)
-      const error = await registeredFields.current[field].validate(
-        value,
-        values
-      )
       return {
-        [field]: error,
+        [field]: await validateFieldRegistrants(
+          registeredFields.current[field],
+          value,
+          values
+        ),
       }
     }
 
@@ -264,11 +281,12 @@ export function useForm<Values extends FormValues>(
       return executeValidate.current()
     },
     async validateField(field: string) {
-      const registrant = registeredFields.current[field]
-      if (!registrant) {
+      const registrants = registeredFields.current[field]
+      if (!registrants) {
         return Promise.resolve(undefined)
       }
-      const errors = await registrant.validate(
+      const errors = await validateFieldRegistrants(
+        registrants,
         form.getFieldValue(field),
         form.values
       )
@@ -309,13 +327,16 @@ export function useForm<Values extends FormValues>(
       form.reset()
     },
     register(field: string, registrant: FieldRegistrant<any, Values>) {
-      if (registeredFields.current[field]) {
-        warn(
-          `Already registered field "${field}". Maybe you used <Field /> with the same "name" prop? Or you forgot to unregister the field?`
-        )
+      registeredFields.current[field] = registeredFields.current[field] || []
+      registeredFields.current[field].push(registrant)
+      return () => {
+        registeredFields.current[field] = registeredFields.current[
+          field
+        ].filter((o) => o !== registrant)
+        if (registeredFields.current[field].length === 0) {
+          delete registeredFields.current[field]
+        }
       }
-      registeredFields.current[field] = registrant
-      return () => delete registeredFields.current[field]
     },
   }))
 
