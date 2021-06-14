@@ -1,7 +1,7 @@
 import { fireEvent, render } from "@testing-library/react"
 import * as React from "react"
 import waitForExpect from "wait-for-expect"
-import { Field, FieldRenderProps, UseFormResult } from "../src"
+import { Field, FieldRenderProps, FieldScope, UseFormResult } from "../src"
 import { FormConfig } from "../src/types"
 import { renderForm } from "./__helpers/renderForm"
 
@@ -31,7 +31,7 @@ describe("<Field />", () => {
     expect(field.form).toBe(form())
     expect(field.name).toEqual("name")
     expect(field.value).toEqual("murray")
-    expect(field.touched).toBe(false)
+    expect(field.isTouched).toBe(false)
     expect(field.error).toBeUndefined()
 
     const input = field.input
@@ -333,5 +333,299 @@ describe("<Field /> validation", () => {
 
     expect(error).toEqual("Name already taken")
     expect(field.error).toEqual(error)
+  })
+
+  it("validateOnChange is off by default", async () => {
+    let injectedField: FieldRenderProps | undefined = undefined
+    const validate = jest.fn(() => Promise.resolve("Error!"))
+
+    renderForm(
+      () => (
+        <Field name="name" validate={validate}>
+          {(field) => (injectedField = field) && <span />}
+        </Field>
+      ),
+      {
+        initialValues: { name: "jack" },
+        validateOnChange: false,
+        validateOnBlur: false,
+      }
+    )
+
+    const field = injectedField!
+    field.setValue("Jim")
+
+    expect(validate).toBeCalledTimes(0)
+  })
+
+  it("validateOnChange", async () => {
+    let injectedField: FieldRenderProps | undefined = undefined
+    const validate = jest.fn(() => Promise.resolve("Error!"))
+
+    renderForm(
+      () => (
+        <Field name="name" validate={validate} validateOnChange={true}>
+          {(field) => (injectedField = field) && <span />}
+        </Field>
+      ),
+      {
+        initialValues: { name: "jack" },
+        validateOnChange: false,
+        validateOnBlur: false,
+      }
+    )
+
+    const field = injectedField!
+    field.setValue("Jim")
+
+    expect(validate).toBeCalledTimes(1)
+
+    await waitForExpect(() => {
+      expect(field.error).toEqual("Error!")
+    })
+  })
+
+  it("validateOnChange with validateOnChangeFields = [] should occur only when field value is changed", async () => {
+    const validate = jest.fn(() => Promise.resolve("Error!"))
+
+    const { form } = renderForm(
+      () => (
+        <Field
+          name="name"
+          validate={validate}
+          validateOnChange={true}
+          validateOnChangeFields={[]}
+        >
+          {() => <span />}
+        </Field>
+      ),
+      {
+        initialValues: { name: "chuck", surname: "norris" },
+        validateOnChange: false,
+        validateOnBlur: false,
+      }
+    )
+
+    form().setFieldValue("surname", "chan")
+
+    expect(validate).toBeCalledTimes(0)
+
+    form().setFieldValue("name", "jackie")
+
+    expect(validate).toBeCalledTimes(1)
+
+    await waitForExpect(() => {
+      expect(validate).toBeCalledTimes(1)
+      expect(form().getFieldError("name")).toEqual("Error!")
+    })
+  })
+
+  it("validateOnChange with validateOnChangeFields referencing other fields should occur when they change", async () => {
+    const validate = jest.fn(() => Promise.resolve("Error!"))
+
+    const { form } = renderForm(
+      () => (
+        <Field
+          name="name"
+          validate={validate}
+          validateOnChange={true}
+          validateOnChangeFields={["surname"]}
+        >
+          {() => <span />}
+        </Field>
+      ),
+      {
+        initialValues: { name: "chuck", surname: "norris", age: 36 },
+        validateOnChange: false,
+        validateOnBlur: false,
+      }
+    )
+
+    form().setFieldValue("age", 40)
+
+    expect(validate).toBeCalledTimes(0)
+
+    form().setFieldValue("name", "jackie")
+
+    expect(validate).toBeCalledTimes(1)
+
+    form().setFieldValue("surname", "chan")
+
+    expect(validate).toBeCalledTimes(2)
+
+    await waitForExpect(() => {
+      expect(form().getFieldError("name")).toEqual("Error!")
+    })
+  })
+
+  it("validateOnChange can be undefined when validateOnChangeFields is set", async () => {
+    const validate = jest.fn(() => Promise.resolve("Error!"))
+
+    const { form } = renderForm(
+      () => (
+        <Field
+          name="name"
+          validate={validate}
+          validateOnChangeFields={["surname"]}
+        >
+          {() => <span />}
+        </Field>
+      ),
+      {
+        initialValues: { name: "chuck", surname: "norris", age: 36 },
+        validateOnChange: false,
+        validateOnBlur: false,
+      }
+    )
+
+    form().setFieldValue("age", 40)
+
+    expect(validate).toBeCalledTimes(0)
+
+    form().setFieldValue("name", "jackie")
+
+    expect(validate).toBeCalledTimes(1)
+
+    form().setFieldValue("surname", "chan")
+
+    expect(validate).toBeCalledTimes(2)
+
+    await waitForExpect(() => {
+      expect(form().getFieldError("name")).toEqual("Error!")
+    })
+  })
+
+  it("validateOnChange should use the latest validateOnChangeFields value", async () => {
+    const validate = jest.fn(() => Promise.resolve("Error!"))
+
+    function renderNameField(validateOnChangeFields?: string[]) {
+      return (
+        <Field
+          name="name"
+          validate={validate}
+          validateOnChangeFields={validateOnChangeFields}
+        >
+          {() => <span />}
+        </Field>
+      )
+    }
+
+    const { form, rerender } = renderForm(() => renderNameField(), {
+      initialValues: { name: "chuck", surname: "norris" },
+      validateOnChange: false,
+      validateOnBlur: false,
+    })
+
+    form().setFieldValue("name", "jackie")
+
+    expect(validate).toBeCalledTimes(0)
+
+    rerender({
+      ui: () => renderNameField(["surname"]),
+      validateOnChange: false,
+      validateOnBlur: false,
+    })
+
+    form().setFieldValue("name", "bill")
+
+    expect(validate).toBeCalledTimes(1)
+
+    form().setFieldValue("surname", "murray")
+
+    expect(validate).toBeCalledTimes(2)
+  })
+
+  it("validateOnChangeFields should respect <FieldScope />", async () => {
+    const validate = jest.fn(() => Promise.resolve("Error!"))
+
+    const { form } = renderForm(
+      () => (
+        <FieldScope name="preferences">
+          <Field
+            name="color"
+            validate={validate}
+            validateOnChangeFields={["dish"]}
+          >
+            {() => <span />}
+          </Field>
+        </FieldScope>
+      ),
+      {
+        initialValues: {
+          preferences: { color: "blue", dish: "pizza", other: "" },
+        },
+        validateOnChange: false,
+        validateOnBlur: false,
+      }
+    )
+
+    form().setFieldValue("preferences.other", "foo")
+
+    expect(validate).toBeCalledTimes(0)
+
+    form().setFieldValue("preferences.dish", "pasta")
+
+    expect(validate).toBeCalledTimes(1)
+
+    form().setFieldValue("preferences.color", "orange")
+
+    expect(validate).toBeCalledTimes(2)
+  })
+
+  it("validateOnBlur is off by default", async () => {
+    const validate = jest.fn(() => Promise.resolve("Error!"))
+
+    const { getByTestId } = renderForm(
+      () => (
+        <Field name="name" validate={validate}>
+          {(field) => (
+            <input type="text" {...field.input} data-testid="name-input" />
+          )}
+        </Field>
+      ),
+      {
+        initialValues: { name: "jack" },
+        validateOnChange: false,
+        validateOnBlur: false,
+      }
+    )
+
+    const nameInput = getByTestId("name-input")
+
+    fireEvent.blur(nameInput)
+
+    expect(validate).toBeCalledTimes(0)
+  })
+
+  it("validateOnBlur", async () => {
+    let injectedField: FieldRenderProps | undefined = undefined
+    const validate = jest.fn(() => Promise.resolve("Error!"))
+
+    const { getByTestId } = renderForm(
+      () => (
+        <Field name="name" validate={validate} validateOnBlur={true}>
+          {(field) =>
+            (injectedField = field) && (
+              <input type="text" {...field.input} data-testid="name-input" />
+            )
+          }
+        </Field>
+      ),
+      {
+        initialValues: { name: "jack" },
+        validateOnChange: false,
+        validateOnBlur: false,
+      }
+    )
+
+    const nameInput = getByTestId("name-input")
+
+    fireEvent.blur(nameInput)
+
+    expect(validate).toBeCalledTimes(1)
+
+    await waitForExpect(() => {
+      expect(injectedField!.error).toEqual("Error!")
+    })
   })
 })
