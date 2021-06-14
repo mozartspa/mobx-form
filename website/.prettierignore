@@ -6,6 +6,11 @@ yarn.lock
 yarn-error.logs
 
 # other
+.docusaurus
+build
 dist
-LICENSE
-coverage
+static
+README.md
+
+# markdown
+*.md

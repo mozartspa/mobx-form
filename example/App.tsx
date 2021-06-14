@@ -4,6 +4,7 @@ import { LinkContainer } from "react-router-bootstrap"
 import { HashRouter, Route, Switch } from "react-router-dom"
 import { ArrayForm } from "./components/ArrayForm"
 import { LoginForm } from "./components/LoginForm"
+import { MinimalForm } from "./components/MinimalForm"
 import { PerformantForm } from "./components/PerformantForm"
 
 export const App = () => {
@@ -16,13 +17,16 @@ export const App = () => {
         <Navbar bg="dark" variant="dark">
           <Nav className="mr-auto">
             <LinkContainer to="/" exact>
-              <Nav.Link>Login form</Nav.Link>
+              <Nav.Link>Minimal</Nav.Link>
+            </LinkContainer>
+            <LinkContainer to="/login-form">
+              <Nav.Link>Login</Nav.Link>
             </LinkContainer>
             <LinkContainer to="/performant-form">
-              <Nav.Link>Performant form</Nav.Link>
+              <Nav.Link>Performant</Nav.Link>
             </LinkContainer>
             <LinkContainer to="/array-form">
-              <Nav.Link>Array form</Nav.Link>
+              <Nav.Link>Array</Nav.Link>
             </LinkContainer>
           </Nav>
         </Navbar>
@@ -34,8 +38,11 @@ export const App = () => {
             <Route path="/performant-form">
               <PerformantForm />
             </Route>
-            <Route path="/">
+            <Route path="/login-form">
               <LoginForm />
+            </Route>
+            <Route path="/">
+              <MinimalForm />
             </Route>
           </Switch>
         </Container>

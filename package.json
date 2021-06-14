@@ -31,6 +31,18 @@
     }
   },
   "name": "@mozartspa/mobx-form",
+  "description": "High performance, hook-based forms library for React powered by MobX",
+  "keywords": [
+    "mobx-form",
+    "form",
+    "forms",
+    "react",
+    "mobx",
+    "hooks",
+    "react hooks",
+    "validation",
+    "high performance"
+  ],
   "author": "Filippo Dossena",
   "module": "dist/mobx-form.esm.js",
   "size-limit": [
