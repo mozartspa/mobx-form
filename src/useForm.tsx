@@ -290,6 +290,8 @@ export function useForm<Values extends FormValues>(
       }
 
       form.setFieldValue(field, toJS(get(originalValuesRef.current, field)))
+      delete form.errors[field]
+      delete form.touched[field]
     },
     async submit() {
       return executeSubmit.current()
