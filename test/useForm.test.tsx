@@ -774,3 +774,79 @@ describe("useForm validation debounce", () => {
     expect(onValidate).toBeCalledTimes(2)
   })
 })
+
+describe("useForm reset", () => {
+  it("should reset values and clear errors and touches", () => {
+    const { form } = renderTestForm({
+      initialValues: { a: "foo", b: 11 },
+    })
+
+    form().setFieldValue("a", "bar")
+    form().setFieldTouched("a")
+    form().setFieldError("a", "invalid")
+
+    form().reset()
+
+    expect(form().values).toEqual({ a: "foo", b: 11 })
+    expect(form().touched).toEqual({})
+    expect(form().errors).toEqual({})
+  })
+
+  it("should reset with the specified values", () => {
+    const { form } = renderTestForm({
+      initialValues: { a: "foo", b: 11 },
+    })
+
+    form().setFieldValue("a", "bar")
+    form().setFieldTouched("a")
+    form().setFieldError("a", "invalid")
+
+    form().reset({ other: "thing" })
+
+    expect(form().values).toEqual({ other: "thing" })
+    expect(form().touched).toEqual({})
+    expect(form().errors).toEqual({})
+  })
+})
+
+describe("useForm resetField", () => {
+  it("should reset the value and clean errors and touches of that field", () => {
+    const { form } = renderTestForm({
+      initialValues: { a: "foo", b: 11 },
+    })
+
+    form().setFieldValue("a", "bar")
+    form().setFieldTouched("a", true)
+    form().setFieldError("a", "invalid a")
+
+    form().setFieldValue("b", 12)
+    form().setFieldTouched("b", true)
+    form().setFieldError("b", "invalid b")
+
+    form().resetField("a")
+
+    expect(form().values).toEqual({ a: "foo", b: 12 })
+    expect(form().touched).toEqual({ b: true })
+    expect(form().errors).toEqual({ b: "invalid b" })
+  })
+
+  it("should reset the field with the specified value", () => {
+    const { form } = renderTestForm({
+      initialValues: { a: "foo", b: 11 },
+    })
+
+    form().setFieldValue("a", "bar")
+    form().setFieldTouched("a", true)
+    form().setFieldError("a", "invalid a")
+
+    form().setFieldValue("b", 12)
+    form().setFieldTouched("b", true)
+    form().setFieldError("b", "invalid b")
+
+    form().resetField("a", "other")
+
+    expect(form().values).toEqual({ a: "other", b: 12 })
+    expect(form().touched).toEqual({ b: true })
+    expect(form().errors).toEqual({ b: "invalid b" })
+  })
+})

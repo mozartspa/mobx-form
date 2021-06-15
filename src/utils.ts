@@ -1,5 +1,5 @@
 import { DependencyList, useMemo, useRef, useState } from "react"
-import { FormErrors, ValidateDebounce } from "./types"
+import { FieldError, FormErrors, ValidateDebounce } from "./types"
 
 export const isString = (obj: any): obj is string =>
   Object.prototype.toString.call(obj) === "[object String]"
@@ -144,24 +144,25 @@ export const logError: typeof console.error = (...args) => {
   console && console.error && console.error(...args)
 }
 
+export function mergeFieldErrors(...fieldErrors: FieldError[]) {
+  return fieldErrors.reduce((result, err) => {
+    if (err == null) {
+      return result
+    } else if (result == null) {
+      return err
+    } else if (Array.isArray(result)) {
+      return result.concat(err)
+    } else {
+      return [result].concat(err)
+    }
+  }, undefined as FieldError)
+}
+
 export function mergeErrors(errors: FormErrors[]) {
   return errors.reduce((acc, err) => {
     if (err) {
       Object.keys(err).forEach((path) => {
-        const curr = acc[path]
-        const mess = err[path]
-
-        if (mess == null) {
-          return
-        }
-
-        if (curr == null) {
-          acc[path] = mess
-        } else if (Array.isArray(curr)) {
-          acc[path] = [...curr].concat(mess)
-        } else {
-          acc[path] = [curr].concat(mess)
-        }
+        acc[path] = mergeFieldErrors(acc[path], err[path])
       })
     }
     return acc
