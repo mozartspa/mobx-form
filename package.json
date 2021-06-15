@@ -5,6 +5,7 @@
     "type": "git",
     "url": "https://github.com/mozartspa/mobx-form.git"
   },
+  "homepage": "https://mozartspa.github.io/mobx-form/",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "files": [

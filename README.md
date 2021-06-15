@@ -1,4 +1,4 @@
-# @mozartspa/mobx-react
+# [@mozartspa/mobx-react](https://mozartspa.github.io/mobx-form/)
 
 High performance, hook-based forms library for React, powered by MobX.
 
@@ -29,7 +29,12 @@ Then install the peer-dependencies: [mobx](https://github.com/mobxjs/mobx) and [
 yarn add mobx mobx-react-lite
 ```
 
-## Getting started
+## Links
+
+- [Docs](https://mozartspa.github.io/mobx-form/)
+- [API](https://mozartspa.github.io/mobx-form/docs/api/useForm)
+
+## Quickstart
 
 A minimal example, not exactly what you would use in a real project, but it gives an overall look:
 
@@ -74,24 +79,6 @@ Few things to note:
 - With `onSubmit={form.handleSubmit}` we let our form instance handle the onSubmit event.
 - `{...nameField.input}` gives the input the necessary props to be a controlled input: `name`, `value`, `onChange`, `onBlur`.
 - With `{nameField.isTouched && nameField.error}` we display the possible error only after the user _touched_ the input. Anyway, in this case there's no input validation.
-
-## Examples
-
-## API
-
-### useForm
-
-### useField
-
-### useFieldArray
-
-### useFormContext
-
-### \<Field />
-
-### \<FieldArray />
-
-### \<FieldScope />
 
 ## Credits
 
