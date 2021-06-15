@@ -186,7 +186,7 @@ isValid: boolean
 setErrors(errors: FormErrors): void
 ```
 
-Set the errors of the form. `errors` should be an object whose keys are the field names (with **dot notation**) and the value is `string | string[] | undefined`.
+Sets the errors of the form. `errors` should be an object whose keys are the field names (with **dot notation**) and the value is `string | string[] | undefined`.
 
 ---
 
@@ -196,7 +196,7 @@ Set the errors of the form. `errors` should be an object whose keys are the fiel
 setTouched(touched: FormTouched): void
 ```
 
-Set the _touche_ fields of the form. `touched` should be an object whose keys are the field names (with **dot notation**) and the value is `boolean | undefined`.
+Sets the _touche_ fields of the form. `touched` should be an object whose keys are the field names (with **dot notation**) and the value is `boolean | undefined`.
 
 ---
 
@@ -206,7 +206,7 @@ Set the _touche_ fields of the form. `touched` should be an object whose keys ar
 setValues(values: Values): void
 ```
 
-Set the values of the form.
+Sets the values of the form.
 
 ---
 
@@ -216,7 +216,7 @@ Set the values of the form.
 setFieldValue(field: string, value: any): void
 ```
 
-Set the value of a field.
+Sets the value of a field.
 
 ---
 
@@ -226,7 +226,7 @@ Set the value of a field.
 setFieldError(field: string, message: string | string[] | undefine): void
 ```
 
-Set the error of a field.
+Sets the error of a field.
 
 ---
 
@@ -236,7 +236,7 @@ Set the error of a field.
 addFieldError(field: string, message: string | string[] | undefine): void
 ```
 
-Add an error to a field. It will be merged with the current error of the field.
+Adds an error to a field. It will be merged with the current error of the field.
 
 ---
 
@@ -246,7 +246,7 @@ Add an error to a field. It will be merged with the current error of the field.
 setFieldTouched(field: string, isTouched?: boolean): void
 ```
 
-Set if a field should be considered _touched_.
+Sets if a field should be considered _touched_.
 
 ---
 
@@ -256,7 +256,7 @@ Set if a field should be considered _touched_.
 getFieldValue(field: string): any
 ```
 
-Get the value of a field.
+Gets the value of a field.
 
 ---
 
@@ -266,7 +266,7 @@ Get the value of a field.
 getFieldError(field: string): string | undefined
 ```
 
-Get the first error of a field, if any.
+Gets the first error of a field, if any.
 
 ---
 
@@ -276,7 +276,7 @@ Get the first error of a field, if any.
 getFieldErrors(field: string): string[] | undefined
 ```
 
-Get the errors of a field, if any.
+Gets the errors of a field, if any.
 
 ---
 
@@ -286,7 +286,7 @@ Get the errors of a field, if any.
 isFieldTouched(field: string): boolean
 ```
 
-Return `true` if a field has been _touched_ by the user.
+Returns `true` if a field has been _touched_ by the user.
 
 ---
 
@@ -296,7 +296,7 @@ Return `true` if a field has been _touched_ by the user.
 isFieldValid(field: string): boolean
 ```
 
-Return `true` if a field has no error.
+Returns `true` if a field has no error.
 
 ---
 
@@ -306,7 +306,7 @@ Return `true` if a field has no error.
 isFieldValid(field: string): boolean
 ```
 
-Return `true` if the field has a different value than the initial value
+Returns `true` if the field has a different value than the initial value
 
 ---
 
@@ -316,7 +316,7 @@ Return `true` if the field has a different value than the initial value
 validate(): Promise<FormErrors>
 ```
 
-Perform form validation. It returns a Promise that is resolved with the errors.
+Performs form validation. It returns a Promise that is resolved with the errors.
 
 ---
 
@@ -326,7 +326,7 @@ Perform form validation. It returns a Promise that is resolved with the errors.
 validateField(field: string): Promise<string | string[] | undefined>
 ```
 
-Perform field validation. It returns a Promise that is resolved with the errors of the field.
+Performs field validation. It returns a Promise that is resolved with the errors of the field.
 
 ---
 
@@ -336,7 +336,7 @@ Perform field validation. It returns a Promise that is resolved with the errors 
 reset(values?: Values): void
 ```
 
-Calling `reset()` will set the form values to the initial values. If you pass a value as argument, that value will be used as initial values.
+Resets the form values to the initial values. If you pass a value as argument, that value will be used as initial values.
 
 ---
 
@@ -346,7 +346,7 @@ Calling `reset()` will set the form values to the initial values. If you pass a 
 resetField(field: string, value?: any): void
 ```
 
-Calling it without the second argument will reset the value of the field to the initial value. If you pass a value as second argument, that value will be used as initial value.
+Resets the value of the field to the initial value. If you pass a value as second argument, that value will be used as initial value.
 
 ---
 
@@ -356,7 +356,7 @@ Calling it without the second argument will reset the value of the field to the 
 submit(): Promise<FormErrors>
 ```
 
-Perform form submission. It returns a Promise that is resolved with the errors of the form.
+Performs form submission. It returns a Promise that is resolved with the errors of the form.
 
 ---
 
