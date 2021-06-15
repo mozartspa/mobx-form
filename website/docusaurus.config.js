@@ -3,13 +3,13 @@ module.exports = {
   title: "@mozartspa/mobx-form",
   tagline:
     "High performance, hook-based forms library for React, powered by MobX",
-  url: "https://your-docusaurus-test-site.com",
-  baseUrl: "/",
+  url: "https://mozartspa.github.io",
+  baseUrl: "/mobx-form/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
   favicon: "img/favicon.ico",
   organizationName: "mozartspa", // Usually your GitHub org/user name.
-  projectName: "docusaurus", // Usually your repo name.
+  projectName: "mobx-form", // Usually your repo name.
   themeConfig: {
     navbar: {
       title: "@mozartspa/mobx-form",
