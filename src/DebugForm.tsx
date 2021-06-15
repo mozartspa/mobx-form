@@ -1,8 +1,10 @@
 import { observer } from "mobx-react-lite"
 import React from "react"
-import { useFormContext } from "./useFormContext"
+import { Form } from "./types"
+import { FormContext } from "./useFormContext"
 
 export type DebugFormProps = {
+  form?: Form | undefined
   showAll?: boolean
   showValues?: boolean
   showErrors?: boolean
@@ -11,7 +13,15 @@ export type DebugFormProps = {
 }
 
 export const DebugForm = observer((props: DebugFormProps) => {
-  const form = useFormContext()
+  const formContext = React.useContext(FormContext) as Form | undefined
+  const form = props.form || formContext
+
+  if (!form) {
+    throw new Error(
+      `Missing FormContext. Did you use "<FormProvider />" or the "<Form />" provided by "useForm()"?` +
+        `Alternatively, you can use the "form" prop to specify which form instance to bind this component to.`
+    )
+  }
 
   const {
     showAll = false,
