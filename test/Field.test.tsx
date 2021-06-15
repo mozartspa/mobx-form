@@ -628,4 +628,45 @@ describe("<Field /> validation", () => {
       expect(injectedField!.error).toEqual("Error!")
     })
   })
+
+  it("should merge errors of multiple <Field/> on same field", async () => {
+    let injectedField: FieldRenderProps | undefined = undefined
+    let injectedField2: FieldRenderProps | undefined = undefined
+    const validate = jest.fn(() => Promise.resolve("Error1"))
+    const validate2 = jest.fn(() => Promise.resolve("Error2"))
+
+    const { form } = renderForm(
+      () => (
+        <>
+          <Field name="name" validate={validate}>
+            {(field) =>
+              (injectedField = field) && (
+                <input type="text" {...field.input} data-testid="name-input" />
+              )
+            }
+          </Field>
+          <Field name="name" validate={validate2}>
+            {(field) =>
+              (injectedField2 = field) && (
+                <input type="text" {...field.input} data-testid="name-input2" />
+              )
+            }
+          </Field>
+        </>
+      ),
+      {
+        initialValues: { name: "jack" },
+        validateOnChange: false,
+      }
+    )
+
+    await form().validate()
+
+    expect(validate).toBeCalledTimes(1)
+    expect(validate2).toBeCalledTimes(1)
+
+    expect(form().getFieldErrors("name")).toEqual(["Error1", "Error2"])
+    expect(injectedField!.errors).toEqual(["Error1", "Error2"])
+    expect(injectedField2!.errors).toEqual(["Error1", "Error2"])
+  })
 })
