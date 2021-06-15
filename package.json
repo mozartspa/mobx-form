@@ -1,6 +1,10 @@
 {
   "version": "0.2.1",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mozartspa/mobx-form.git"
+  },
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "files": [
