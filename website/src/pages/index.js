@@ -3,7 +3,6 @@ import useDocusaurusContext from "@docusaurus/useDocusaurusContext"
 import Layout from "@theme/Layout"
 import clsx from "clsx"
 import React from "react"
-import EmbedCodesandbox from "../components/EmbedCodesandbox"
 import HomepageFeatures from "../components/HomepageFeatures"
 import styles from "./index.module.css"
 
@@ -37,13 +36,12 @@ export default function Home() {
   const { siteConfig } = useDocusaurusContext()
   return (
     <Layout
-      title={`Hello from ${siteConfig.title}`}
-      description="Description will go into a meta tag in <head />"
+      title={`Docs for ${siteConfig.title}`}
+      description="High performance, hook-based forms library for React, powered by MobX"
     >
       <HomepageHeader />
       <main>
         <HomepageFeatures />
-        <EmbedCodesandbox src="https://codesandbox.io/embed/framer-motion-side-menu-forked-flj6y?fontsize=14&hidenavigation=1&theme=dark" />
       </main>
     </Layout>
   )

@@ -35,46 +35,8 @@ yarn add mobx mobx-react-lite
 
 ## Getting started
 
-A minimal example, not exactly what you would use in a real project, but it gives an overall look:
+[Start creating your first form](getting-started/create-form.md).
 
-```typescript
-import React from "react"
-import { observer } from "mobx-react-lite"
-import { useField, useForm } from "@mozartspa/mobx-form"
+## Credits
 
-const App = observer(() => {
-  const form = useForm({
-    initialValues: {
-      name: "",
-    },
-    onSubmit: (values) => {
-      console.log("submitted values", values)
-    },
-  })
-
-  const nameField = useField("name", { form })
-
-  return (
-    <form onSubmit={form.handleSubmit}>
-      <div>
-        <label>Name</label>
-        <input type="text" {...nameField.input} />
-        {nameField.isTouched && nameField.error}
-      </div>
-      <button type="submit">Submit</button>
-    </form>
-  )
-})
-
-export default App
-```
-
-Few things to note:
-
-- We import `useForm` and `useField` from the package `@mozartspa/mobx-form`.
-- We wrap our component with [`observer()`](https://mobx.js.org/react-integration.html), since we're using MobX.
-- `useForm()` gives us back a stable reference to our form instance.
-- `useField()` gives us back a stable reference to a specific field of our form. We pass it the `form` instance, to make it know which form it should be bound to. It's required here, but in other examples we'll leverage the React Context.
-- With `onSubmit={form.handleSubmit}` we let our form instance handle the onSubmit event.
-- `{...nameField.input}` gives the input the necessary props to be a controlled input: `name`, `value`, `onChange`, `onBlur`.
-- With `{nameField.isTouched && nameField.error}` we display the possible error only after the user _touched_ the input. Anyway, in this case there's no input validation.
+Heavily inspired by [formik](https://github.com/formium/formik), with some ideas taken from [react-form](https://github.com/tannerlinsley/react-form) and [react-final-form](https://github.com/final-form/react-final-form).
