@@ -330,4 +330,4 @@ If you **run the code** and edit the age field (setting it to `40` for example),
 
 This is the state of our form, exposed by our `form` instance. `age` is actually a number (it does not have double quotes). Great!
 
-Another thing: have you noticed that `"touched"` object? It contains the field names that triggered an `onBlur` event. It's a useful information in order to display the field error only when the user already interacted with the input. More on this in the [Validation](#todo) section.
+Another thing: have you noticed that `"touched"` object? It contains the field names that triggered an `onBlur` event. It's a useful information in order to display the field error only when the user already interacted with the input. More on this in the [Validation](validation) section.

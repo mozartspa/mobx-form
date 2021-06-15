@@ -120,3 +120,173 @@ validateOnChangeFields?: string[]
 ```
 
 Array of field names that should trigger validation of this field whenever they change. If you pass a value that is **not** `undefined`, [validateOnChange](#validateonchange) is automatically considered `true` unless you set it to `false`.
+
+---
+
+## UseFieldResult
+
+It is returned by `useField()` and represents the field instance that gives access to props and methods to easily manage the field.
+
+### input
+
+It's an object of type:
+
+```typescript
+{
+  name: string
+  readonly value: T
+  onBlur: (event: React.FocusEvent) => void
+  onChange: (event: React.ChangeEvent<any>) => void
+}
+```
+
+- `name` is the name of the field.
+- `value` is the current value of the field in the form values.
+- `onBlur` is a function that, when called, informs the form instance that this field has been _touched_.
+- `onChange`is a function that, when called, changes the value of the field extrapolating the new value from the `React.ChangeEvent` event it receives.
+
+Usually, this `input` object is _spread_ into the input element props:
+
+```typescript
+<input type="text" {...field.input} />
+```
+
+---
+
+### name
+
+```typescript
+name: string
+```
+
+The name of the field.
+
+---
+
+### value
+
+```typescript
+value: T
+```
+
+The value of the field.
+
+---
+
+### isTouched
+
+```typescript
+isTouched: boolean
+```
+
+`true` if the field has been _touched_ by the user.
+
+---
+
+### error
+
+```typescript
+error: string | undefined
+```
+
+The first error of the field, if any.
+
+---
+
+### errors
+
+```typescript
+errors: string[] | undefined
+```
+
+The errors of the field, if any.
+
+---
+
+### isValid
+
+```typescript
+isValid: boolean
+```
+
+`true` if the field has no errors.
+
+---
+
+### isDirty
+
+```typescript
+isDirty: boolean
+```
+
+`true` if the field has a different value than the initial value.
+
+---
+
+### isValidating
+
+```typescript
+isValidating: boolean
+```
+
+`true` if the field validation is running.
+
+---
+
+### form
+
+```typescript
+form: Form
+```
+
+The [Form](useForm#form) instance this field is bound to.
+
+---
+
+### setValue
+
+```typescript
+setValue: (value: T) => void
+```
+
+Sets the value of the field.
+
+---
+
+### setTouched
+
+```typescript
+setTouched: (isTouched?: boolean) => void
+```
+
+Sets if the field should be considered _touched_.
+
+---
+
+### setError
+
+```typescript
+setError: (error: FieldError) => void
+```
+
+Sets the error of the field.
+
+---
+
+### addError
+
+```typescript
+addError: (error: FieldError) => void
+```
+
+Adds an error to the field. It will be merged with the current error of the field.
+
+---
+
+### validate
+
+```typescript
+validate(): Promise<string | string[] | undefined>
+```
+
+Performs field validation. It returns a Promise that is resolved with the errors of the field.

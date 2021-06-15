@@ -10,7 +10,7 @@ A good form library should adapt to the shape of your data structure, not viceve
 
 Let's take a form data structure with nested fields (and deeply nested fields):
 
-```typescript {4-11}
+```typescript {4-12}
 const initialValues = {
   name: "",
   age: 36,
@@ -292,7 +292,7 @@ export default App
 
 In the previous example we wrote:
 
-```typescript {3-4}
+```typescript {4-5}
 {
   placesField.names.map((name, index) => (
     <div key={index}>
@@ -305,7 +305,7 @@ In the previous example we wrote:
 
 In this case we are concatenating the name of the array field (_"preferences.places.0"_, _"preferences.places.1"_, _..._) with the name of the subfields (_"street"_ and _"city"_). To avoid this, we can use the `<FieldScope />` component:
 
-```typescript {3-6}
+```typescript {4-7}
 {
   placesField.names.map((name, index) => (
     <div key={index}>

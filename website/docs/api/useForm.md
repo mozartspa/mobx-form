@@ -296,7 +296,7 @@ Returns `true` if a field has been _touched_ by the user.
 isFieldValid(field: string): boolean
 ```
 
-Returns `true` if a field has no error.
+Returns `true` if the field has no error.
 
 ---
 

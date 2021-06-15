@@ -164,7 +164,7 @@ useField("email", {
 
 ### Debouncing
 
-Similarely to [form validation](#debouncing) you can pass a `validateDebounce` value.
+Similarly to [form validation](#debouncing) you can pass a `validateDebounce` value.
 
 ### When does field validation run?
 
@@ -210,7 +210,7 @@ useField("confirmEmail", {
 })
 ```
 
-In this way, while the user is typing in `email` field, the error appears in the `confirmEmail` field, complaining that the two emails are not equal.
+In this way, while the user is typing into the `email` field, the error appears in the `confirmEmail` field, complaining that the two emails are not equal.
 
 :::note
 
