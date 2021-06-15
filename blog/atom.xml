@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <id>https://mozartspa.github.io/blog</id>
+    <title>@mozartspa/mobx-form Blog</title>
+    <updated>2015-10-25T23:29:00.000Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <link rel="alternate" href="https://mozartspa.github.io/blog"/>
+    <subtitle>@mozartspa/mobx-form Blog</subtitle>
+    <icon>https://mozartspa.github.io/img/favicon.ico</icon>
+</feed>
