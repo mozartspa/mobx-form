@@ -3,6 +3,7 @@ import useDocusaurusContext from "@docusaurus/useDocusaurusContext"
 import Layout from "@theme/Layout"
 import clsx from "clsx"
 import React from "react"
+import EmbedCodesandbox from "../components/EmbedCodesandbox"
 import HomepageFeatures from "../components/HomepageFeatures"
 import styles from "./index.module.css"
 
@@ -42,6 +43,11 @@ export default function Home() {
       <HomepageHeader />
       <main>
         <HomepageFeatures />
+        <EmbedCodesandbox
+          title="Try it live"
+          src="https://codesandbox.io/embed/mozartspamobx-form-checkout-demo-bwrhh?fontsize=14&hidenavigation=1&theme=dark&view=preview"
+          height="800px"
+        />
       </main>
     </Layout>
   )

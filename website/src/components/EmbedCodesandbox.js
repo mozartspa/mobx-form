@@ -1,14 +1,21 @@
 import React from "react"
+import styles from "./EmbedCodesandbox.module.css"
 
-export default function EmbedCodesandbox({ src }) {
+export default function EmbedCodesandbox({
+  src,
+  title,
+  width = "100%",
+  height = "500px",
+}) {
   return (
-    <section className="margin-bottom--xl">
+    <section className={styles.codesandbox}>
+      {title && <h3 className={styles.title}>{title}</h3>}
       <div className="container">
         <iframe
           src={src}
           style={{
-            width: "100%",
-            height: "500px",
+            width,
+            height,
             border: "0",
             borderRadius: "4px",
             overflow: "hidden",
