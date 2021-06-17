@@ -54,7 +54,7 @@ Few things to note:
 
 ## `<Form />` component
 
-In the previous example we did not use any fancy component, just only HTML. It's a great thing, but we can do better using the `<Form />` component provided by `useForm()`. Let's how it looks:
+In the previous example we did not use any fancy component, just only HTML. It's a great thing, but we can do better using the `<Form />` component provided by `useForm()`. Let's see how it looks:
 
 ```typescript {17,20,27}
 import React from "react"
@@ -257,9 +257,87 @@ Few things to note:
 - The `<Field />` component didn't need the `observer()` wrapper, because under the hood it was already using it.
 - We didn't pass the `form` instance to the `useField` hook. Because, if not explicitely set, `useField` uses the React Context created by `<Form />` to get access to the `form` instance.
 
+### Using `splitFieldProps`
+
+In the previous example, our custom input component accepts only 3 props: `name`, `label` and `type`. It's enough in this case, because we are not using any option that `useField()` (or `<Field />`) can receive. Indeed `useField()` accepts, as second argument, a long list of options, many of them about validation (see [useField API reference](../api/useField) for more details).
+
+In order to make our custom input component more versatile, we should make it accept a long list of options related to `useField`, that our component will pass to `useField()`. This is boring and error prone.
+
+For this reason, we can use the `splitFieldProps` function which takes some props and splits them in:
+
+- `name` of the field
+- `useField` options
+- other unknown props
+
+Here is how it should be used:
+
+```typescript {4-5,10,16-17,19}
+import React from "react"
+import { observer } from "mobx-react-lite"
+import {
+  FieldComponentProps,
+  splitFieldProps,
+  useField,
+  useForm,
+} from "@mozartspa/mobx-form"
+
+type InputProps = FieldComponentProps & {
+  label?: string
+  type?: string
+}
+
+const Input = observer((props: InputProps) => {
+  const [name, fieldOptions, rest] = splitFieldProps(props)
+  const field = useField(name, fieldOptions)
+
+  const { label, type } = rest
+
+  return (
+    <div>
+      <label>{label}</label>
+      <input type={type} {...field.input} />
+      {field.isTouched && field.error}
+    </div>
+  )
+})
+
+const App = observer(() => {
+  const form = useForm({
+    initialValues: {
+      name: "",
+      age: 36,
+    },
+    onSubmit: (values) => {
+      console.log("submitted values", values)
+    },
+  })
+
+  const { Form } = form
+
+  return (
+    <Form>
+      <Input name="name" label="Your name" />
+      <Input name="age" type="number" label="Your age" />
+      <button type="submit">Submit</button>
+    </Form>
+  )
+})
+
+export default App
+```
+
+Few things to note:
+
+- We updated the definition of `type InputProps` merging it with `FieldComponentProps`: it contains all the options that `useField` can accept (`name` prop included).
+- We use `splitFieldProps` to split our props into `name`, `fieldOptions` and `rest`.
+- We pass `name` and `fieldOptions` to `useField()`
+- We extract from `rest` the 2 specific props of our component: `label` and `type`.
+
 ## Debugging the state of the form instance
 
-To be sure that `age` value is converted correctly to a number, we should inspect the values of the form. For this reason, there is a `debug` prop available on the `<Form />` component. It's only for development purposes, of course. Let's apply it:
+During development it would be nice to know the internal state of our `form` instance. For this reason, there is a `debug` prop available on the `<Form />` component.
+
+Let's apply it:
 
 ```typescript {37}
 import React from "react"
