@@ -1,8 +1,8 @@
 import { UseFieldOptions } from "./types"
 
-type SplitFieldProps = UseFieldOptions & { name?: string }
+export type FieldComponentProps = UseFieldOptions & { name?: string }
 
-type SplitFieldPropsOutput<T extends SplitFieldProps> = [
+type SplitFieldPropsOutput<T extends FieldComponentProps> = [
   T["name"],
   {
     form: T["form"]
@@ -30,7 +30,7 @@ type SplitFieldPropsOutput<T extends SplitFieldProps> = [
   >
 ]
 
-export function splitFieldProps<T extends SplitFieldProps>(
+export function splitFieldProps<T extends FieldComponentProps>(
   props: T
 ): SplitFieldPropsOutput<T> {
   const {
