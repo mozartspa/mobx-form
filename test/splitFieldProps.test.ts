@@ -38,14 +38,6 @@ describe("splitFieldProps", () => {
     })
   })
 
-  it("should return `name` as undefined, if not provided", () => {
-    const props = {}
-
-    const [name] = splitFieldProps(props)
-
-    expect(name).toBe(undefined)
-  })
-
   it("should return `fieldOptions` with all undefined values, if not provided", () => {
     const props = {
       name: "name",

@@ -1,6 +1,6 @@
 import { UseFieldOptions } from "./types"
 
-export type FieldComponentProps = UseFieldOptions & { name?: string }
+export type FieldComponentProps = UseFieldOptions & { name: string }
 
 type SplitFieldPropsOutput<T extends FieldComponentProps> = [
   T["name"],
