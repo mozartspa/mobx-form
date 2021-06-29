@@ -117,16 +117,12 @@ export function useField<T = any, Values = any>(
     ] /* eslint-enable react-hooks/exhaustive-deps */
   )
 
-  // register the debounced validator to the form, if it should validate
+  // register to the form
   useEffect(() => {
-    if (validate) {
-      const disposer = form.register(name, {
-        validate: debouncedValidator,
-      })
-      return disposer
-    } else {
-      return
-    }
+    const disposer = form.register(name, {
+      validate: validate ? debouncedValidator : undefined,
+    })
+    return disposer
   }, [form, name, validate, debouncedValidator])
 
   // validateOnChange

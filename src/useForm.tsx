@@ -50,10 +50,10 @@ async function validateFieldRegistrants(
   if (registrants.length === 0) {
     return Promise.resolve(undefined)
   } else if (registrants.length === 1) {
-    return await registrants[0].validate(value, values)
+    return await registrants[0]?.validate?.(value, values)
   } else {
     const errors = await Promise.all(
-      registrants.map((reg) => reg.validate(value, values))
+      registrants.map((reg) => reg.validate?.(value, values))
     )
     return mergeFieldErrors(...errors)
   }
@@ -154,7 +154,10 @@ export function useForm<Values extends FormValues>(
 
       runInAction(() => {
         form.isSubmitting = true
-        form.touched = buildObjectPaths(values, true)
+        form.touched = {
+          ...buildObjectPaths(values, true),
+          ...buildObjectPaths(registeredFields.current, true, false),
+        }
       })
 
       const errors = await form.validate()

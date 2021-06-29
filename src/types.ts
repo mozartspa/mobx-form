@@ -13,7 +13,7 @@ export type FormTouched = {
 }
 
 export type FieldRegistrant<T = any, Values = any> = {
-  validate: FieldValidate<T, Values>
+  validate?: FieldValidate<T, Values>
 }
 
 export type Disposer = () => void

@@ -527,6 +527,29 @@ describe("useForm submit", () => {
     expect(failedSubmit).toBeCalledTimes(1)
     expect(failedSubmit2).toBeCalledTimes(1)
   })
+
+  it("should touch all fields, even if not present in the initialValues", async () => {
+    const { form } = renderForm(
+      () => (
+        <>
+          <Field name="field1">{() => <span />}</Field>
+          <Field name="field2">{() => <span />}</Field>
+          <Field name="field3">{() => <span />}</Field>
+        </>
+      ),
+      {
+        initialValues: {
+          field1: "foo",
+        },
+      }
+    )
+
+    await form().submit()
+
+    expect(form().isFieldTouched("field1")).toBe(true)
+    expect(form().isFieldTouched("field2")).toBe(true)
+    expect(form().isFieldTouched("field3")).toBe(true)
+  })
 })
 
 describe("useForm validation", () => {

@@ -13,6 +13,7 @@ export const isObject = (obj: any): obj is Object =>
 export function buildObjectPaths<TObject, TValue>(
   object: TObject,
   value: TValue,
+  recursive = true,
   parentKey: string = "",
   response: any = {}
 ): Record<string, TValue> {
@@ -21,8 +22,8 @@ export function buildObjectPaths<TObject, TValue>(
     response[path] = value
 
     const val = (object as any)[k]
-    if (isObject(val)) {
-      buildObjectPaths(val, value, path + ".", response)
+    if (recursive && isObject(val)) {
+      buildObjectPaths(val, value, recursive, path + ".", response)
     }
   }
 
