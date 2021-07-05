@@ -116,7 +116,17 @@ It's the form instance.
 values: Values
 ```
 
-The current values of the form.
+The current values of the form. Its reference changes whenever a value of the form changes, even in deep nested values. Therefore, it can be used as dependency in `useEffect()`.
+
+---
+
+### observableValues
+
+```typescript
+observableValues: Values
+```
+
+The mobx-observable current values of the form. It has a stable reference, even if the values change. Therefore, don't use it as a dependency.
 
 ---
 
