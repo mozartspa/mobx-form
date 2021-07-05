@@ -876,7 +876,7 @@ describe("useForm resetField", () => {
 })
 
 describe("useForm values", () => {
-  it("values reference should change whenever an observable value changes", () => {
+  it("values reference should change only when an observable value changes", () => {
     const { form } = renderTestForm({
       initialValues: { a: "foo", b: 11 },
     })
@@ -889,13 +889,20 @@ describe("useForm values", () => {
     const values2 = form().values
     const observableValues2 = form().observableValues
 
+    form().setFieldValue("a", "bar") // same value
+
+    const values3 = form().values
+    const observableValues3 = form().observableValues
+
     expect(values1).not.toEqual(values2)
+    expect(values2).toEqual(values3) // should not change when value is the same
     expect(observableValues1).toBe(observableValues2) // observableValues should have a stable reference
+    expect(observableValues2).toBe(observableValues3) // observableValues should have a stable reference
   })
 
   it("can be used as dependency in useEffect", () => {
     const effectFn = jest.fn()
-    const { form } = renderForm(
+    const { form, rerender } = renderForm(
       (form) => {
         const { values } = form
 
@@ -916,6 +923,18 @@ describe("useForm values", () => {
     })
 
     expect(effectFn).toBeCalledTimes(2)
+
+    act(() => {
+      form().setFieldValue("name", "beez") // same value
+    })
+
+    expect(effectFn).toBeCalledTimes(2) // should not be called again
+
+    act(() => {
+      rerender()
+    })
+
+    expect(effectFn).toBeCalledTimes(2) // should not be called again
 
     act(() => {
       form().setFieldValue("nested.list.1", 4)
