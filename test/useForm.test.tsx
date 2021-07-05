@@ -1,3 +1,4 @@
+import { act } from "@testing-library/react"
 import * as React from "react"
 import waitForExpect from "wait-for-expect"
 import { Field } from "../src"
@@ -871,5 +872,55 @@ describe("useForm resetField", () => {
     expect(form().values).toEqual({ a: "other", b: 12 })
     expect(form().touched).toEqual({ b: true })
     expect(form().errors).toEqual({ b: "invalid b" })
+  })
+})
+
+describe("useForm values", () => {
+  it("values reference should change whenever an observable value changes", () => {
+    const { form } = renderTestForm({
+      initialValues: { a: "foo", b: 11 },
+    })
+
+    const values1 = form().values
+    const observableValues1 = form().observableValues
+
+    form().setFieldValue("a", "bar")
+
+    const values2 = form().values
+    const observableValues2 = form().observableValues
+
+    expect(values1).not.toEqual(values2)
+    expect(observableValues1).toBe(observableValues2) // observableValues should have a stable reference
+  })
+
+  it("can be used as dependency in useEffect", () => {
+    const effectFn = jest.fn()
+    const { form } = renderForm(
+      (form) => {
+        const { values } = form
+
+        React.useEffect(effectFn, [values])
+
+        return null
+      },
+      {
+        initialValues: { name: "jack", nested: { list: [1, 2, 3] } },
+        validateOnChange: false,
+      }
+    )
+
+    expect(effectFn).toBeCalledTimes(1)
+
+    act(() => {
+      form().setFieldValue("name", "beez")
+    })
+
+    expect(effectFn).toBeCalledTimes(2)
+
+    act(() => {
+      form().setFieldValue("nested.list.1", 4)
+    })
+
+    expect(effectFn).toBeCalledTimes(3)
   })
 })

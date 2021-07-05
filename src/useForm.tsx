@@ -104,7 +104,7 @@ export function useForm<Values extends FormValues>(
       })
 
       const validationId = counter.getValue()
-      const values = toJS(form.values)
+      const values = form.values
 
       let errors: FormErrors
       try {
@@ -150,7 +150,7 @@ export function useForm<Values extends FormValues>(
   // submitter
   const executeSubmit = useLatestValue(() => {
     const doSubmit = async () => {
-      const values = toJS(form.values)
+      const values = form.values
 
       runInAction(() => {
         form.isSubmitting = true
@@ -198,13 +198,16 @@ export function useForm<Values extends FormValues>(
 
   // the form!
   const form: Form<Values> = useLocalObservable(() => ({
-    values: originalValuesRef.current,
+    observableValues: originalValuesRef.current,
     errors: {} as FormErrors,
     touched: {} as FormTouched,
     isSubmitting: false,
     isValidating: false,
+    get values() {
+      return toJS(form.observableValues)
+    },
     get isDirty() {
-      return !isEqual(originalValuesRef.current, toJS(form.values))
+      return !isEqual(originalValuesRef.current, form.values)
     },
     get isValid() {
       return !hasErrors(form.errors)
@@ -216,16 +219,16 @@ export function useForm<Values extends FormValues>(
       form.touched = touched || {}
     },
     setValues(values: Values) {
-      form.values = toJS(values)
+      form.observableValues = toJS(values)
     },
     setFieldValue(field: string, value: any) {
       if (form.getFieldValue(field) !== value) {
-        set(form.values, field, value)
+        set(form.observableValues, field, value)
         optionsRef.current.validateOnChange && form.validate()
       }
     },
     getFieldValue(field: string) {
-      return get(form.values, field)
+      return get(form.observableValues, field)
     },
     setFieldError(field: string, message: FieldError) {
       form.errors[field] = message
@@ -277,7 +280,7 @@ export function useForm<Values extends FormValues>(
     isFieldDirty(field: string) {
       return !isEqual(
         get(originalValuesRef.current, field),
-        toJS(get(form.values, field))
+        toJS(get(form.observableValues, field))
       )
     },
     async validate() {
