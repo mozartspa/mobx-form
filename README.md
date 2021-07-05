@@ -11,7 +11,7 @@ High performance, hook-based forms library for React, powered by MobX.
 - Powered by [MobX](https://mobx.js.org/)
 - Built with React hooks
 - Written in Typescript
-- It's only [~7kB gzipped](https://bundlephobia.com/package/@mozartspa/mobx-form)
+- [![Minzipped Size](https://badgen.net/bundlephobia/minzip/@mozartspa/mobx-form)](https://bundlephobia.com/package/@mozartspa/mobx-form)
 
 ## Motivation
 
