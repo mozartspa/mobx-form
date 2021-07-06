@@ -397,3 +397,33 @@ register: (field: string, registrant: FieldRegistrant<any, Values>) => Disposer
 ```
 
 Used internally by `useField` in order to register itself to the form.
+
+---
+
+### freeze
+
+```typescript
+freeze: () => void
+```
+
+It freezes the form values, preventing them to be changed: `reset`, `resetField`, `setFieldValue` and `setValues` methods do nothing when the form is freezed.
+
+---
+
+### unfreeze
+
+```typescript
+unfreeze: () => void
+```
+
+It unfreezes the form values.
+
+---
+
+### isFreezed
+
+```typescript
+isFreezed: boolean
+```
+
+Whether the form is freezed.
