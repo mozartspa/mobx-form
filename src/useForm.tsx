@@ -203,6 +203,7 @@ export function useForm<Values extends FormValues>(
     touched: {} as FormTouched,
     isSubmitting: false,
     isValidating: false,
+    isFreezed: false,
     get values() {
       return toJS(form.observableValues)
     },
@@ -219,9 +220,17 @@ export function useForm<Values extends FormValues>(
       form.touched = touched || {}
     },
     setValues(values: Values) {
+      if (form.isFreezed) {
+        return
+      }
+
       form.observableValues = toJS(values)
     },
     setFieldValue(field: string, value: any) {
+      if (form.isFreezed) {
+        return
+      }
+
       if (form.getFieldValue(field) !== value) {
         set(form.observableValues, field, value)
         optionsRef.current.validateOnChange && form.validate()
@@ -300,6 +309,10 @@ export function useForm<Values extends FormValues>(
       return errors
     },
     reset(values: Values | undefined = undefined) {
+      if (form.isFreezed) {
+        return
+      }
+
       if (values) {
         originalValuesRef.current = toJS(values)
       }
@@ -309,6 +322,10 @@ export function useForm<Values extends FormValues>(
       form.setTouched({})
     },
     resetField(field: string, value: any = undefined) {
+      if (form.isFreezed) {
+        return
+      }
+
       if (value !== undefined) {
         set(originalValuesRef.current, field, toJS(value))
       }
@@ -343,6 +360,12 @@ export function useForm<Values extends FormValues>(
           delete registeredFields.current[field]
         }
       }
+    },
+    freeze() {
+      form.isFreezed = true
+    },
+    unfreeze() {
+      form.isFreezed = false
     },
   }))
 

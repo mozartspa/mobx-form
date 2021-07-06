@@ -943,3 +943,32 @@ describe("useForm values", () => {
     expect(effectFn).toBeCalledTimes(3)
   })
 })
+
+describe("useForm freeze", () => {
+  it("when freezed `reset`, `resetField`, `setFieldValue` and `setValues` do not work", () => {
+    const { form } = renderTestForm({
+      initialValues: { a: "foo", b: 1 },
+    })
+
+    form().freeze()
+    expect(form().isFreezed).toBe(true)
+
+    form().reset({ a: "joe", b: 2 })
+    expect(form().values).toEqual({ a: "foo", b: 1 })
+
+    form().resetField("a", "joe")
+    expect(form().getFieldValue("a")).toBe("foo")
+
+    form().setFieldValue("a", "bar")
+    expect(form().getFieldValue("a")).toBe("foo")
+
+    form().setValues({ a: "joe", b: 2 })
+    expect(form().values).toEqual({ a: "foo", b: 1 })
+
+    form().unfreeze()
+    expect(form().isFreezed).toBe(false)
+
+    form().setFieldValue("a", "bar")
+    expect(form().getFieldValue("a")).toBe("bar") // here it should work
+  })
+})

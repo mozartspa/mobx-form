@@ -27,6 +27,7 @@ export type Form<Values = FormValues> = {
   isValidating: boolean
   readonly isDirty: boolean
   readonly isValid: boolean
+  isFreezed: boolean
   setErrors(errors: FormErrors): void
   setTouched(touched: FormTouched): void
   setValues(values: Values): void
@@ -51,6 +52,8 @@ export type Form<Values = FormValues> = {
     field: string,
     registrant: FieldRegistrant<any, Values>
   ) => Disposer
+  freeze(): void
+  unfreeze(): void
 }
 
 export type FormValidate<Values = any> = (
