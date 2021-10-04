@@ -85,7 +85,7 @@ export type UseFieldOptions<T = any, Values = any> = {
   format?: (value: T) => any
   parse?: (value: any) => T
   parseOnBlur?: (value: any) => T
-  validate?: FieldValidate<T, Values>
+  validate?: FieldValidate<T, Values> | FieldValidate<T, Values>[]
   validateDebounce?: ValidateDebounce
   validateOnChangeFields?: string[]
   validateOnChange?: boolean

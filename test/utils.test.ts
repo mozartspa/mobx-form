@@ -1,4 +1,4 @@
-import { buildObjectPaths, mergeErrors } from "../src/utils"
+import { buildObjectPaths, composeValidators, mergeErrors } from "../src/utils"
 
 describe("buildObjectPaths", () => {
   it("works", () => {
@@ -69,5 +69,68 @@ describe("mergeErrors", () => {
         "Friend name error3",
       ],
     })
+  })
+})
+
+describe("composeValidators", () => {
+  it("calls all the validators if none return an error", async () => {
+    const syncValidator = jest.fn(() => undefined)
+    const asyncValidator = jest.fn(async () => undefined)
+    const validator = composeValidators(syncValidator, asyncValidator)
+
+    expect(validator).toBeDefined()
+
+    const error = await validator!({}, {})
+
+    expect(syncValidator).toHaveBeenCalledTimes(1)
+    expect(asyncValidator).toHaveBeenCalledTimes(1)
+    expect(error).toBeUndefined()
+  })
+
+  it("returns the error returned by the first failed validator", async () => {
+    const v1 = jest.fn(() => undefined)
+    const v2 = jest.fn(() => "ouch!")
+    const v3 = jest.fn(() => "ouch!")
+    const validator = composeValidators(v1, v2, v3)
+
+    const error = await validator!({}, {})
+
+    expect(v1).toHaveBeenCalledTimes(1)
+    expect(v2).toHaveBeenCalledTimes(1)
+    expect(v3).toHaveBeenCalledTimes(0)
+    expect(error).toBe("ouch!")
+  })
+
+  it("all validators receive the same args", async () => {
+    const v1 = jest.fn(() => undefined)
+    const v2 = jest.fn(() => undefined)
+
+    const validator = composeValidators(v1, v2)
+
+    const value = "foo"
+    const values = { foo: value, bar: "bar" }
+
+    await validator!(value, values)
+
+    expect(v1).toHaveBeenCalledWith(value, values)
+    expect(v2).toHaveBeenCalledWith(value, values)
+  })
+
+  it("accepts undefined validators", async () => {
+    const v1 = jest.fn(() => "ouch!")
+
+    const validator = composeValidators(undefined, v1)
+
+    const error = await validator!({}, {})
+
+    expect(error).toBe("ouch!")
+  })
+
+  it("returns undefined if it receives only undefined validators", async () => {
+    const validator1 = composeValidators()
+    const validator2 = composeValidators(undefined, undefined)
+
+    expect(validator1).toBeUndefined()
+    expect(validator2).toBeUndefined()
   })
 })

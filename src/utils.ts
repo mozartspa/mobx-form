@@ -1,5 +1,10 @@
 import { DependencyList, useMemo, useRef, useState } from "react"
-import { FieldError, FormErrors, ValidateDebounce } from "./types"
+import {
+  FieldError,
+  FieldValidate,
+  FormErrors,
+  ValidateDebounce,
+} from "./types"
 
 export const isString = (obj: any): obj is string =>
   Object.prototype.toString.call(obj) === "[object String]"
@@ -168,4 +173,27 @@ export function mergeErrors(errors: FormErrors[]) {
     }
     return acc
   }, {} as FormErrors)
+}
+
+export function composeValidators<T = any, Values = any>(
+  ...validates: (FieldValidate<T, Values> | undefined)[]
+) {
+  const validators = validates.filter(Boolean)
+
+  if (validators.length === 0) {
+    return undefined
+  }
+
+  const composed: FieldValidate<T, Values> = async (value, values) => {
+    for (const validate of validators) {
+      const error = await validate?.(value, values)
+      if (error != null) {
+        return error
+      }
+    }
+
+    return undefined
+  }
+
+  return composed
 }

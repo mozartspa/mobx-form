@@ -669,4 +669,39 @@ describe("<Field /> validation", () => {
     expect(injectedField!.errors).toEqual(["Error1", "Error2"])
     expect(injectedField2!.errors).toEqual(["Error1", "Error2"])
   })
+
+  it("validate prop accepts an array of validators", async () => {
+    let injectedField: FieldRenderProps | undefined = undefined
+
+    const required = (value: any) =>
+      value == null || value === "" ? "Required" : undefined
+    const notJack = (value: any) =>
+      value === "jack" ? "Name already taken" : undefined
+
+    const { form } = renderForm(
+      () => (
+        <Field name="name" validate={[required, notJack]}>
+          {(field) => (injectedField = field) && <span />}
+        </Field>
+      ),
+      {
+        initialValues: { name: "" },
+      }
+    )
+
+    const field = injectedField!
+    await field.validate()
+
+    expect(field.error).toEqual("Required")
+
+    form().setFieldValue("name", "jack")
+    await field.validate()
+
+    expect(field.error).toEqual("Name already taken")
+
+    form().setFieldValue("name", "philip")
+    await field.validate()
+
+    expect(field.error).toBeUndefined()
+  })
 })

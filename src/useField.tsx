@@ -6,6 +6,7 @@ import { FieldScopeContext } from "./FieldScope"
 import { FieldError, FieldValidate, Form, UseFieldOptions } from "./types"
 import { FormContext } from "./useFormContext"
 import {
+  composeValidators,
   getDebounceValues,
   getSelectedValues,
   getValueForCheckbox,
@@ -87,9 +88,13 @@ export function useField<T = any, Values = any>(
         state.setValidating(true)
         const validationId = counter.getValue()
 
+        const validator = Array.isArray(validate)
+          ? composeValidators(...validate)
+          : validate
+
         let errors: FieldError
         try {
-          errors = validate ? await validate(value, values) : undefined
+          errors = validator ? await validator(value, values) : undefined
         } catch (err) {
           errors = err.message
         }
