@@ -19,7 +19,7 @@
     "start": "tsdx watch",
     "build": "tsdx build",
     "test": "tsdx test --passWithNoTests",
-    "lint": "tsdx lint",
+    "lint": "tsdx lint && tsc --noEmit",
     "format": "prettier --write '**/*'",
     "prepare": "tsdx build",
     "size": "size-limit",

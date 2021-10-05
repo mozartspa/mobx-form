@@ -8,10 +8,12 @@ import isEqual from "react-fast-compare"
 import { DebugForm } from "./DebugForm"
 import {
   FieldError,
+  FieldErrorInput,
   FieldRegistrant,
   Form,
   FormConfig,
   FormErrors,
+  FormErrorsInput,
   FormTouched,
   FormValues,
 } from "./types"
@@ -46,11 +48,9 @@ async function validateFieldRegistrants(
   registrants: FieldRegistrant[],
   value: any,
   values: any
-): Promise<FieldError> {
+): Promise<FieldError[] | undefined> {
   if (registrants.length === 0) {
     return Promise.resolve(undefined)
-  } else if (registrants.length === 1) {
-    return await registrants[0]?.validate?.(value, values)
   } else {
     const errors = await Promise.all(
       registrants.map((reg) => reg.validate?.(value, values))
@@ -168,8 +168,10 @@ export function useForm<Values extends FormValues>(
           const maybeErrors = await onSubmit?.(values)
           if (maybeErrors) {
             form.setErrors(maybeErrors)
+            return mergeErrors([maybeErrors])
+          } else {
+            return {}
           }
-          return maybeErrors || ({} as FormErrors)
         } else {
           onFailedSubmit?.()
           return errors
@@ -213,8 +215,8 @@ export function useForm<Values extends FormValues>(
     get isValid() {
       return !hasErrors(form.errors)
     },
-    setErrors(errors: FormErrors) {
-      form.errors = errors || {}
+    setErrors(errors: FormErrorsInput) {
+      form.errors = mergeErrors([errors]) || {}
     },
     setTouched(touched: FormTouched) {
       form.touched = touched || {}
@@ -239,26 +241,16 @@ export function useForm<Values extends FormValues>(
     getFieldValue(field: string) {
       return get(form.observableValues, field)
     },
-    setFieldError(field: string, message: FieldError) {
-      form.errors[field] = message
+    setFieldError(field: string, message: FieldErrorInput | undefined) {
+      form.errors[field] = mergeFieldErrors(message)
     },
-    addFieldError(field: string, message: FieldError) {
+    addFieldError(field: string, message: FieldErrorInput | undefined) {
       if (message == null) {
         return // do nothing
       }
-
-      const error = Array.isArray(message) ? message : [message]
-      const current = form.errors[field]
-
-      if (current == null) {
-        form.errors[field] = message
-      } else if (Array.isArray(current)) {
-        form.errors[field] = [...current, ...error]
-      } else {
-        form.errors[field] = [current, ...error]
-      }
+      form.errors[field] = mergeFieldErrors(form.errors[field], message)
     },
-    getFieldError(field: string): string | undefined {
+    getFieldError(field: string): FieldError | undefined {
       const err = form.errors[field]
       if (Array.isArray(err)) {
         return err.length > 0 ? err[0] : undefined
@@ -266,7 +258,7 @@ export function useForm<Values extends FormValues>(
         return err
       }
     },
-    getFieldErrors(field: string): string[] | undefined {
+    getFieldErrors(field: string): FieldError[] | undefined {
       const err = form.errors[field]
       if (err == null) {
         return undefined

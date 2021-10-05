@@ -1,5 +1,12 @@
 import { DependencyList, useMemo, useRef, useState } from "react"
-import { FieldError, FormErrors, ValidateDebounce } from "./types"
+import {
+  FieldError,
+  FieldErrorInput,
+  FieldValidate,
+  FormErrors,
+  FormErrorsInput,
+  ValidateDebounce,
+} from "./types"
 
 export const isString = (obj: any): obj is string =>
   Object.prototype.toString.call(obj) === "[object String]"
@@ -86,7 +93,7 @@ export function useLatestValue<T>(getValue: () => T, deps?: DependencyList) {
   return ref
 }
 
-export function isError(error: string | string[] | undefined) {
+export function isError(error: FieldErrorInput | undefined) {
   if (error == null || error === "") {
     return false
   }
@@ -96,7 +103,7 @@ export function isError(error: string | string[] | undefined) {
   return true
 }
 
-export function hasErrors(errors: FormErrors) {
+export function hasErrors(errors: FormErrorsInput) {
   for (let key of Object.keys(errors)) {
     if (isError(errors[key])) {
       return true
@@ -145,27 +152,65 @@ export const logError: typeof console.error = (...args) => {
   console && console.error && console.error(...args)
 }
 
-export function mergeFieldErrors(...fieldErrors: FieldError[]) {
-  return fieldErrors.reduce((result, err) => {
-    if (err == null) {
-      return result
-    } else if (result == null) {
-      return err
-    } else if (Array.isArray(result)) {
-      return result.concat(err)
-    } else {
-      return [result].concat(err)
+export function mergeFieldErrors(
+  ...fieldErrors: (FieldErrorInput | undefined)[]
+): FieldError[] | undefined {
+  const result: FieldError[] = []
+
+  for (const error of fieldErrors) {
+    if (error == null || error === "") {
+      continue
     }
-  }, undefined as FieldError)
+    if (Array.isArray(error)) {
+      result.push(...(mergeFieldErrors(...error) ?? []))
+    } else if (typeof error === "string") {
+      result.push({ message: error })
+    } else {
+      result.push(error)
+    }
+  }
+
+  return result.length === 0 ? undefined : result
 }
 
-export function mergeErrors(errors: FormErrors[]) {
-  return errors.reduce((acc, err) => {
-    if (err) {
-      Object.keys(err).forEach((path) => {
-        acc[path] = mergeFieldErrors(acc[path], err[path])
+export function mergeErrors(
+  errors: (FormErrorsInput | undefined)[]
+): FormErrors {
+  const result: FormErrors = {}
+
+  for (const error of errors) {
+    if (error) {
+      Object.keys(error).forEach((path) => {
+        const merged = mergeFieldErrors(result[path], error[path])
+        if (merged) {
+          result[path] = merged
+        }
       })
     }
-    return acc
-  }, {} as FormErrors)
+  }
+
+  return result
+}
+
+export function composeValidators<T = any, Values = any>(
+  ...validates: (FieldValidate<T, Values> | undefined)[]
+) {
+  const validators = validates.filter(Boolean)
+
+  if (validators.length === 0) {
+    return undefined
+  }
+
+  const composed: FieldValidate<T, Values> = async (value, values) => {
+    for (const validate of validators) {
+      const error = await validate?.(value, values)
+      if (error != null) {
+        return error
+      }
+    }
+
+    return undefined
+  }
+
+  return composed
 }

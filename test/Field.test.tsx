@@ -243,7 +243,7 @@ describe("<Field /> validation", () => {
     field.setValue("jean")
 
     await waitForExpect(() => {
-      expect(field.error).toEqual("Error!")
+      expect(field.error).toEqual({ message: "Error!" })
     })
   })
 
@@ -266,7 +266,7 @@ describe("<Field /> validation", () => {
     field.setValue("jean")
 
     await waitForExpect(() => {
-      expect(field.error).toEqual("Uh oh!")
+      expect(field.error).toEqual({ message: "Uh oh!" })
     })
   })
 
@@ -290,8 +290,8 @@ describe("<Field /> validation", () => {
 
     const error = await form().validateField("name")
 
-    expect(error).toEqual("Name already taken")
-    expect(injectedField!.error).toEqual(error)
+    expect(error).toEqual([{ message: "Name already taken" }])
+    expect(injectedField!.error).toEqual(error![0])
   })
 
   it("validateField on field without validation or non-existing returns no error", async () => {
@@ -331,8 +331,8 @@ describe("<Field /> validation", () => {
     const field = injectedField!
     const error = await field.validate()
 
-    expect(error).toEqual("Name already taken")
-    expect(field.error).toEqual(error)
+    expect(error).toEqual([{ message: "Name already taken" }])
+    expect(field.error).toEqual(error![0])
   })
 
   it("validateOnChange is off by default", async () => {
@@ -381,7 +381,7 @@ describe("<Field /> validation", () => {
     expect(validate).toBeCalledTimes(1)
 
     await waitForExpect(() => {
-      expect(field.error).toEqual("Error!")
+      expect(field.error).toEqual({ message: "Error!" })
     })
   })
 
@@ -416,7 +416,7 @@ describe("<Field /> validation", () => {
 
     await waitForExpect(() => {
       expect(validate).toBeCalledTimes(1)
-      expect(form().getFieldError("name")).toEqual("Error!")
+      expect(form().getFieldError("name")).toEqual({ message: "Error!" })
     })
   })
 
@@ -454,7 +454,7 @@ describe("<Field /> validation", () => {
     expect(validate).toBeCalledTimes(2)
 
     await waitForExpect(() => {
-      expect(form().getFieldError("name")).toEqual("Error!")
+      expect(form().getFieldError("name")).toEqual({ message: "Error!" })
     })
   })
 
@@ -491,7 +491,7 @@ describe("<Field /> validation", () => {
     expect(validate).toBeCalledTimes(2)
 
     await waitForExpect(() => {
-      expect(form().getFieldError("name")).toEqual("Error!")
+      expect(form().getFieldError("name")).toEqual({ message: "Error!" })
     })
   })
 
@@ -625,7 +625,7 @@ describe("<Field /> validation", () => {
     expect(validate).toBeCalledTimes(1)
 
     await waitForExpect(() => {
-      expect(injectedField!.error).toEqual("Error!")
+      expect(injectedField!.error).toEqual({ message: "Error!" })
     })
   })
 
@@ -665,8 +665,52 @@ describe("<Field /> validation", () => {
     expect(validate).toBeCalledTimes(1)
     expect(validate2).toBeCalledTimes(1)
 
-    expect(form().getFieldErrors("name")).toEqual(["Error1", "Error2"])
-    expect(injectedField!.errors).toEqual(["Error1", "Error2"])
-    expect(injectedField2!.errors).toEqual(["Error1", "Error2"])
+    expect(form().getFieldErrors("name")).toEqual([
+      { message: "Error1" },
+      { message: "Error2" },
+    ])
+    expect(injectedField!.errors).toEqual([
+      { message: "Error1" },
+      { message: "Error2" },
+    ])
+    expect(injectedField2!.errors).toEqual([
+      { message: "Error1" },
+      { message: "Error2" },
+    ])
+  })
+
+  it("validate prop accepts an array of validators", async () => {
+    let injectedField: FieldRenderProps | undefined = undefined
+
+    const required = (value: any) =>
+      value == null || value === "" ? "Required" : undefined
+    const notJack = (value: any) =>
+      value === "jack" ? "Name already taken" : undefined
+
+    const { form } = renderForm(
+      () => (
+        <Field name="name" validate={[required, notJack]}>
+          {(field) => (injectedField = field) && <span />}
+        </Field>
+      ),
+      {
+        initialValues: { name: "" },
+      }
+    )
+
+    const field = injectedField!
+    await field.validate()
+
+    expect(field.error).toEqual({ message: "Required" })
+
+    form().setFieldValue("name", "jack")
+    await field.validate()
+
+    expect(field.error).toEqual({ message: "Name already taken" })
+
+    form().setFieldValue("name", "philip")
+    await field.validate()
+
+    expect(field.error).toBeUndefined()
   })
 })
