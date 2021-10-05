@@ -2,10 +2,19 @@ export type FormValues = {
   [field: string]: any
 }
 
-export type FieldError = string | string[] | undefined
+export type FieldError = {
+  message: string
+  args?: any
+}
+
+export type FieldErrorInput = string | FieldError | (string | FieldError)[]
 
 export type FormErrors = {
-  [index: string]: FieldError
+  [index: string]: FieldError[] | undefined
+}
+
+export type FormErrorsInput = {
+  [index: string]: FieldErrorInput | undefined
 }
 
 export type FormTouched = {
@@ -28,21 +37,21 @@ export type Form<Values = FormValues> = {
   readonly isDirty: boolean
   readonly isValid: boolean
   isFreezed: boolean
-  setErrors(errors: FormErrors): void
+  setErrors(errors: FormErrorsInput): void
   setTouched(touched: FormTouched): void
   setValues(values: Values): void
   setFieldValue(field: string, value: any): void
-  setFieldError(field: string, message: FieldError): void
-  addFieldError(field: string, message: FieldError): void
+  setFieldError(field: string, message: FieldErrorInput | undefined): void
+  addFieldError(field: string, message: FieldErrorInput | undefined): void
   setFieldTouched(field: string, isTouched?: boolean): void
   getFieldValue(field: string): any
-  getFieldError(field: string): string | undefined
-  getFieldErrors(field: string): string[] | undefined
+  getFieldError(field: string): FieldError | undefined
+  getFieldErrors(field: string): FieldError[] | undefined
   isFieldTouched(field: string): boolean
   isFieldValid(field: string): boolean
   isFieldDirty(field: string): boolean
   validate(): Promise<FormErrors>
-  validateField(field: string): Promise<FieldError>
+  validateField(field: string): Promise<FieldError[] | undefined>
   reset(values?: Values): void
   resetField(field: string, value?: any): void
   submit(): Promise<FormErrors>
@@ -58,7 +67,7 @@ export type Form<Values = FormValues> = {
 
 export type FormValidate<Values = any> = (
   values: Values
-) => FormErrors | Promise<FormErrors>
+) => FormErrorsInput | Promise<FormErrorsInput>
 
 export type ValidateDebounce =
   | boolean
@@ -70,7 +79,9 @@ export type FormConfig<Values = any> = {
   validateOnChange?: boolean
   validateOnBlur?: boolean
   validateDebounce?: ValidateDebounce
-  onSubmit?: (values: Values) => void | FormErrors | Promise<void | FormErrors>
+  onSubmit?: (
+    values: Values
+  ) => void | FormErrorsInput | Promise<void | FormErrorsInput>
   onValidate?: FormValidate<Values>
   onFailedSubmit?: () => void
 }
@@ -78,7 +89,7 @@ export type FormConfig<Values = any> = {
 export type FieldValidate<T = any, Values = any> = (
   value: T,
   values: Values
-) => FieldError | Promise<FieldError>
+) => FieldErrorInput | undefined | Promise<FieldErrorInput | undefined>
 
 export type UseFieldOptions<T = any, Values = any> = {
   form?: Form<Values> | undefined

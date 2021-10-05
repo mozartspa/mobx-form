@@ -37,7 +37,7 @@ function renderTestForm(props: FormConfig = {}) {
                     {...field.input}
                     data-testid="name-input"
                   />
-                  {field.isTouched && field.error}
+                  {field.isTouched && field.error?.message}
                 </div>
               )
             }}
@@ -50,7 +50,7 @@ function renderTestForm(props: FormConfig = {}) {
                   {...field.input}
                   data-testid="surname-input"
                 />
-                {field.isTouched && field.error}
+                {field.isTouched && field.error?.message}
               </div>
             )}
           </Field>
@@ -58,7 +58,7 @@ function renderTestForm(props: FormConfig = {}) {
             {(field) => (
               <div>
                 <input type="text" {...field.input} data-testid="color-input" />
-                {field.isTouched && field.error}
+                {field.isTouched && field.error?.message}
               </div>
             )}
           </Field>
@@ -70,7 +70,7 @@ function renderTestForm(props: FormConfig = {}) {
                   {...field.input}
                   data-testid="friend-name-input"
                 />
-                {field.isTouched && field.error}
+                {field.isTouched && field.error?.message}
               </div>
             )}
           </Field>
@@ -82,7 +82,7 @@ function renderTestForm(props: FormConfig = {}) {
                   {...field.input}
                   data-testid="friend-age-input"
                 />
-                {field.isTouched && field.error}
+                {field.isTouched && field.error?.message}
               </div>
             )}
           </Field>
@@ -206,16 +206,20 @@ describe("useForm", () => {
     form().setFieldError("preferences.color", "Not a nice color")
     form().setFieldError("friends.0.name", "Is it a name?")
 
-    expect(form().getFieldError("name")).toEqual("Empty name")
-    expect(form().getFieldError("surname")).toEqual("Empty surname")
+    expect(form().getFieldError("name")).toEqual({ message: "Empty name" })
+    expect(form().getFieldError("surname")).toEqual({
+      message: "Empty surname",
+    })
     expect(form().getFieldErrors("surname")).toEqual([
-      "Empty surname",
-      "Another error",
+      { message: "Empty surname" },
+      { message: "Another error" },
     ])
-    expect(form().getFieldError("preferences.color")).toEqual(
-      "Not a nice color"
-    )
-    expect(form().getFieldError("friends.0.name")).toEqual("Is it a name?")
+    expect(form().getFieldError("preferences.color")).toEqual({
+      message: "Not a nice color",
+    })
+    expect(form().getFieldError("friends.0.name")).toEqual({
+      message: "Is it a name?",
+    })
     expect(form().getFieldError("friends.0.surname")).toEqual(undefined)
 
     // undefined clear errors
@@ -227,7 +231,7 @@ describe("useForm", () => {
     form().setFieldError("name", "New error")
     form().setFieldError("name", [])
     expect(form().getFieldError("name")).toBe(undefined)
-    expect(form().getFieldErrors("name")).toEqual([])
+    expect(form().getFieldErrors("name")).toBe(undefined)
   })
 
   it("setErrors", () => {
@@ -240,16 +244,20 @@ describe("useForm", () => {
       "friends.0.name": "Is it a name?",
     })
 
-    expect(form().getFieldError("name")).toEqual("Empty name")
-    expect(form().getFieldError("surname")).toEqual("Empty surname")
+    expect(form().getFieldError("name")).toEqual({ message: "Empty name" })
+    expect(form().getFieldError("surname")).toEqual({
+      message: "Empty surname",
+    })
     expect(form().getFieldErrors("surname")).toEqual([
-      "Empty surname",
-      "Another error",
+      { message: "Empty surname" },
+      { message: "Another error" },
     ])
-    expect(form().getFieldError("preferences.color")).toEqual(
-      "Not a nice color"
-    )
-    expect(form().getFieldError("friends.0.name")).toEqual("Is it a name?")
+    expect(form().getFieldError("preferences.color")).toEqual({
+      message: "Not a nice color",
+    })
+    expect(form().getFieldError("friends.0.name")).toEqual({
+      message: "Is it a name?",
+    })
     expect(form().getFieldError("friends.0.surname")).toEqual(undefined)
   })
 
@@ -260,12 +268,15 @@ describe("useForm", () => {
 
     // single error
     form().addFieldError("name", "Empty name")
-    expect(form().getFieldError("name")).toEqual("Empty name")
+    expect(form().getFieldError("name")).toEqual({ message: "Empty name" })
 
     // multiple errors
-    const expectedErrors = ["Empty name", "Another error"]
+    const expectedErrors = [
+      { message: "Empty name" },
+      { message: "Another error" },
+    ]
     form().addFieldError("name", "Another error")
-    expect(form().getFieldError("name")).toEqual("Empty name")
+    expect(form().getFieldError("name")).toEqual({ message: "Empty name" })
     expect(form().getFieldErrors("name")).toEqual(expectedErrors)
 
     // undefined do nothing
@@ -451,9 +462,9 @@ describe("useForm submit", () => {
 
     const errors = await form().submit()
 
-    expect(errors).toEqual({ name: "Error" })
+    expect(errors).toEqual({ name: [{ message: "Error" }] })
     expect(form().isValid).toBe(false)
-    expect(form().getFieldError("name")).toEqual("Error")
+    expect(form().getFieldError("name")).toEqual({ message: "Error" })
   })
 
   it("handleSubmit should prevent default event", async () => {
@@ -697,12 +708,12 @@ describe("useForm validation", () => {
     await wait(10)
 
     expect(onValidate).toBeCalledTimes(2)
-    expect(form().getFieldError("name")).toEqual("Error 1")
+    expect(form().getFieldError("name")).toEqual({ message: "Error 1" })
 
     await wait(500)
 
     expect(onValidate).toBeCalledTimes(2)
-    expect(form().getFieldError("name")).toEqual("Error 1")
+    expect(form().getFieldError("name")).toEqual({ message: "Error 1" })
   })
 })
 
@@ -851,7 +862,7 @@ describe("useForm resetField", () => {
 
     expect(form().values).toEqual({ a: "foo", b: 12 })
     expect(form().touched).toEqual({ b: true })
-    expect(form().errors).toEqual({ b: "invalid b" })
+    expect(form().errors).toEqual({ b: [{ message: "invalid b" }] })
   })
 
   it("should reset the field with the specified value", () => {
@@ -871,7 +882,7 @@ describe("useForm resetField", () => {
 
     expect(form().values).toEqual({ a: "other", b: 12 })
     expect(form().touched).toEqual({ b: true })
-    expect(form().errors).toEqual({ b: "invalid b" })
+    expect(form().errors).toEqual({ b: [{ message: "invalid b" }] })
   })
 })
 

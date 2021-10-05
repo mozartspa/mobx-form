@@ -3,7 +3,13 @@ import { reaction } from "mobx"
 import { useLocalObservable } from "mobx-react-lite"
 import React, { useCallback, useEffect, useMemo } from "react"
 import { FieldScopeContext } from "./FieldScope"
-import { FieldError, FieldValidate, Form, UseFieldOptions } from "./types"
+import {
+  FieldError,
+  FieldErrorInput,
+  FieldValidate,
+  Form,
+  UseFieldOptions,
+} from "./types"
 import { FormContext } from "./useFormContext"
 import {
   composeValidators,
@@ -27,17 +33,17 @@ export type UseFieldResult<T = any, Values = any> = {
   readonly name: string
   readonly value: T
   readonly isTouched: boolean
-  readonly error: string | undefined
-  readonly errors: string[] | undefined
+  readonly error: FieldError | undefined
+  readonly errors: FieldError[] | undefined
   readonly isValid: boolean
   readonly isDirty: boolean
   readonly isValidating: boolean
   form: Form<Values>
   setValue: (value: T) => void
   setTouched: (isTouched?: boolean) => void
-  setError: (error: FieldError) => void
+  setError: (error: FieldErrorInput | undefined) => void
   addError: (error: FieldError) => void
-  validate: () => Promise<FieldError>
+  validate: () => Promise<FieldError[] | undefined>
 }
 
 export function useField<T = any, Values = any>(
@@ -92,7 +98,7 @@ export function useField<T = any, Values = any>(
           ? composeValidators(...validate)
           : validate
 
-        let errors: FieldError
+        let errors: FieldErrorInput | undefined
         try {
           errors = validator ? await validator(value, values) : undefined
         } catch (err) {
@@ -230,7 +236,7 @@ export function useField<T = any, Values = any>(
     setTouched(isTouched = true) {
       form.setFieldTouched(name, isTouched)
     },
-    setError(error: FieldError) {
+    setError(error: FieldErrorInput | undefined) {
       form.setFieldError(name, error)
     },
     addError(error: FieldError) {

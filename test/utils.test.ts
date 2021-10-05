@@ -1,4 +1,9 @@
-import { buildObjectPaths, composeValidators, mergeErrors } from "../src/utils"
+import {
+  buildObjectPaths,
+  composeValidators,
+  mergeErrors,
+  mergeFieldErrors,
+} from "../src/utils"
 
 describe("buildObjectPaths", () => {
   it("works", () => {
@@ -35,6 +40,33 @@ describe("buildObjectPaths", () => {
   })
 })
 
+describe("mergeFieldErrors", () => {
+  it("works", () => {
+    const result = mergeFieldErrors(
+      "Name error",
+      { message: "Too old" },
+      [],
+      ["Not a color", { message: "Not good" }],
+      ["Missing age", "Nope"]
+    )
+
+    expect(result).toEqual([
+      { message: "Name error" },
+      { message: "Too old" },
+      { message: "Not a color" },
+      { message: "Not good" },
+      { message: "Missing age" },
+      { message: "Nope" },
+    ])
+  })
+
+  it("returns undefined in case of no error", () => {
+    const result = mergeFieldErrors("", undefined, [], [""])
+
+    expect(result).toBeUndefined()
+  })
+})
+
 describe("mergeErrors", () => {
   it("works", () => {
     const result = mergeErrors([
@@ -59,14 +91,21 @@ describe("mergeErrors", () => {
     ])
 
     expect(result).toEqual({
-      name: ["Name error", "Name error2"],
-      surname: "Surname error",
-      age: ["Too old", "Not good", "Missing age"],
-      "preferences.color": ["Not a color", "Not a color2"],
+      name: [{ message: "Name error" }, { message: "Name error2" }],
+      surname: [{ message: "Surname error" }],
+      age: [
+        { message: "Too old" },
+        { message: "Not good" },
+        { message: "Missing age" },
+      ],
+      "preferences.color": [
+        { message: "Not a color" },
+        { message: "Not a color2" },
+      ],
       "friends.0.name": [
-        "Friend name error",
-        "Friend name error2",
-        "Friend name error3",
+        { message: "Friend name error" },
+        { message: "Friend name error2" },
+        { message: "Friend name error3" },
       ],
     })
   })
