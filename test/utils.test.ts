@@ -65,6 +65,23 @@ describe("mergeFieldErrors", () => {
 
     expect(result).toBeUndefined()
   })
+
+  it("always returns an array in case of error", () => {
+    const result = mergeFieldErrors("Name error")
+
+    expect(result).toEqual([{ message: "Name error" }])
+  })
+
+  it("keeps `args` field of error", () => {
+    const result = mergeFieldErrors({
+      message: "Name error",
+      args: { foo: "foo", bar: 1 },
+    })
+
+    expect(result).toEqual([
+      { message: "Name error", args: { foo: "foo", bar: 1 } },
+    ])
+  })
 })
 
 describe("mergeErrors", () => {
@@ -88,6 +105,9 @@ describe("mergeErrors", () => {
       {
         "friends.0.name": ["Friend name error2", "Friend name error3"],
       },
+      {
+        "friends.0.name": [{ message: "Friend name error4", args: { foo: 1 } }],
+      },
     ])
 
     expect(result).toEqual({
@@ -106,6 +126,7 @@ describe("mergeErrors", () => {
         { message: "Friend name error" },
         { message: "Friend name error2" },
         { message: "Friend name error3" },
+        { message: "Friend name error4", args: { foo: 1 } },
       ],
     })
   })
