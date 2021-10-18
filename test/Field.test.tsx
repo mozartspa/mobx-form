@@ -83,19 +83,31 @@ describe("<Field />", () => {
   })
 
   it("format value", () => {
+    let injectedField: FieldRenderProps | undefined = undefined
     const format = (value: any) => (value === "" ? "no value" : value)
 
     const { form, getByTestId } = renderTestForm(() => (
       <Field name="name" format={format}>
-        {(field) => <input {...field.input} data-testid="name-input" />}
+        {(field) =>
+          (injectedField = field) && (
+            <input {...field.input} data-testid="name-input" />
+          )
+        }
       </Field>
     ))
 
     form().setFieldValue("name", "")
 
+    // <input/> value should be formatted
     const input = getByTestId("name-input") as HTMLInputElement
-    expect(form().getFieldValue("name")).toEqual("")
     expect(input.value).toEqual("no value")
+
+    // `value` of Field should be formatted as well
+    const field = injectedField!
+    expect(field.value).toEqual("no value")
+
+    // form value should not be formatted
+    expect(form().getFieldValue("name")).toEqual("")
   })
 
   it("parse value", () => {
@@ -116,6 +128,28 @@ describe("<Field />", () => {
 
     expect(form().getFieldValue("name")).toEqual("no value")
     expect(input.value).toEqual("no value")
+  })
+
+  it("parse value also when using `setValue`", () => {
+    let injectedField: FieldRenderProps | undefined = undefined
+    const parse = (value: any) => (value === "" ? "no value" : value)
+
+    const { form } = renderTestForm(() => (
+      <Field name="name" parse={parse}>
+        {(field) =>
+          (injectedField = field) && (
+            <input {...field.input} data-testid="name-input" />
+          )
+        }
+      </Field>
+    ))
+
+    const field = injectedField!
+
+    field.setValue("")
+
+    expect(field.value).toEqual("no value")
+    expect(form().getFieldValue("name")).toEqual("no value")
   })
 
   it("format and parse value", () => {

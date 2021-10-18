@@ -212,7 +212,8 @@ export function useField<T = any, Values = any>(
     },
     name,
     get value(): T {
-      return form.getFieldValue(name)
+      const value = form.getFieldValue(name)
+      return format ? format(value) : value
     },
     get isTouched() {
       return form.isFieldTouched(name)
@@ -231,7 +232,7 @@ export function useField<T = any, Values = any>(
     },
     form,
     setValue(value: T) {
-      form.setFieldValue(name, value)
+      form.setFieldValue(name, parse ? parse(value) : value)
     },
     setTouched(isTouched = true) {
       form.setFieldTouched(name, isTouched)
