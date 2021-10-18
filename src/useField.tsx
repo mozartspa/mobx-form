@@ -213,7 +213,7 @@ export function useField<T = any, Values = any>(
     name,
     get value(): T {
       const value = form.getFieldValue(name)
-      return format ? format((String(value) + "x") as any) : value
+      return format ? format(value) : value
     },
     get isTouched() {
       return form.isFieldTouched(name)
