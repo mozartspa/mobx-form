@@ -23,6 +23,7 @@ export type FormTouched = {
 
 export type FieldRegistrant<T = any, Values = any> = {
   validate?: FieldValidate<T, Values>
+  onBeforeSubmit?: () => void
 }
 
 export type Disposer = () => void

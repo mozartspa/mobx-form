@@ -93,6 +93,12 @@ export function useLatestValue<T>(getValue: () => T, deps?: DependencyList) {
   return ref
 }
 
+export function useImmediateRef<T>(value: T) {
+  const ref = useRef(value)
+  ref.current = value
+  return ref
+}
+
 export function isError(error: FieldErrorInput | undefined) {
   if (error == null || error === "") {
     return false

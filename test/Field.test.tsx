@@ -206,6 +206,93 @@ describe("<Field />", () => {
     expect(input.value).toEqual("no value")
   })
 
+  it("parse value before submit", async () => {
+    const onSubmit = jest.fn()
+
+    const parse = (value: any) =>
+      value ? `*${String(value).replace(/\*/g, "")}*` : value
+
+    const { form } = renderTestForm(
+      () => (
+        <Field name="name" parse={parse}>
+          {(field) => <input {...field.input} data-testid="name-input" />}
+        </Field>
+      ),
+      {
+        initialValues: {
+          name: "Jack",
+        },
+        onSubmit,
+      }
+    )
+
+    expect(form().getFieldValue("name")).toEqual("Jack")
+
+    await form().submit()
+
+    expect(onSubmit).toBeCalledWith({ name: "*Jack*" })
+    expect(form().getFieldValue("name")).toEqual("*Jack*")
+  })
+
+  it("parseOnBlur value before submit", async () => {
+    const onSubmit = jest.fn()
+
+    const parse = (value: any) =>
+      value ? `*${String(value).replace(/\*/g, "")}*` : value
+
+    const { form } = renderTestForm(
+      () => (
+        <Field name="name" parseOnBlur={parse}>
+          {(field) => <input {...field.input} data-testid="name-input" />}
+        </Field>
+      ),
+      {
+        initialValues: {
+          name: "Jack",
+        },
+        onSubmit,
+      }
+    )
+
+    expect(form().getFieldValue("name")).toEqual("Jack")
+
+    await form().submit()
+
+    expect(onSubmit).toBeCalledWith({ name: "*Jack*" })
+    expect(form().getFieldValue("name")).toEqual("*Jack*")
+  })
+
+  it("parseOnBlur takes precedence over parse on before submit", async () => {
+    const onSubmit = jest.fn()
+
+    const parse = (value: any) =>
+      value ? `*${String(value).replace(/\*/g, "")}*` : value
+
+    const parseOnBlur = (value: any) =>
+      value ? `**${String(value).replace(/\*/g, "")}**` : value
+
+    const { form } = renderTestForm(
+      () => (
+        <Field name="name" parse={parse} parseOnBlur={parseOnBlur}>
+          {(field) => <input {...field.input} data-testid="name-input" />}
+        </Field>
+      ),
+      {
+        initialValues: {
+          name: "Jack",
+        },
+        onSubmit,
+      }
+    )
+
+    expect(form().getFieldValue("name")).toEqual("Jack")
+
+    await form().submit()
+
+    expect(onSubmit).toBeCalledWith({ name: "**Jack**" })
+    expect(form().getFieldValue("name")).toEqual("**Jack**")
+  })
+
   it("reset to initial value", () => {
     let injectedField: FieldRenderProps | undefined = undefined
 

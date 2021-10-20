@@ -17,6 +17,7 @@ import {
   getSelectedValues,
   getValueForCheckbox,
   useCounter,
+  useImmediateRef,
 } from "./utils"
 
 function defaultFormat(value: any) {
@@ -129,13 +130,28 @@ export function useField<T = any, Values = any>(
     ] /* eslint-enable react-hooks/exhaustive-deps */
   )
 
+  // handle onBeforeSubmit
+  const parseRef = useImmediateRef(parse)
+  const parseOnBlurRef = useImmediateRef(parseOnBlur)
+  const handleBeforeSubmit = useCallback(() => {
+    // Before submit, the field value is updated in case
+    // `parse` or `parseOnBlur` is passed. This ensures that
+    // the submitted value is parsed correctly.
+    if (parseOnBlurRef.current) {
+      form.setFieldValue(name, parseOnBlurRef.current(form.getFieldValue(name)))
+    } else if (parseRef.current) {
+      form.setFieldValue(name, parseRef.current(form.getFieldValue(name)))
+    }
+  }, [form, name])
+
   // register to the form
   useEffect(() => {
     const disposer = form.register(name, {
       validate: validate ? debouncedValidator : undefined,
+      onBeforeSubmit: handleBeforeSubmit,
     })
     return disposer
-  }, [form, name, validate, debouncedValidator])
+  }, [form, name, validate, debouncedValidator, handleBeforeSubmit])
 
   // validateOnChange
   useEffect(() => {

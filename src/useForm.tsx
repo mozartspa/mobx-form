@@ -150,6 +150,13 @@ export function useForm<Values extends FormValues>(
   // submitter
   const executeSubmit = useLatestValue(() => {
     const doSubmit = async () => {
+      // trigger onBeforeSubmit
+      Object.keys(registeredFields.current).map((field) => {
+        registeredFields.current[field].forEach((registrant) => {
+          registrant.onBeforeSubmit?.()
+        })
+      })
+
       const values = form.values
 
       runInAction(() => {
