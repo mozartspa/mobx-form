@@ -205,6 +205,61 @@ describe("<Field />", () => {
 
     expect(input.value).toEqual("no value")
   })
+
+  it("reset to initial value", () => {
+    let injectedField: FieldRenderProps | undefined = undefined
+
+    const { form } = renderTestForm(
+      () => (
+        <Field name="name">
+          {(field) => (injectedField = field) && <input {...field.input} />}
+        </Field>
+      ),
+      {
+        initialValues: {
+          name: "Bob",
+        },
+      }
+    )
+
+    const field = injectedField!
+    field.setValue("Jack")
+
+    expect(form().getFieldValue("name")).toEqual("Jack")
+    expect(form().isFieldDirty("name")).toBe(true)
+    expect(field.isDirty).toBe(true)
+
+    field.reset()
+
+    expect(form().getFieldValue("name")).toEqual("Bob")
+    expect(form().isFieldDirty("name")).toBe(false)
+    expect(field.isDirty).toBe(false)
+  })
+
+  it("reset to new value", () => {
+    let injectedField: FieldRenderProps | undefined = undefined
+
+    const { form } = renderTestForm(
+      () => (
+        <Field name="name">
+          {(field) => (injectedField = field) && <input {...field.input} />}
+        </Field>
+      ),
+      {
+        initialValues: {
+          name: "Bob",
+        },
+      }
+    )
+
+    const field = injectedField!
+
+    field.reset("Jack")
+
+    expect(form().getFieldValue("name")).toEqual("Jack")
+    expect(form().isFieldDirty("name")).toBe(false)
+    expect(field.isDirty).toBe(false)
+  })
 })
 
 describe("<Field /> validation", () => {

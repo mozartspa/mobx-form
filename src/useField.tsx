@@ -44,6 +44,7 @@ export type UseFieldResult<T = any, Values = any> = {
   setError: (error: FieldErrorInput | undefined) => void
   addError: (error: FieldError) => void
   validate: () => Promise<FieldError[] | undefined>
+  reset: (value?: T) => void
 }
 
 export function useField<T = any, Values = any>(
@@ -245,6 +246,9 @@ export function useField<T = any, Values = any>(
     },
     validate() {
       return form.validateField(name)
+    },
+    reset(value?: T) {
+      form.resetField(name, value)
     },
     get isValidating() {
       return state.isValidating
