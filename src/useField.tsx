@@ -131,16 +131,25 @@ export function useField<T = any, Values = any>(
   )
 
   // handle onBeforeSubmit
+  const formatRef = useImmediateRef(format)
   const parseRef = useImmediateRef(parse)
   const parseOnBlurRef = useImmediateRef(parseOnBlur)
   const handleBeforeSubmit = useCallback(() => {
     // Before submit, the field value is updated in case
     // `parse` or `parseOnBlur` is passed. This ensures that
     // the submitted value is parsed correctly.
-    if (parseOnBlurRef.current) {
-      form.setFieldValue(name, parseOnBlurRef.current(form.getFieldValue(name)))
-    } else if (parseRef.current) {
-      form.setFieldValue(name, parseRef.current(form.getFieldValue(name)))
+    // `parseOnBlur` takes precedence over `parse`.
+    if (parseRef.current || parseOnBlurRef.current) {
+      let value = form.getFieldValue(name)
+      if (formatRef.current) {
+        value = formatRef.current(value)
+      }
+      if (parseOnBlurRef.current) {
+        value = parseOnBlurRef.current(value)
+      } else if (parseRef.current) {
+        value = parseRef.current(value)
+      }
+      form.setFieldValue(name, value)
     }
   }, [form, name])
 

@@ -293,6 +293,41 @@ describe("<Field />", () => {
     expect(form().getFieldValue("name")).toEqual("**Jack**")
   })
 
+  it("parse receives formatted value before submit", async () => {
+    const onSubmit = jest.fn()
+
+    const format = (value: any) => (value ? `${value}0` : value)
+    const parse = (value: any) => {
+      const num = parseInt(value)
+      if (isNaN(num)) {
+        return 0
+      } else {
+        return num
+      }
+    }
+
+    const { form } = renderTestForm(
+      () => (
+        <Field name="age" format={format} parse={parse}>
+          {(field) => <input {...field.input} />}
+        </Field>
+      ),
+      {
+        initialValues: {
+          age: 37,
+        },
+        onSubmit,
+      }
+    )
+
+    expect(form().getFieldValue("age")).toEqual(37)
+
+    await form().submit()
+
+    expect(onSubmit).toBeCalledWith({ age: 370 })
+    expect(form().getFieldValue("age")).toEqual(370)
+  })
+
   it("reset to initial value", () => {
     let injectedField: FieldRenderProps | undefined = undefined
 
