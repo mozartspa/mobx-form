@@ -48,6 +48,7 @@ export type Form<Values = FormValues> = {
   getFieldValue(field: string): any
   getFieldError(field: string): FieldError | undefined
   getFieldErrors(field: string): FieldError[] | undefined
+  getFieldResetValue(field: string): any
   isFieldTouched(field: string): boolean
   isFieldValid(field: string): boolean
   isFieldDirty(field: string): boolean

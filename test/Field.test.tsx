@@ -382,6 +382,31 @@ describe("<Field />", () => {
     expect(form().isFieldDirty("name")).toBe(false)
     expect(field.isDirty).toBe(false)
   })
+
+  it("get the reset value", () => {
+    let injectedField: FieldRenderProps | undefined = undefined
+
+    renderTestForm(
+      () => (
+        <Field name="name">
+          {(field) => (injectedField = field) && <input {...field.input} />}
+        </Field>
+      ),
+      {
+        initialValues: {
+          name: "Bob",
+        },
+      }
+    )
+
+    const field = injectedField!
+
+    expect(field.resetValue).toEqual("Bob")
+
+    field.reset("Jack")
+
+    expect(field.resetValue).toEqual("Jack")
+  })
 })
 
 describe("<Field /> validation", () => {

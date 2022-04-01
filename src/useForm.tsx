@@ -275,6 +275,9 @@ export function useForm<Values extends FormValues>(
         return [err]
       }
     },
+    getFieldResetValue(field: string): any {
+      return get(originalValuesRef.current, field)
+    },
     setFieldTouched(field: string, isTouched: boolean = true) {
       form.touched[field] = isTouched
       isTouched && optionsRef.current.validateOnBlur && form.validate()

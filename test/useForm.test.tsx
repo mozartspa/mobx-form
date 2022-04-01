@@ -886,6 +886,24 @@ describe("useForm resetField", () => {
   })
 })
 
+describe("useForm getFieldResetValue", () => {
+  it("should return the reset value", () => {
+    const { form } = renderTestForm({
+      initialValues: { a: "foo" },
+    })
+
+    expect(form().getFieldResetValue("a")).toEqual("foo")
+
+    form().setFieldValue("a", "bar")
+
+    expect(form().getFieldResetValue("a")).toEqual("foo")
+
+    form().resetField("a", "bar")
+
+    expect(form().getFieldResetValue("a")).toEqual("bar")
+  })
+})
+
 describe("useForm values", () => {
   it("values reference should change only when an observable value changes", () => {
     const { form } = renderTestForm({

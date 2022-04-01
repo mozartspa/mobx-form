@@ -33,6 +33,7 @@ export type UseFieldResult<T = any, Values = any> = {
   }
   readonly name: string
   readonly value: T
+  readonly resetValue: T
   readonly isTouched: boolean
   readonly error: FieldError | undefined
   readonly errors: FieldError[] | undefined
@@ -240,6 +241,9 @@ export function useField<T = any, Values = any>(
     get value(): T {
       const value = form.getFieldValue(name)
       return format ? format(value) : value
+    },
+    get resetValue(): T {
+      return form.getFieldResetValue(name)
     },
     get isTouched() {
       return form.isFieldTouched(name)
