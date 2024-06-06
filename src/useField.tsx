@@ -60,7 +60,7 @@ export function useField<T = any, Values = any>(
     validate,
     validateDebounce = false,
     validateOnChangeFields,
-    validateOnChange,
+    validateOnChange = true,
     validateOnBlur,
   } = options
 
@@ -165,8 +165,7 @@ export function useField<T = any, Values = any>(
 
   // validateOnChange
   useEffect(() => {
-    // validate only if explicitely turned on or `validateOnChangeFields` is set.
-    if (validateOnChange !== true && !validateOnChangeFields) {
+    if (!validateOnChange) {
       return
     }
 

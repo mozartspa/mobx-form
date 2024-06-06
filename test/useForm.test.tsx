@@ -22,6 +22,7 @@ const InitialValues = {
 
 function renderTestForm(props: FormConfig = {}) {
   let renderNameCount = 0
+  let renderSurnameCount = 0
 
   const result = renderForm(
     () => {
@@ -37,28 +38,31 @@ function renderTestForm(props: FormConfig = {}) {
                     {...field.input}
                     data-testid="name-input"
                   />
-                  {field.isTouched && field.error?.message}
+                  {field.error?.message}
                 </div>
               )
             }}
           </Field>
           <Field name="surname">
-            {(field) => (
-              <div>
-                <input
-                  type="text"
-                  {...field.input}
-                  data-testid="surname-input"
-                />
-                {field.isTouched && field.error?.message}
-              </div>
-            )}
+            {(field) => {
+              renderSurnameCount++
+              return (
+                <div>
+                  <input
+                    type="text"
+                    {...field.input}
+                    data-testid="surname-input"
+                  />
+                  {field.error?.message}
+                </div>
+              )
+            }}
           </Field>
           <Field name="preferences.color">
             {(field) => (
               <div>
                 <input type="text" {...field.input} data-testid="color-input" />
-                {field.isTouched && field.error?.message}
+                {field.error?.message}
               </div>
             )}
           </Field>
@@ -102,6 +106,9 @@ function renderTestForm(props: FormConfig = {}) {
     ...result,
     renderNameCount() {
       return renderNameCount
+    },
+    renderSurnameCount() {
+      return renderSurnameCount
     },
   }
 }
@@ -154,16 +161,21 @@ describe("useForm", () => {
     expect(getInputValue("friend-age-input")).toEqual("42")
   })
 
-  it("rerenders only the input", () => {
-    const { form, renderCount, renderNameCount } = renderTestForm()
+  it("rerenders only the input", async () => {
+    const { form, renderCount, renderNameCount, renderSurnameCount } =
+      renderTestForm()
 
     expect(renderCount()).toBe(1)
     expect(renderNameCount()).toEqual(1)
+    expect(renderSurnameCount()).toEqual(1)
 
     form().setFieldValue("name", "jean")
 
+    await wait(200) // waiting for validation
+
     expect(renderCount()).toEqual(1)
     expect(renderNameCount()).toEqual(2)
+    expect(renderSurnameCount()).toEqual(1)
   })
 
   it("handles field touched", () => {
