@@ -98,7 +98,7 @@ export function useForm<Values extends FormValues>(
       }
     }
 
-    const doValidate = async () => {
+    const doValidate = async (opts: { includeFieldValidation: boolean }) => {
       runInAction(() => {
         form.isValidating = true
       })
@@ -111,9 +111,11 @@ export function useForm<Values extends FormValues>(
         errors = mergeErrors(
           await Promise.all([
             onValidate(values),
-            ...Object.keys(registeredFields.current).map((field) =>
-              validateField(field, values)
-            ),
+            ...(opts.includeFieldValidation
+              ? Object.keys(registeredFields.current).map((field) =>
+                  validateField(field, values)
+                )
+              : []),
           ])
         )
 
@@ -223,10 +225,40 @@ export function useForm<Values extends FormValues>(
       return !hasErrors(form.errors)
     },
     setErrors(errors: FormErrorsInput) {
-      form.errors = mergeErrors([errors]) || {}
+      // Optimization, instead of replacing the whole object
+      const nextErrors = mergeErrors([errors]) || {}
+      const nextErrorsKeys = Object.keys(nextErrors)
+      const currErrorKeys = Object.keys(form.errors)
+
+      runInAction(() => {
+        nextErrorsKeys.forEach((key) => {
+          if (form.errors[key] !== nextErrors[key]) {
+            form.errors[key] = nextErrors[key]
+          }
+        })
+        currErrorKeys.forEach((key) => {
+          if (nextErrorsKeys.indexOf(key) === -1) {
+            form.errors[key] = undefined
+          }
+        })
+      })
     },
     setTouched(touched: FormTouched) {
-      form.touched = touched || {}
+      // Optimization, instead of replacing the whole object
+      const nextTouched = touched || {}
+      const nextTouchedKeys = Object.keys(nextTouched)
+      const currTouchedKeys = Object.keys(form.touched)
+
+      runInAction(() => {
+        nextTouchedKeys.forEach((key) => {
+          form.touched[key] = nextTouched[key]
+        })
+        currTouchedKeys.forEach((key) => {
+          if (nextTouchedKeys.indexOf(key) === -1) {
+            form.touched[key] = undefined
+          }
+        })
+      })
     },
     setValues(values: Values) {
       if (form.isFreezed) {
@@ -242,14 +274,19 @@ export function useForm<Values extends FormValues>(
 
       if (form.getFieldValue(field) !== value) {
         set(form.observableValues, field, value)
-        optionsRef.current.validateOnChange && form.validate()
+        if (optionsRef.current.validateOnChange) {
+          executeValidate.current({ includeFieldValidation: false })
+        }
       }
     },
     getFieldValue(field: string) {
       return get(form.observableValues, field)
     },
     setFieldError(field: string, message: FieldErrorInput | undefined) {
-      form.errors[field] = mergeFieldErrors(message)
+      const nextErrors = mergeFieldErrors(message)
+      if (form.errors[field] !== nextErrors) {
+        form.errors[field] = nextErrors
+      }
     },
     addFieldError(field: string, message: FieldErrorInput | undefined) {
       if (message == null) {
@@ -295,7 +332,7 @@ export function useForm<Values extends FormValues>(
       )
     },
     async validate() {
-      return executeValidate.current()
+      return executeValidate.current({ includeFieldValidation: true })
     },
     async validateField(field: string) {
       const registrants = registeredFields.current[field]

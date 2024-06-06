@@ -419,7 +419,61 @@ describe("<Field /> validation", () => {
         </Field>
       ),
       {
-        validateOnChange: true,
+        validateOnChange: false,
+      }
+    )
+
+    form().validate()
+
+    expect(validate).toBeCalledTimes(1)
+  })
+
+  it("field validation is called when submitting form", () => {
+    const validate = jest.fn(() => Promise.resolve(undefined))
+    const { form } = renderTestForm(
+      () => (
+        <Field name="name" validate={validate}>
+          {() => <span />}
+        </Field>
+      ),
+      {
+        validateOnChange: false,
+      }
+    )
+
+    form().submit()
+
+    expect(validate).toBeCalledTimes(1)
+  })
+
+  it("validateOnChange = false does not trigger field validation when field value changes", () => {
+    const validate = jest.fn(() => Promise.resolve(undefined))
+    const { form } = renderTestForm(
+      () => (
+        <Field name="name" validate={validate} validateOnChange={false}>
+          {() => <span />}
+        </Field>
+      ),
+      {
+        validateOnChange: false,
+      }
+    )
+
+    form().setFieldValue("name", "jean")
+
+    expect(validate).toBeCalledTimes(0)
+  })
+
+  it("validateOnChange = true does trigger field validation when field value changes", () => {
+    const validate = jest.fn(() => Promise.resolve(undefined))
+    const { form } = renderTestForm(
+      () => (
+        <Field name="name" validate={validate} validateOnChange={true}>
+          {() => <span />}
+        </Field>
+      ),
+      {
+        validateOnChange: false,
       }
     )
 
@@ -438,11 +492,11 @@ describe("<Field /> validation", () => {
         </Field>
       ),
       {
-        validateOnChange: true,
+        validateOnChange: false,
       }
     )
 
-    form().setFieldValue("name", "jean")
+    form().validate()
 
     expect(validate).toBeCalledTimes(1)
 
@@ -454,7 +508,7 @@ describe("<Field /> validation", () => {
       ),
     })
 
-    form().setFieldValue("name", "jean2")
+    form().validate()
 
     expect(validate).toBeCalledTimes(1)
     expect(validate2).toBeCalledTimes(1)
@@ -471,12 +525,12 @@ describe("<Field /> validation", () => {
         </Field>
       ),
       {
-        validateOnChange: true,
+        validateOnChange: false,
       }
     )
 
     const field = injectedField!
-    field.setValue("jean")
+    field.validate()
 
     await waitForExpect(() => {
       expect(field.error).toEqual({ message: "Error!" })
@@ -494,12 +548,12 @@ describe("<Field /> validation", () => {
         </Field>
       ),
       {
-        validateOnChange: true,
+        validateOnChange: false,
       }
     )
 
     const field = injectedField!
-    field.setValue("jean")
+    field.validate()
 
     await waitForExpect(() => {
       expect(field.error).toEqual({ message: "Uh oh!" })
@@ -571,7 +625,7 @@ describe("<Field /> validation", () => {
     expect(field.error).toEqual(error![0])
   })
 
-  it("validateOnChange is off by default", async () => {
+  it("validateOnChange is on by default", async () => {
     let injectedField: FieldRenderProps | undefined = undefined
     const validate = jest.fn(() => Promise.resolve("Error!"))
 
@@ -591,7 +645,7 @@ describe("<Field /> validation", () => {
     const field = injectedField!
     field.setValue("Jim")
 
-    expect(validate).toBeCalledTimes(0)
+    expect(validate).toBeCalledTimes(1)
   })
 
   it("validateOnChange", async () => {
@@ -747,14 +801,14 @@ describe("<Field /> validation", () => {
     }
 
     const { form, rerender } = renderForm(() => renderNameField(), {
-      initialValues: { name: "chuck", surname: "norris" },
+      initialValues: { name: "chuck", surname: "norris", age: 40 },
       validateOnChange: false,
       validateOnBlur: false,
     })
 
     form().setFieldValue("name", "jackie")
 
-    expect(validate).toBeCalledTimes(0)
+    expect(validate).toBeCalledTimes(1)
 
     rerender({
       ui: () => renderNameField(["surname"]),
@@ -764,11 +818,15 @@ describe("<Field /> validation", () => {
 
     form().setFieldValue("name", "bill")
 
-    expect(validate).toBeCalledTimes(1)
+    expect(validate).toBeCalledTimes(2)
 
     form().setFieldValue("surname", "murray")
 
-    expect(validate).toBeCalledTimes(2)
+    expect(validate).toBeCalledTimes(3)
+
+    form().setFieldValue("age", 25)
+
+    expect(validate).toBeCalledTimes(3)
   })
 
   it("validateOnChangeFields should respect <FieldScope />", async () => {
