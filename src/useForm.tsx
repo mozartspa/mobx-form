@@ -233,12 +233,16 @@ export function useForm<Values extends FormValues>(
       runInAction(() => {
         nextErrorsKeys.forEach((key) => {
           if (form.errors[key] !== nextErrors[key]) {
-            form.errors[key] = nextErrors[key]
+            if (nextErrors[key] === undefined) {
+              delete form.errors[key]
+            } else {
+              form.errors[key] = nextErrors[key]
+            }
           }
         })
         currErrorKeys.forEach((key) => {
           if (nextErrorsKeys.indexOf(key) === -1) {
-            form.errors[key] = undefined
+            delete form.errors[key]
           }
         })
       })
@@ -255,7 +259,7 @@ export function useForm<Values extends FormValues>(
         })
         currTouchedKeys.forEach((key) => {
           if (nextTouchedKeys.indexOf(key) === -1) {
-            form.touched[key] = undefined
+            delete form.touched[key]
           }
         })
       })
@@ -285,7 +289,11 @@ export function useForm<Values extends FormValues>(
     setFieldError(field: string, message: FieldErrorInput | undefined) {
       const nextErrors = mergeFieldErrors(message)
       if (form.errors[field] !== nextErrors) {
-        form.errors[field] = nextErrors
+        if (nextErrors === undefined) {
+          delete form.errors[field]
+        } else {
+          form.errors[field] = nextErrors
+        }
       }
     },
     addFieldError(field: string, message: FieldErrorInput | undefined) {

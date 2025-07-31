@@ -4,6 +4,7 @@ import waitForExpect from "wait-for-expect"
 import { Field, FieldRenderProps, FieldScope, UseFormResult } from "../src"
 import { FormConfig } from "../src/types"
 import { renderForm } from "./__helpers/renderForm"
+import { wait } from "./__helpers/wait"
 
 const InitialValues = { name: "murray" }
 
@@ -1006,5 +1007,47 @@ describe("<Field /> validation", () => {
     await field.validate()
 
     expect(field.error).toBeUndefined()
+  })
+
+  it("should keep other field errors when field validation occurs", async () => {
+    let injectedField: FieldRenderProps | undefined = undefined
+
+    const required = (value: any) =>
+      value == null || value === "" ? "Required" : undefined
+
+    const { form } = renderForm(
+      () => (
+        <>
+          <Field name="name" validate={required}>
+            {(field) => (injectedField = field) && <span />}
+          </Field>
+          <Field name="surname" validate={required}>
+            {() => <span />}
+          </Field>
+        </>
+      ),
+      {
+        initialValues: { name: "", surname: "" },
+      }
+    )
+
+    await form().validate()
+
+    expect(form().getFieldError("name")?.message).toBe("Required")
+    expect(form().getFieldError("surname")?.message).toBe("Required")
+
+    // Field validation on change
+    injectedField!.setValue("jack")
+
+    await wait(200)
+
+    expect(form().getFieldError("name")?.message).toBe(undefined)
+    expect(form().getFieldError("surname")?.message).toBe("Required")
+
+    // Direct field validation
+    await form().validateField("name")
+
+    expect(form().getFieldError("name")?.message).toBe(undefined)
+    expect(form().getFieldError("surname")?.message).toBe("Required")
   })
 })
