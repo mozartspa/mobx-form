@@ -12,9 +12,6 @@
     "dist",
     "src"
   ],
-  "engines": {
-    "node": ">=18"
-  },
   "scripts": {
     "start": "tsdx watch",
     "build": "tsdx build",
