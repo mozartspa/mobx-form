@@ -101,7 +101,7 @@ It is what `useForm()` returns. It is a `Form` instance with two additional comp
 
 ```typescript
 type UseFormResult<Values> = Form<Values> & {
-  FormContext: React.FC<{}>
+  FormContext: React.FC<{ children?: ReactNode }>
   Form: React.FC<FormProps>
 }
 ```

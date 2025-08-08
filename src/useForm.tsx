@@ -60,7 +60,7 @@ async function validateFieldRegistrants(
 }
 
 export type UseFormResult<Values> = Form<Values> & {
-  FormContext: React.FC<{}>
+  FormContext: React.FC<{ children?: ReactNode }>
   Form: React.FC<FormProps>
 }
 
