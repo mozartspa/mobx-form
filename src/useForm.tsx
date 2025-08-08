@@ -2,7 +2,7 @@ import debounce from "debounce-promise"
 import get from "dlv"
 import { runInAction, toJS } from "mobx"
 import { observer, useLocalObservable } from "mobx-react-lite"
-import React, { useRef, useState } from "react"
+import React, { ReactNode, useRef, useState } from "react"
 import isEqual from "react-fast-compare"
 import { DebugForm } from "./DebugForm"
 import { dset as set } from "./dset"
@@ -202,10 +202,13 @@ export function useForm<Values extends FormValues>(
   const registeredFields = useRef<RegisteredFields<Values>>({})
 
   // refs to validation options
-  const optionsRef = useLatestValue(() => ({
-    validateOnChange,
-    validateOnBlur,
-  }))
+  const optionsRef = useLatestValue(
+    () => ({
+      validateOnChange,
+      validateOnBlur,
+    }),
+    [validateOnChange, validateOnBlur]
+  )
 
   // the form!
   const form: Form<Values> = useLocalObservable(() => ({
@@ -412,7 +415,7 @@ export function useForm<Values extends FormValues>(
     Object.assign(form, {
       FormContext: withFormProvider(
         form,
-        (({ children }) => children) as React.FC<{}>
+        (({ children }) => children) as React.FC<{ children?: ReactNode }>
       ),
       Form: withFormProvider(form, FormComp),
     })

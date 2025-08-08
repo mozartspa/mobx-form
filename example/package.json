@@ -21,8 +21,8 @@
   },
   "devDependencies": {
     "@types/faker": "^5.5.6",
-    "@types/react": "^16.9.11",
-    "@types/react-dom": "^16.8.4",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
     "@types/react-router-bootstrap": "^0.24.5",
     "@types/react-router-dom": "^5.1.7",
     "parcel": "1.12.3",

@@ -122,7 +122,10 @@ describe("useForm", () => {
 
   it("does not change initial values", () => {
     const { form } = renderTestForm()
-    form().setFieldValue("name", "jean")
+
+    act(() => {
+      form().setFieldValue("name", "jean")
+    })
 
     expect(form().values.name).toEqual("jean")
     expect(InitialValues.name).toEqual("bill")
@@ -140,10 +143,12 @@ describe("useForm", () => {
 
   it("setFieldValue", () => {
     const { form, getByTestId } = renderTestForm()
-    form().setFieldValue("name", "jean")
-    form().setFieldValue("preferences.color", "red")
-    form().setFieldValue("friends.0.name", "robin")
-    form().setFieldValue("friends.0.age", 42)
+    act(() => {
+      form().setFieldValue("name", "jean")
+      form().setFieldValue("preferences.color", "red")
+      form().setFieldValue("friends.0.name", "robin")
+      form().setFieldValue("friends.0.age", 42)
+    })
 
     expect(form().values.name).toEqual("jean")
     expect(form().values.preferences.color).toEqual("red")
@@ -169,7 +174,9 @@ describe("useForm", () => {
     expect(renderNameCount()).toEqual(1)
     expect(renderSurnameCount()).toEqual(1)
 
-    form().setFieldValue("name", "jean")
+    act(() => {
+      form().setFieldValue("name", "jean")
+    })
 
     await wait(200) // waiting for validation
 
@@ -181,10 +188,12 @@ describe("useForm", () => {
   it("handles field touched", () => {
     const { form } = renderTestForm()
 
-    form().setFieldTouched("name", true)
-    form().setFieldTouched("surname", false)
-    form().setFieldTouched("preferences.color") // true if not specified
-    form().setFieldTouched("friends.0.name", true)
+    act(() => {
+      form().setFieldTouched("name", true)
+      form().setFieldTouched("surname", false)
+      form().setFieldTouched("preferences.color") // true if not specified
+      form().setFieldTouched("friends.0.name", true)
+    })
 
     expect(form().isFieldTouched("name")).toBe(true)
     expect(form().isFieldTouched("surname")).toBe(false)
@@ -196,11 +205,13 @@ describe("useForm", () => {
   it("setTouched", () => {
     const { form } = renderTestForm()
 
-    form().setTouched({
-      name: true,
-      surname: false,
-      "preferences.color": true,
-      "friends.0.name": true,
+    act(() => {
+      form().setTouched({
+        name: true,
+        surname: false,
+        "preferences.color": true,
+        "friends.0.name": true,
+      })
     })
 
     expect(form().isFieldTouched("name")).toBe(true)
@@ -213,10 +224,12 @@ describe("useForm", () => {
   it("handles field errors", () => {
     const { form } = renderTestForm()
 
-    form().setFieldError("name", "Empty name")
-    form().setFieldError("surname", ["Empty surname", "Another error"])
-    form().setFieldError("preferences.color", "Not a nice color")
-    form().setFieldError("friends.0.name", "Is it a name?")
+    act(() => {
+      form().setFieldError("name", "Empty name")
+      form().setFieldError("surname", ["Empty surname", "Another error"])
+      form().setFieldError("preferences.color", "Not a nice color")
+      form().setFieldError("friends.0.name", "Is it a name?")
+    })
 
     expect(form().getFieldError("name")).toEqual({ message: "Empty name" })
     expect(form().getFieldError("surname")).toEqual({
@@ -235,13 +248,17 @@ describe("useForm", () => {
     expect(form().getFieldError("friends.0.surname")).toEqual(undefined)
 
     // undefined clear errors
-    form().setFieldError("name", undefined)
+    act(() => {
+      form().setFieldError("name", undefined)
+    })
     expect(form().getFieldError("name")).toBe(undefined)
     expect(form().getFieldErrors("name")).toBe(undefined)
 
     // [] clear errors
-    form().setFieldError("name", "New error")
-    form().setFieldError("name", [])
+    act(() => {
+      form().setFieldError("name", "New error")
+      form().setFieldError("name", [])
+    })
     expect(form().getFieldError("name")).toBe(undefined)
     expect(form().getFieldErrors("name")).toBe(undefined)
   })
@@ -249,11 +266,13 @@ describe("useForm", () => {
   it("setErrors", () => {
     const { form } = renderTestForm()
 
-    form().setErrors({
-      name: "Empty name",
-      surname: ["Empty surname", "Another error"],
-      "preferences.color": "Not a nice color",
-      "friends.0.name": "Is it a name?",
+    act(() => {
+      form().setErrors({
+        name: "Empty name",
+        surname: ["Empty surname", "Another error"],
+        "preferences.color": "Not a nice color",
+        "friends.0.name": "Is it a name?",
+      })
     })
 
     expect(form().getFieldError("name")).toEqual({ message: "Empty name" })
@@ -279,7 +298,9 @@ describe("useForm", () => {
     expect(form().getFieldError("name")).toBe(undefined)
 
     // single error
-    form().addFieldError("name", "Empty name")
+    act(() => {
+      form().addFieldError("name", "Empty name")
+    })
     expect(form().getFieldError("name")).toEqual({ message: "Empty name" })
 
     // multiple errors
@@ -287,16 +308,22 @@ describe("useForm", () => {
       { message: "Empty name" },
       { message: "Another error" },
     ]
-    form().addFieldError("name", "Another error")
+    act(() => {
+      form().addFieldError("name", "Another error")
+    })
     expect(form().getFieldError("name")).toEqual({ message: "Empty name" })
     expect(form().getFieldErrors("name")).toEqual(expectedErrors)
 
     // undefined do nothing
-    form().addFieldError("name", undefined)
+    act(() => {
+      form().addFieldError("name", undefined)
+    })
     expect(form().getFieldErrors("name")).toEqual(expectedErrors)
 
     // [] do nothing
-    form().addFieldError("name", [])
+    act(() => {
+      form().addFieldError("name", [])
+    })
     expect(form().getFieldErrors("name")).toEqual(expectedErrors)
   })
 
@@ -306,23 +333,33 @@ describe("useForm", () => {
     expect(form().isFieldValid("name")).toBe(true)
 
     // single error
-    form().setFieldError("name", "Empty name")
+    act(() => {
+      form().setFieldError("name", "Empty name")
+    })
     expect(form().isFieldValid("name")).toBe(false)
 
     // multiple errors
-    form().setFieldError("name", ["Empty name", "Another error"])
+    act(() => {
+      form().setFieldError("name", ["Empty name", "Another error"])
+    })
     expect(form().isFieldValid("name")).toBe(false)
 
     // undefined means no error
-    form().setFieldError("name", undefined)
+    act(() => {
+      form().setFieldError("name", undefined)
+    })
     expect(form().isFieldValid("name")).toBe(true)
 
     // [] means no error
-    form().setFieldError("name", [])
+    act(() => {
+      form().setFieldError("name", [])
+    })
     expect(form().isFieldValid("name")).toBe(true)
 
     // "" means no error
-    form().setFieldError("name", "")
+    act(() => {
+      form().setFieldError("name", "")
+    })
     expect(form().isFieldValid("name")).toBe(true)
   })
 
@@ -333,26 +370,34 @@ describe("useForm", () => {
     expect(form().isValid).toBe(true)
 
     // errors make it mark as not vlid
-    form().setErrors({
-      name: "any error",
+    act(() => {
+      form().setErrors({
+        name: "any error",
+      })
     })
     expect(form().isValid).toBe(false)
 
     // undefined means no error
-    form().setErrors({
-      name: undefined,
+    act(() => {
+      form().setErrors({
+        name: undefined,
+      })
     })
     expect(form().isValid).toBe(true)
 
     // [] means no error
-    form().setErrors({
-      name: [],
+    act(() => {
+      form().setErrors({
+        name: [],
+      })
     })
     expect(form().isValid).toBe(true)
 
     // "" means no error
-    form().setErrors({
-      name: "",
+    act(() => {
+      form().setErrors({
+        name: "",
+      })
     })
     expect(form().isValid).toBe(true)
   })
@@ -366,28 +411,36 @@ describe("useForm", () => {
 
     it("dirty if changing a field", () => {
       const { form } = renderTestForm()
-      form().setFieldValue("name", "jane")
+      act(() => {
+        form().setFieldValue("name", "jane")
+      })
 
       expect(form().isDirty).toBe(true)
     })
 
     it("dirty if changing a nested field", () => {
       const { form } = renderTestForm()
-      form().setFieldValue("preferences.color", "orange")
+      act(() => {
+        form().setFieldValue("preferences.color", "orange")
+      })
 
       expect(form().isDirty).toBe(true)
     })
 
     it("dirty if changing a nested field in list", () => {
       const { form } = renderTestForm()
-      form().setFieldValue("friends.0.name", "buzz")
+      act(() => {
+        form().setFieldValue("friends.0.name", "buzz")
+      })
 
       expect(form().isDirty).toBe(true)
     })
 
     it("not dirty if changing with same values", () => {
       const { form } = renderTestForm()
-      form().setFieldValue("friends", [{ name: "bax", age: 23 }])
+      act(() => {
+        form().setFieldValue("friends", [{ name: "bax", age: 23 }])
+      })
 
       expect(form().isDirty).toBe(false)
     })
@@ -402,35 +455,45 @@ describe("useForm", () => {
 
     it("dirty if changing a field", () => {
       const { form } = renderTestForm()
-      form().setFieldValue("name", "jane")
+      act(() => {
+        form().setFieldValue("name", "jane")
+      })
 
       expect(form().isFieldDirty("name")).toBe(true)
     })
 
     it("dirty if changing a nested field", () => {
       const { form } = renderTestForm()
-      form().setFieldValue("preferences.color", "orange")
+      act(() => {
+        form().setFieldValue("preferences.color", "orange")
+      })
 
       expect(form().isFieldDirty("preferences.color")).toBe(true)
     })
 
     it("dirty if changing a nested field in list", () => {
       const { form } = renderTestForm()
-      form().setFieldValue("friends.0.name", "buzz")
+      act(() => {
+        form().setFieldValue("friends.0.name", "buzz")
+      })
 
       expect(form().isFieldDirty("friends.0.name")).toBe(true)
     })
 
     it("not dirty if changing with same values", () => {
       const { form } = renderTestForm()
-      form().setFieldValue("friends", [{ name: "bax", age: 23 }])
+      act(() => {
+        form().setFieldValue("friends", [{ name: "bax", age: 23 }])
+      })
 
       expect(form().isFieldDirty("friends")).toBe(false)
     })
 
     it("dirty if changing a branch of the values", () => {
       const { form } = renderTestForm()
-      form().setFieldValue("friends", [{ name: "bax", age: 99 }])
+      act(() => {
+        form().setFieldValue("friends", [{ name: "bax", age: 99 }])
+      })
 
       expect(form().isFieldDirty("friends")).toBe(true)
     })
@@ -444,7 +507,9 @@ describe("useForm submit", () => {
 
     expect(form().isValid).toBe(true)
 
-    await form().submit()
+    await act(async () => {
+      await form().submit()
+    })
 
     expect(submit).toBeCalledTimes(1)
   })
@@ -460,7 +525,9 @@ describe("useForm submit", () => {
       },
     })
 
-    await form().submit()
+    await act(async () => {
+      await form().submit()
+    })
 
     expect(form().isValid).toBe(false)
     expect(submit).toBeCalledTimes(0)
@@ -472,7 +539,9 @@ describe("useForm submit", () => {
 
     expect(form().isValid).toBe(true)
 
-    const errors = await form().submit()
+    const errors = await act(async () => {
+      return await form().submit()
+    })
 
     expect(errors).toEqual({ name: [{ message: "Error" }] })
     expect(form().isValid).toBe(false)
@@ -485,7 +554,9 @@ describe("useForm submit", () => {
 
     const { form } = renderTestForm({ onSubmit: submit })
 
-    form().handleSubmit({ preventDefault } as any)
+    await act(async () => {
+      await form().handleSubmit({ preventDefault } as any)
+    })
 
     await waitForExpect(() => {
       expect(preventDefault).toBeCalledTimes(1)
@@ -500,7 +571,9 @@ describe("useForm submit", () => {
       onSubmit: submit,
     })
 
-    await form().submit()
+    await act(async () => {
+      await form().submit()
+    })
 
     expect(submit).toBeCalledTimes(1)
 
@@ -508,7 +581,9 @@ describe("useForm submit", () => {
       onSubmit: submit2,
     })
 
-    await form().submit()
+    await act(async () => {
+      await form().submit()
+    })
 
     expect(submit).toBeCalledTimes(1)
     expect(submit2).toBeCalledTimes(1)
@@ -523,7 +598,9 @@ describe("useForm submit", () => {
       onValidate: () => ({ name: "Error" }),
     })
 
-    await form().submit()
+    await act(async () => {
+      await form().submit()
+    })
 
     expect(submit).toBeCalledTimes(0)
     expect(failedSubmit).toBeCalledTimes(1)
@@ -537,7 +614,9 @@ describe("useForm submit", () => {
       onValidate: () => ({ name: "Error" }),
     })
 
-    await form().submit()
+    await act(async () => {
+      await form().submit()
+    })
 
     expect(failedSubmit).toBeCalledTimes(1)
 
@@ -546,7 +625,9 @@ describe("useForm submit", () => {
       onValidate: () => ({ name: "Error" }),
     })
 
-    await form().submit()
+    await act(async () => {
+      await form().submit()
+    })
 
     expect(failedSubmit).toBeCalledTimes(1)
     expect(failedSubmit2).toBeCalledTimes(1)
@@ -568,7 +649,9 @@ describe("useForm submit", () => {
       }
     )
 
-    await form().submit()
+    await act(async () => {
+      await form().submit()
+    })
 
     expect(form().isFieldTouched("field1")).toBe(true)
     expect(form().isFieldTouched("field2")).toBe(true)
@@ -585,13 +668,17 @@ describe("useForm validation", () => {
       validateOnChange: true,
     })
 
-    form().setFieldValue("name", "jean")
+    act(() => {
+      form().setFieldValue("name", "jean")
+    })
 
     expect(onValidate).toBeCalledTimes(1)
 
     rerender({ onValidate: onValidate2, validateOnChange: true })
 
-    form().setFieldValue("name", "jean2")
+    act(() => {
+      form().setFieldValue("name", "jean2")
+    })
 
     expect(onValidate).toBeCalledTimes(1)
     expect(onValidate2).toBeCalledTimes(1)
@@ -601,7 +688,9 @@ describe("useForm validation", () => {
     const onValidate = jest.fn(() => Promise.resolve({}))
     const { form } = renderTestForm({ onValidate })
 
-    form().setFieldValue("name", "jean")
+    act(() => {
+      form().setFieldValue("name", "jean")
+    })
 
     expect(onValidate).toBeCalledTimes(1)
   })
@@ -610,25 +699,33 @@ describe("useForm validation", () => {
     const onValidate = jest.fn(() => Promise.resolve({}))
     const { form } = renderTestForm({ onValidate, validateOnChange: false })
 
-    form().setFieldValue("name", "jean")
+    act(() => {
+      form().setFieldValue("name", "jean")
+    })
 
     expect(onValidate).toBeCalledTimes(0)
   })
 
-  it("validateOnChange can be changed later", () => {
+  it("validateOnChange can be changed later", async () => {
     const onValidate = jest.fn(() => Promise.resolve({}))
     const { form, rerender } = renderTestForm({
       onValidate,
       validateOnChange: false,
     })
 
-    form().setFieldValue("name", "jean")
+    act(() => {
+      form().setFieldValue("name", "jean")
+    })
+    await wait(100) // wait for validation
 
     expect(onValidate).toBeCalledTimes(0)
 
     rerender({ onValidate, validateOnChange: true })
 
-    form().setFieldValue("name", "jean2")
+    act(() => {
+      form().setFieldValue("name", "jean2")
+    })
+    await wait(100) // wait for validation
 
     expect(onValidate).toBeCalledTimes(1)
   })
@@ -637,7 +734,9 @@ describe("useForm validation", () => {
     const onValidate = jest.fn(() => Promise.resolve({}))
     const { form } = renderTestForm({ onValidate })
 
-    form().setFieldTouched("name", true)
+    act(() => {
+      form().setFieldTouched("name", true)
+    })
 
     expect(onValidate).toBeCalledTimes(0)
   })
@@ -646,7 +745,9 @@ describe("useForm validation", () => {
     const onValidate = jest.fn(() => Promise.resolve({}))
     const { form } = renderTestForm({ onValidate, validateOnBlur: false })
 
-    form().setFieldTouched("name", true)
+    act(() => {
+      form().setFieldTouched("name", true)
+    })
 
     expect(onValidate).toBeCalledTimes(0)
   })
@@ -655,7 +756,9 @@ describe("useForm validation", () => {
     const onValidate = jest.fn(() => Promise.resolve({}))
     const { form } = renderTestForm({ onValidate, validateOnBlur: true })
 
-    form().setFieldTouched("name", true)
+    act(() => {
+      form().setFieldTouched("name", true)
+    })
 
     expect(onValidate).toBeCalledTimes(1)
   })
@@ -667,13 +770,17 @@ describe("useForm validation", () => {
       validateOnBlur: false,
     })
 
-    form().setFieldTouched("name", true)
+    act(() => {
+      form().setFieldTouched("name", true)
+    })
 
     expect(onValidate).toBeCalledTimes(0)
 
     rerender({ onValidate, validateOnBlur: true })
 
-    form().setFieldTouched("surname", true)
+    act(() => {
+      form().setFieldTouched("surname", true)
+    })
 
     expect(onValidate).toBeCalledTimes(1)
   })
@@ -686,11 +793,15 @@ describe("useForm validation", () => {
       validateOnBlur: true,
     })
 
-    form().setFieldValue("name", "jean")
+    act(() => {
+      form().setFieldValue("name", "jean")
+    })
 
     expect(onValidate).toBeCalledTimes(1)
 
-    form().setFieldTouched("name", true)
+    act(() => {
+      form().setFieldTouched("name", true)
+    })
 
     expect(onValidate).toBeCalledTimes(2)
   })
@@ -711,13 +822,15 @@ describe("useForm validation", () => {
       validateOnChange: true,
     })
 
-    form().setFieldValue("name", "jean")
+    await act(async () => {
+      form().setFieldValue("name", "jean")
+      await wait(100)
+    })
 
-    await wait(100)
-
-    form().setFieldValue("name", "jean2")
-
-    await wait(10)
+    await act(async () => {
+      form().setFieldValue("name", "jean2")
+      await wait(10)
+    })
 
     expect(onValidate).toBeCalledTimes(2)
     expect(form().getFieldError("name")).toEqual({ message: "Error 1" })
@@ -738,7 +851,9 @@ describe("useForm validation debounce", () => {
     })
 
     for (let i = 0; i < 3; i++) {
-      form().setFieldValue("name", `jean${i}`)
+      act(() => {
+        form().setFieldValue("name", `jean${i}`)
+      })
       expect(onValidate).toBeCalledTimes(i + 1)
     }
   })
@@ -752,7 +867,9 @@ describe("useForm validation debounce", () => {
     })
 
     for (let i = 0; i < 3; i++) {
-      form().setFieldValue("name", `jean${i}`)
+      act(() => {
+        form().setFieldValue("name", `jean${i}`)
+      })
       expect(onValidate).toBeCalledTimes(0)
     }
 
@@ -770,7 +887,9 @@ describe("useForm validation debounce", () => {
     })
 
     for (let i = 0; i < 3; i++) {
-      form().setFieldValue("name", `jean${i}`)
+      act(() => {
+        form().setFieldValue("name", `jean${i}`)
+      })
       expect(onValidate).toBeCalledTimes(0)
       await wait(100)
     }
@@ -789,7 +908,9 @@ describe("useForm validation debounce", () => {
     })
 
     for (let i = 0; i < 3; i++) {
-      form().setFieldValue("name", `jean${i}`)
+      act(() => {
+        form().setFieldValue("name", `jean${i}`)
+      })
       expect(onValidate).toBeCalledTimes(1)
       await wait(100)
     }
@@ -807,7 +928,9 @@ describe("useForm validation debounce", () => {
     })
 
     for (let i = 0; i < 3; i++) {
-      form().setFieldValue("name", `jean${i}`)
+      act(() => {
+        form().setFieldValue("name", `jean${i}`)
+      })
       expect(onValidate).toBeCalledTimes(1)
       rerender({
         onValidate,
@@ -828,11 +951,15 @@ describe("useForm reset", () => {
       initialValues: { a: "foo", b: 11 },
     })
 
-    form().setFieldValue("a", "bar")
-    form().setFieldTouched("a")
-    form().setFieldError("a", "invalid")
+    act(() => {
+      form().setFieldValue("a", "bar")
+      form().setFieldTouched("a")
+      form().setFieldError("a", "invalid")
+    })
 
-    form().reset()
+    act(() => {
+      form().reset()
+    })
 
     expect(form().values).toEqual({ a: "foo", b: 11 })
     expect(form().touched).toEqual({})
@@ -844,11 +971,15 @@ describe("useForm reset", () => {
       initialValues: { a: "foo", b: 11 },
     })
 
-    form().setFieldValue("a", "bar")
-    form().setFieldTouched("a")
-    form().setFieldError("a", "invalid")
+    act(() => {
+      form().setFieldValue("a", "bar")
+      form().setFieldTouched("a")
+      form().setFieldError("a", "invalid")
+    })
 
-    form().reset({ other: "thing" })
+    act(() => {
+      form().reset({ other: "thing" })
+    })
 
     expect(form().values).toEqual({ other: "thing" })
     expect(form().touched).toEqual({})
@@ -862,15 +993,21 @@ describe("useForm resetField", () => {
       initialValues: { a: "foo", b: 11 },
     })
 
-    form().setFieldValue("a", "bar")
-    form().setFieldTouched("a", true)
-    form().setFieldError("a", "invalid a")
+    act(() => {
+      form().setFieldValue("a", "bar")
+      form().setFieldTouched("a", true)
+      form().setFieldError("a", "invalid a")
+    })
 
-    form().setFieldValue("b", 12)
-    form().setFieldTouched("b", true)
-    form().setFieldError("b", "invalid b")
+    act(() => {
+      form().setFieldValue("b", 12)
+      form().setFieldTouched("b", true)
+      form().setFieldError("b", "invalid b")
+    })
 
-    form().resetField("a")
+    act(() => {
+      form().resetField("a")
+    })
 
     expect(form().values).toEqual({ a: "foo", b: 12 })
     expect(form().touched).toEqual({ b: true })
@@ -882,15 +1019,21 @@ describe("useForm resetField", () => {
       initialValues: { a: "foo", b: 11 },
     })
 
-    form().setFieldValue("a", "bar")
-    form().setFieldTouched("a", true)
-    form().setFieldError("a", "invalid a")
+    act(() => {
+      form().setFieldValue("a", "bar")
+      form().setFieldTouched("a", true)
+      form().setFieldError("a", "invalid a")
+    })
 
-    form().setFieldValue("b", 12)
-    form().setFieldTouched("b", true)
-    form().setFieldError("b", "invalid b")
+    act(() => {
+      form().setFieldValue("b", 12)
+      form().setFieldTouched("b", true)
+      form().setFieldError("b", "invalid b")
+    })
 
-    form().resetField("a", "other")
+    act(() => {
+      form().resetField("a", "other")
+    })
 
     expect(form().values).toEqual({ a: "other", b: 12 })
     expect(form().touched).toEqual({ b: true })
@@ -906,11 +1049,15 @@ describe("useForm getFieldResetValue", () => {
 
     expect(form().getFieldResetValue("a")).toEqual("foo")
 
-    form().setFieldValue("a", "bar")
+    act(() => {
+      form().setFieldValue("a", "bar")
+    })
 
     expect(form().getFieldResetValue("a")).toEqual("foo")
 
-    form().resetField("a", "bar")
+    act(() => {
+      form().resetField("a", "bar")
+    })
 
     expect(form().getFieldResetValue("a")).toEqual("bar")
   })
@@ -925,12 +1072,16 @@ describe("useForm values", () => {
     const values1 = form().values
     const observableValues1 = form().observableValues
 
-    form().setFieldValue("a", "bar")
+    act(() => {
+      form().setFieldValue("a", "bar")
+    })
 
     const values2 = form().values
     const observableValues2 = form().observableValues
 
-    form().setFieldValue("a", "bar") // same value
+    act(() => {
+      form().setFieldValue("a", "bar") // same value
+    })
 
     const values3 = form().values
     const observableValues3 = form().observableValues

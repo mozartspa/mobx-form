@@ -1,5 +1,5 @@
 import { fireEvent, render } from "@testing-library/react"
-import * as React from "react"
+import React, { act } from "react"
 import waitForExpect from "wait-for-expect"
 import { Field, FieldRenderProps, FieldScope, UseFormResult } from "../src"
 import { FormConfig } from "../src/types"
@@ -96,7 +96,9 @@ describe("<Field />", () => {
       </Field>
     ))
 
-    form().setFieldValue("name", "")
+    act(() => {
+      form().setFieldValue("name", "")
+    })
 
     // <input/> value should be formatted
     const input = getByTestId("name-input") as HTMLInputElement
@@ -146,7 +148,9 @@ describe("<Field />", () => {
 
     const field = injectedField!
 
-    field.setValue("")
+    act(() => {
+      field.setValue("")
+    })
 
     expect(field.value).toEqual("no value")
     expect(form().getFieldValue("name")).toEqual("no value")
@@ -196,7 +200,9 @@ describe("<Field />", () => {
       </Field>
     ))
 
-    form().setFieldValue("name", "")
+    act(() => {
+      form().setFieldValue("name", "")
+    })
 
     const input = getByTestId("name-input") as HTMLInputElement
     expect(input.value).toEqual("")
@@ -228,7 +234,9 @@ describe("<Field />", () => {
 
     expect(form().getFieldValue("name")).toEqual("Jack")
 
-    await form().submit()
+    await act(async () => {
+      await form().submit()
+    })
 
     expect(onSubmit).toBeCalledWith({ name: "*Jack*" })
     expect(form().getFieldValue("name")).toEqual("*Jack*")
@@ -256,7 +264,9 @@ describe("<Field />", () => {
 
     expect(form().getFieldValue("name")).toEqual("Jack")
 
-    await form().submit()
+    await act(async () => {
+      await form().submit()
+    })
 
     expect(onSubmit).toBeCalledWith({ name: "*Jack*" })
     expect(form().getFieldValue("name")).toEqual("*Jack*")
@@ -287,7 +297,9 @@ describe("<Field />", () => {
 
     expect(form().getFieldValue("name")).toEqual("Jack")
 
-    await form().submit()
+    await act(async () => {
+      await form().submit()
+    })
 
     expect(onSubmit).toBeCalledWith({ name: "**Jack**" })
     expect(form().getFieldValue("name")).toEqual("**Jack**")
@@ -322,7 +334,9 @@ describe("<Field />", () => {
 
     expect(form().getFieldValue("age")).toEqual(37)
 
-    await form().submit()
+    await act(async () => {
+      await form().submit()
+    })
 
     expect(onSubmit).toBeCalledWith({ age: 370 })
     expect(form().getFieldValue("age")).toEqual(370)
@@ -345,13 +359,17 @@ describe("<Field />", () => {
     )
 
     const field = injectedField!
-    field.setValue("Jack")
+    act(() => {
+      field.setValue("Jack")
+    })
 
     expect(form().getFieldValue("name")).toEqual("Jack")
     expect(form().isFieldDirty("name")).toBe(true)
     expect(field.isDirty).toBe(true)
 
-    field.reset()
+    act(() => {
+      field.reset()
+    })
 
     expect(form().getFieldValue("name")).toEqual("Bob")
     expect(form().isFieldDirty("name")).toBe(false)
@@ -376,7 +394,9 @@ describe("<Field />", () => {
 
     const field = injectedField!
 
-    field.reset("Jack")
+    act(() => {
+      field.reset("Jack")
+    })
 
     expect(form().getFieldValue("name")).toEqual("Jack")
     expect(form().isFieldDirty("name")).toBe(false)
@@ -403,7 +423,9 @@ describe("<Field />", () => {
 
     expect(field.resetValue).toEqual("Bob")
 
-    field.reset("Jack")
+    act(() => {
+      field.reset("Jack")
+    })
 
     expect(field.resetValue).toEqual("Jack")
   })

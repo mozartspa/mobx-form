@@ -86,7 +86,7 @@ export function useCounter() {
   return counter
 }
 
-export function useLatestValue<T>(getValue: () => T, deps?: DependencyList) {
+export function useLatestValue<T>(getValue: () => T, deps: DependencyList) {
   const value = useMemo(getValue, deps)
   const ref = useRef(value)
   ref.current = value
